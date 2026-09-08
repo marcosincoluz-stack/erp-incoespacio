@@ -16,7 +16,7 @@ class AccountMove(models.Model):
         move = self.with_context(ctx or {}).create({
             'move_type': move_type,
             'ocr_status': 'pending',
-            **({'journal_id': journal_id} if journal_id else {}),
+            'journal_id': journal_id,
         })
         attachment.write({'res_model': 'account.move', 'res_id': move.id})
         move.with_context(

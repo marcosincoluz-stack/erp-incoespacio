@@ -525,7 +525,6 @@ class AccountMove(models.Model):
         else:
             self.ocr_iban_status = 'none'
 
-    # Ponytail: Compact chatter summary (~35 lines) replacing 150 lines of boilerplate HTML
     def _post_ai_chatter_summary(self, data, was_created, partner):
         fac = data.get('factura', {})
         emi = data.get('emisor', {})

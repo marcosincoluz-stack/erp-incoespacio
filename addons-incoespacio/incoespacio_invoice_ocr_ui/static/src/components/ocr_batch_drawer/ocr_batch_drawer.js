@@ -277,8 +277,7 @@ export class OcrBatchDrawer extends Component {
             const createdMoves = await this.orm.call(
                 "account.move",
                 "upload_bills_batch",
-                [filesData],
-                { context: {} }
+                [filesData]
             );
 
             if (createdMoves && createdMoves.length > 0) {
