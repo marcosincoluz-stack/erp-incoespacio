@@ -16,7 +16,6 @@
     'depends': ['base', 'account'],
     'data': [
         'security/support_groups.xml',
-        'security/it_groups.xml',
         'security/invoice_security.xml',
         'views/account_move_views.xml',
     ],
