@@ -14,8 +14,8 @@
                 <table style="width: 100%; margin-top: 5px; margin-bottom: 25px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
                     <tr>
                         <!-- Tarjeta Cliente -->
-                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
-                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                        <td class="inco-card" style="width: 50%; vertical-align: top;">
+                            <div class="inco-card-title">
                                 DATOS DEL CLIENTE
                             </div>
                             <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
@@ -44,8 +44,8 @@
                         </td>
 
                         <!-- Tarjeta Datos de la Oferta -->
-                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
-                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                        <td class="inco-card" style="width: 50%; vertical-align: top;">
+                            <div class="inco-card-title">
                                 INFORMACIÓN DE LA OFERTA
                             </div>
                             <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
@@ -84,44 +84,29 @@
             <!-- Eliminar table-borderless y forzar estilos de tabla estructurada -->
             <xpath expr="//table[hasclass('o_main_table')]" position="attributes">
                 <attribute name="class">table table-sm o_main_table</attribute>
-                <attribute name="style">-webkit-print-color-adjust: exact; width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 25px;</attribute>
             </xpath>
 
-            <!-- Renombrar cabeceras con fondo, borde y alineación explícita -->
+            <!-- Renombrar cabeceras; el estilo vive en report_styles.css -->
             <xpath expr="//th[@name='th_description']" position="replace">
-                <th name="th_description" style="text-align: left; width: 52%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">Elemento</th>
+                <th name="th_description">Elemento</th>
             </xpath>
             <xpath expr="//th[@name='th_quantity']" position="replace">
-                <th name="th_quantity" style="text-align: right; width: 14%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">Cantidad</th>
+                <th name="th_quantity">Cantidad</th>
             </xpath>
             <xpath expr="//th[@name='th_priceunit']" position="replace">
-                <th name="th_priceunit" style="text-align: right; width: 16%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">P/U</th>
+                <th name="th_priceunit">P/U</th>
             </xpath>
             <xpath expr="//th[@name='th_discount']" position="replace">
-                <th name="th_discount" style="text-align: right; width: 10%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;" t-if="display_discount" groups="product.group_discount_per_so_line">
+                <th name="th_discount" t-if="display_discount" groups="product.group_discount_per_so_line">
                     <span>Desc.%</span>
                 </th>
             </xpath>
             <xpath expr="//th[@name='th_taxes']" position="replace">
             </xpath>
             <xpath expr="//th[@name='th_subtotal']" position="replace">
-                <th name="th_subtotal" style="text-align: right; width: 18%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">
+                <th name="th_subtotal">
                     <span>Importe</span>
                 </th>
-            </xpath>
-
-            <!-- Forzar líneas de separación y alineación en las celdas -->
-            <xpath expr="//td[@name='td_name']" position="attributes">
-                <attribute name="style">text-align: left; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
-            </xpath>
-            <xpath expr="//td[@name='td_quantity']" position="attributes">
-                <attribute name="style">text-align: right; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
-            </xpath>
-            <xpath expr="//td[@name='td_priceunit']" position="attributes">
-                <attribute name="style">text-align: right; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
-            </xpath>
-            <xpath expr="//td[@name='td_subtotal']" position="attributes">
-                <attribute name="style">text-align: right; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
             </xpath>
 
             <!-- Ocultar celda de impuestos por línea para mantener la tabla limpia como en Incoluz -->
@@ -131,7 +116,7 @@
             <!-- Reemplazar bloque de totales por tarjeta limpia anclada a la derecha -->
             <xpath expr="//div[@name='so_total_summary']" position="replace">
                 <div class="clearfix" style="margin-top: 20px; margin-bottom: 25px;">
-                    <table class="incoespacio-totals-table" style="-webkit-print-color-adjust: exact; float: right; width: 44%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 20px; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                    <table class="incoespacio-totals-table">
                         <t t-set="tax_totals" t-value="doc.tax_totals"/>
                         <t t-call="sale.document_tax_totals"/>
                     </table>
@@ -148,8 +133,8 @@
                 <table style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 25px; page-break-inside: avoid; font-size: 0.82rem;">
                     <tr>
                         <!-- Condiciones comerciales -->
-                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
-                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                        <td class="inco-card" style="width: 50%; vertical-align: top;">
+                            <div class="inco-card-title">
                                 CONDICIONES Y OBSERVACIONES
                             </div>
                             <div t-if="doc.payment_term_id" style="margin-top: 4px; color: #334155;">
@@ -162,7 +147,7 @@
 
                         <!-- Recuadro de Firma y Aceptación -->
                         <td style="width: 50%; vertical-align: top; background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 12px 14px; text-align: center;">
-                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                            <div class="inco-card-title">
                                 CONFORME Y ACEPTADO POR EL CLIENTE
                             </div>
                             <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">

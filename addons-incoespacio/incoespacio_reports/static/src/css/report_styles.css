@@ -14,26 +14,46 @@
     float: left !important;
 }
 
+/* Tarjetas y Contenedores */
+.inco-card {
+    background-color: #fafbfc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 12px 14px;
+    line-height: 1.45;
+}
+.inco-card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #e72228;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 3px;
+}
+
+/* Tabla de Partidas */
 .o_main_table {
+    -webkit-print-color-adjust: exact;
     width: 100% !important;
-    margin-top: 15px !important;
-    margin-bottom: 20px !important;
+    margin-top: 20px !important;
+    margin-bottom: 25px !important;
     border-collapse: collapse !important;
 }
-
 .o_main_table thead tr th {
-    border-top: none !important;
-    border-bottom: 2px solid #212529 !important;
-    padding: 8px 6px !important;
+    background-color: #f1f5f9 !important;
+    border-top: 1px solid #cbd5e1 !important;
+    border-bottom: 2px solid #94a3b8 !important;
+    padding: 8px 10px !important;
     font-size: 0.85rem !important;
-    color: #212529 !important;
-    font-weight: bold !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
 }
-
 .o_main_table thead tr th[name="th_description"] {
     text-align: left !important;
+    width: 52%;
 }
-
 .o_main_table thead tr th.text-end,
 .o_main_table thead tr th[name="th_quantity"],
 .o_main_table thead tr th[name="th_priceunit"],
@@ -41,18 +61,29 @@
 .o_main_table thead tr th[name="th_subtotal"] {
     text-align: right !important;
 }
-
-.o_main_table tbody tr td {
-    padding: 6px 6px !important;
-    font-size: 0.82rem !important;
-    border-bottom: 1px solid #e9ecef !important;
-    vertical-align: top !important;
+.o_main_table thead tr th[name="th_quantity"] {
+    width: 14%;
 }
-
-.o_main_table tbody tr td[name="td_name"] {
+.o_main_table thead tr th[name="th_priceunit"] {
+    width: 16%;
+}
+.o_main_table thead tr th[name="th_discount"] {
+    width: 10%;
+}
+.o_main_table thead tr th[name="th_subtotal"] {
+    width: 18%;
+}
+.o_main_table tbody tr td {
+    padding: 9px 10px !important;
+    font-size: 0.82rem !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    vertical-align: middle !important;
+    color: #334155;
+}
+.o_main_table tbody tr td[name="td_name"],
+.o_main_table tbody tr td[name="account_invoice_line_name"] {
     text-align: left !important;
 }
-
 .o_main_table tbody tr td.text-end,
 .o_main_table tbody tr td[name="td_quantity"],
 .o_main_table tbody tr td[name="td_priceunit"],
@@ -60,53 +91,56 @@
 .o_main_table tbody tr td[name="td_subtotal"] {
     text-align: right !important;
 }
-
 .o_main_table tbody tr.o_line_section td {
-    background-color: #f8f9fa !important;
-    font-weight: bold !important;
-    color: #212529 !important;
-    border-top: 1px solid #dee2e6 !important;
-    border-bottom: 1px solid #dee2e6 !important;
-    padding: 7px 6px !important;
+    background-color: #f1f5f9 !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    border-top: 1px solid #cbd5e1 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
 }
-
 .o_main_table tbody tr.o_line_note td {
     font-style: italic !important;
-    color: #6c757d !important;
-    padding: 5px 6px !important;
+    color: #64748b !important;
+    padding: 6px 8px !important;
 }
 
-/* Tabla de totales alineada a la derecha */
+/* Tabla de Totales */
 .incoespacio-totals-table {
+    -webkit-print-color-adjust: exact;
     float: right !important;
-    width: 45% !important;
+    width: 44% !important;
     border-collapse: collapse !important;
     font-size: 0.85rem !important;
     margin-bottom: 20px !important;
+    background-color: #fafbfc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
 }
-
 .incoespacio-totals-table tr td {
-    padding: 4px 6px !important;
+    padding: 6px 12px !important;
 }
-
 .incoespacio-totals-table tr td:first-child {
     text-align: left !important;
-    font-weight: normal;
+    color: #475569;
+    font-weight: 500;
 }
-
-.incoespacio-totals-table tr td:last-child {
+.incoespacio-totals-table tr td:last-child,
+.incoespacio-totals-table tr td.text-end {
     text-align: right !important;
+    color: #0f172a;
+    font-weight: 600;
 }
-
 .incoespacio-totals-table tr.border-black td {
-    border-top: 1px solid #212529 !important;
+    border-top: 1px solid #cbd5e1 !important;
 }
-
 .incoespacio-totals-table tr.o_total td {
-    border-top: 2px solid #212529 !important;
+    border-top: 2px solid #0f172a !important;
+    background-color: #f1f5f9 !important;
     font-size: 1.05rem !important;
-    font-weight: bold !important;
-    color: #212529 !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
 }
 
 /* Eliminación estricta de bordes en cabecera y pie de página para evitar marcos no deseados al imprimir */
