@@ -9,6 +9,7 @@
     'depends': ['incoespacio_invoice_ocr_async', 'web', 'bus'],
     'assets': {
         'web.assets_backend': [
+            'incoespacio_invoice_ocr_ui/static/src/components/ocr_upload_wizard/ocr_upload_utils.js',
             'incoespacio_invoice_ocr_ui/static/src/components/ocr_upload_wizard/ocr_upload_wizard_dialog.scss',
             'incoespacio_invoice_ocr_ui/static/src/components/ocr_upload_wizard/ocr_upload_wizard_dialog.xml',
             'incoespacio_invoice_ocr_ui/static/src/components/ocr_upload_wizard/ocr_upload_wizard_dialog.js',

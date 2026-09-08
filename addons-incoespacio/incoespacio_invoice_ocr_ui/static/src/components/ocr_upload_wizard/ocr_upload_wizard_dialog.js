@@ -4,6 +4,7 @@ import { Component, useState, useRef } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+import { collectFiles } from "./ocr_upload_utils";
 
 export class OcrUploadWizardDialog extends Component {
     static template = "incoespacio_invoice_ocr.OcrUploadWizardDialog";
@@ -47,26 +48,7 @@ export class OcrUploadWizardDialog extends Component {
         if (!fileList || fileList.length === 0) {
             return;
         }
-
-        const maxSizeBytes = 25 * 1024 * 1024; // 25 MB
-        for (let i = 0; i < fileList.length; i++) {
-            const file = fileList[i];
-            if (file.size > maxSizeBytes) {
-                this.notification.add(
-                    _t("El archivo '%s' (%s) supera el límite máximo permitido de 25 MB y ha sido omitido.", file.name, this.formatFileSize(file.size)),
-                    { type: "danger" }
-                );
-                continue;
-            }
-            const base64Data = await this.readFileAsBase64(file);
-            this.state.files.push({
-                name: file.name,
-                size: file.size,
-                mimetype: file.type || "application/pdf",
-                data: base64Data,
-            });
-        }
-
+        this.state.files.push(...(await collectFiles(fileList, this.notification)));
         // Limpiar input para permitir seleccionar de nuevo
         ev.target.value = "";
     }
@@ -88,42 +70,11 @@ export class OcrUploadWizardDialog extends Component {
         if (!fileList || fileList.length === 0) {
             return;
         }
-
-        const maxSizeBytes = 25 * 1024 * 1024; // 25 MB
-        for (let i = 0; i < fileList.length; i++) {
-            const file = fileList[i];
-            if (file.size > maxSizeBytes) {
-                this.notification.add(
-                    _t("El archivo '%s' (%s) supera el límite máximo permitido de 25 MB y ha sido omitido.", file.name, this.formatFileSize(file.size)),
-                    { type: "danger" }
-                );
-                continue;
-            }
-            const base64Data = await this.readFileAsBase64(file);
-            this.state.files.push({
-                name: file.name,
-                size: file.size,
-                mimetype: file.type || "application/pdf",
-                data: base64Data,
-            });
-        }
+        this.state.files.push(...(await collectFiles(fileList, this.notification)));
     }
 
     removeFile(index) {
         this.state.files.splice(index, 1);
-    }
-
-    readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const result = reader.result;
-                const base64 = result.includes(",") ? result.split(",")[1] : result;
-                resolve(base64);
-            };
-            reader.onerror = (error) => reject(error);
-            reader.readAsDataURL(file);
-        });
     }
 
     async processFiles() {

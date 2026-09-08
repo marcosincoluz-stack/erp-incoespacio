@@ -3,6 +3,7 @@
 import { Component, useState, useRef, onWillStart, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { collectFiles } from "../ocr_upload_wizard/ocr_upload_utils";
 
 export class OcrBatchDrawer extends Component {
     static template = "incoespacio_invoice_ocr.OcrBatchDrawer";
@@ -269,24 +270,7 @@ export class OcrBatchDrawer extends Component {
 
         sessionStorage.removeItem("incoespacio_ocr_dismissed_ids");
 
-        const MAX_FILE_SIZE = 25 * 1024 * 1024;
-        const filesData = [];
-        for (let i = 0; i < fileList.length; i++) {
-            const file = fileList[i];
-            if (file.size > MAX_FILE_SIZE) {
-                this.notification.add(`El archivo ${file.name} supera el tamaño máximo permitido de 25 MB y ha sido omitido.`, {
-                    type: "danger",
-                });
-                continue;
-            }
-            const base64Data = await this.readFileAsBase64(file);
-            filesData.push({
-                name: file.name,
-                data: base64Data,
-                mimetype: file.type || "application/pdf",
-            });
-        }
-
+        const filesData = await collectFiles(fileList, this.notification);
         ev.target.value = "";
 
         try {
@@ -294,7 +278,7 @@ export class OcrBatchDrawer extends Component {
                 "account.move",
                 "upload_bills_batch",
                 [filesData],
-                { context: this.env.searchModel ? this.env.searchModel.context : {} }
+                { context: {} }
             );
 
             if (createdMoves && createdMoves.length > 0) {
@@ -312,19 +296,6 @@ export class OcrBatchDrawer extends Component {
             });
             console.error(error);
         }
-    }
-
-    readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const result = reader.result;
-                const base64 = result.includes(",") ? result.split(",")[1] : result;
-                resolve(base64);
-            };
-            reader.onerror = (error) => reject(error);
-            reader.readAsDataURL(file);
-        });
     }
 
     formatCurrency(amount) {
