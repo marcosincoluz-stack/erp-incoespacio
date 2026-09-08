@@ -8,7 +8,6 @@ class TicketType(models.Model):
 
     sequence = fields.Integer(default=10)
     name = fields.Char(string='Nombre', required=True)
-    color = fields.Char(string='Color', default='#4285F4')
 
     _sql_constraints = [
         ('name_ticket_type_unique', 'UNIQUE(name)', "El nombre del tipo de ticket debe ser único."),

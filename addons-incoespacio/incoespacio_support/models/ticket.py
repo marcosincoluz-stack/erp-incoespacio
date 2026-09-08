@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -89,45 +88,36 @@ class Ticket(models.Model):
             return True
         return True
 
-    def button_working(self):
+    def _transition(self, state, msg_fn, require_resolution=False):
         self._check_ticket_permission()
-        self.write({'state': 'working'})
         for rec in self:
+            if require_resolution and not (rec.resolution or '').strip():
+                raise UserError(_("Debes redactar la 'Resolución' antes de poder cerrar el ticket."))
+            vals = {'state': state}
+            if state == 'done':
+                vals['closed_date'] = fields.Datetime.now()
+            rec.write(vals)
             partners = [rec.user_id.partner_id.id] if rec.user_id else []
             if rec.assigned_user_id and rec.assigned_user_id != rec.user_id:
                 partners.append(rec.assigned_user_id.partner_id.id)
             rec.message_post(
-                body=_("El ticket <b>[%s]</b> ha pasado a estado: <b>En revisión</b>") % rec.name,
+                body=msg_fn(rec),
                 partner_ids=partners,
                 subtype_xmlid='mail.mt_comment',
             )
+
+    def button_working(self):
+        self._transition('working', lambda r: _("El ticket <b>[%s]</b> ha pasado a estado: <b>En revisión</b>") % r.name)
 
     def button_soon(self):
-        self._check_ticket_permission()
-        self.write({'state': 'soon'})
-        for rec in self:
-            partners = [rec.user_id.partner_id.id] if rec.user_id else []
-            rec.message_post(
-                body=_("El ticket <b>[%s]</b> ha sido marcado como: <b>Resuelto</b>") % rec.name,
-                partner_ids=partners,
-                subtype_xmlid='mail.mt_comment',
-            )
+        self._transition('soon', lambda r: _("El ticket <b>[%s]</b> ha sido marcado como: <b>Resuelto</b>") % r.name)
 
     def button_done(self):
-        self._check_ticket_permission()
-        for rec in self:
-            if not rec.resolution or not rec.resolution.strip():
-                raise UserError(_("Debes redactar la 'Resolución' antes de poder cerrar el ticket."))
-            rec.write({
-                'state': 'done',
-                'closed_date': fields.Datetime.now(),
-            })
-            partners = [rec.user_id.partner_id.id] if rec.user_id else []
-            rec.message_post(
-                body=_("El ticket <b>[%s]</b> ha sido <b>Cerrado</b>.<br/><b>Resolución:</b> %s") % (rec.name, rec.resolution),
-                partner_ids=partners,
-                subtype_xmlid='mail.mt_comment',
-            )
+        self._transition(
+            'done',
+            lambda r: _("El ticket <b>[%s]</b> ha sido <b>Cerrado</b>.<br/><b>Resolución:</b> %s") % (r.name, r.resolution),
+            require_resolution=True,
+        )
 
     def button_reset(self):
         user = self.env.user
