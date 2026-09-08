@@ -19,7 +19,7 @@
             ('prepend', 'incoespacio_theme/static/src/scss/primary_variables.scss'),
         ],
         'web.assets_backend': [
-            'incoespacio_theme/static/src/css/backend_theme.css',
+            'incoespacio_theme/static/src/scss/backend_theme.scss',
             'incoespacio_theme/static/src/js/web_title_widget.js',
             'incoespacio_theme/static/src/js/app_sidebar.js',
             'incoespacio_theme/static/src/xml/app_sidebar.xml',

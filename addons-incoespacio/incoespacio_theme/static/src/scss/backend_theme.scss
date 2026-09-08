@@ -1,0 +1,583 @@
+// Theme corporativo Incoespacio para el backend de Odoo 17.
+// Los colores vienen de las variables SCSS (primary_variables.scss -> $o-brand-primary);
+// este fichero solo viste el chrome que el core no expone como variable.
+// Carga despues del core en web.assets_backend: a igual especificidad gana la
+// cascada sin !important. Los !important que quedan son reglas que pelean con
+// selectores de mayor especificidad o inline del core (sheet, modales, chatter).
+
+$o-inco-blue: #4285F4;
+$o-inco-blue-dark: #1266f1;
+$o-inco-gray: #2b2a33;
+$o-inco-gray-dark: #1c1b22;
+$o-inco-red: #e72228;
+
+// Diseno (no deuda): botones primarios en mayusculas, hover exacto corporativo
+.btn-primary,
+.btn-fill-primary,
+.o_list_button_add,
+.o_form_button_create {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    --bs-btn-hover-bg: #{$o-inco-blue-dark};
+    --bs-btn-hover-border-color: #{$o-inco-blue-dark};
+}
+
+.btn {
+    border-radius: 6px;
+}
+.btn:focus {
+    box-shadow: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    color: #495057;
+
+    &:hover {
+        background-color: #f8f9fa;
+        border-color: #caced3;
+        color: #212529;
+    }
+}
+
+// Pestanas
+.nav-tabs .nav-link {
+    color: $o-inco-blue;
+
+    &:hover {
+        color: $o-inco-blue-dark;
+    }
+    &.active {
+        color: #495057;
+        border-bottom: 2px solid $o-inco-blue;
+        font-weight: 500;
+    }
+}
+
+// Fondo suave en el campo nombre de la ficha
+.o_form_view .oe_title h1 input,
+.o_form_view .oe_title h1 .o_field_char {
+    background-color: #f0f4fd;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
+// Barra de estado / timeline corporativa
+.o_field_statusbar > .o_statusbar_status,
+.o_form_view .o_form_statusbar > .o_statusbar_status {
+    gap: 0;
+
+    > .o_arrow_button {
+        font-weight: 500;
+        color: #495057;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        text-transform: none;
+        transition: all 0.15s ease-in-out;
+
+        &:not(.o_first):after {
+            border-left-color: #f8f9fa;
+        }
+        &:not(.o_first):before {
+            border-left-color: #dee2e6;
+        }
+        &:not(.o_arrow_button_current):hover {
+            background-color: #e9ecef;
+            color: #1a73e8;
+
+            &:not(.o_first):after {
+                border-left-color: #e9ecef;
+            }
+        }
+        &.o_arrow_button_current,
+        &.o_arrow_button_current:disabled {
+            background-color: #e8f0fe;
+            border-color: $o-inco-blue;
+            color: #1a73e8;
+            font-weight: 700;
+            opacity: 1;
+
+            &:not(.o_first):after {
+                border-left-color: #e8f0fe;
+            }
+            &:not(.o_first):before {
+                border-left-color: $o-inco-blue;
+            }
+        }
+    }
+}
+.o_form_view .o_form_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current + .btn:before {
+    border-left-color: $o-inco-blue;
+}
+
+// Indicadores de carga
+.o_loading_indicator {
+    background-color: $o-inco-blue;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 6px 0 0 0;
+    padding: 6px 14px;
+    box-shadow: 0 -2px 10px rgba(66, 133, 244, 0.35);
+    letter-spacing: 0.3px;
+}
+.o_blockUI .o_spinner {
+    filter: drop-shadow(0 0 8px rgba(66, 133, 244, 0.5));
+
+    img {
+        filter: invert(41%) sepia(85%) saturate(1450%) hue-rotate(202deg) brightness(98%) contrast(97%);
+    }
+}
+svg.o_spinner circle,
+.o_spinner svg circle,
+.o_spinner circle {
+    stroke: $o-inco-blue;
+}
+.spinner-border,
+.spinner-grow {
+    color: $o-inco-blue;
+}
+
+// Insignias y selecciones activas (el fondo ya lo da el mapa de colores del core)
+.nav-pills .nav-link.active,
+.badge-primary,
+.badge.text-bg-primary {
+    border-color: $o-inco-blue;
+}
+.badge-danger {
+    border: 1px solid #dc3545;
+}
+.o_ChatterTopbar_button:hover {
+    background-color: #fff;
+}
+.o_form_view .oe_button_box .btn.oe_stat_button .o_stat_value {
+    color: $o-inco-blue;
+}
+.o_search_panel .o_search_panel_category .o_search_panel_section_icon {
+    color: $o-inco-blue;
+}
+.o_searchview .o_searchview_facet {
+    border: 1px solid $o-inco-blue;
+    color: $o-inco-blue;
+
+    .o_facet_remove {
+        color: $o-inco-blue;
+    }
+}
+.o_purchase_dashboard .table > thead > tr > td.o_main,
+.o_purchase_dashboard .table tbody > tr > td.o_main {
+    background-color: $o-inco-blue;
+}
+
+// Autocomplete (clases ui-* que mantiene el widget OWL del core)
+.ui-menu-item a {
+    color: #4c4c4c;
+    background-color: transparent;
+
+    &:hover,
+    &:focus {
+        color: #fff;
+        background-color: $o-inco-blue;
+    }
+}
+.ui-autocomplete .ui-menu-item.ui-state-focus a {
+    color: #fff;
+    background-color: $o-inco-blue;
+}
+.o_button_icon {
+    color: inherit;
+}
+
+// Navbar corporativa
+.o_main_navbar {
+    --NavBar-background: #{$o-inco-gray};
+    --NavBar-color: #ffffff;
+    --NavBar-entry-backgroundColor: transparent;
+    --NavBar-entry-backgroundColor--hover: rgba(255, 255, 255, 0.08);
+    --NavBar-entry-backgroundColor--focus: transparent;
+    --NavBar-entry-backgroundColor--active: rgba(255, 255, 255, 0.1);
+    --NavBar-entry-borderColor: transparent;
+    --NavBar-entry-borderColor--hover: transparent;
+    --NavBar-entry-borderColor--focus: transparent;
+    --NavBar-entry-borderColor-active: transparent;
+    --NavBar-entry-color--active: #ffffff;
+    background-color: $o-inco-gray;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    .o_menu_brand {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .o_menu_sections > .o_nav_entry,
+    .o_menu_sections > .dropdown,
+    .o_menu_sections > .dropdown > button,
+    .o_menu_sections > .dropdown > a,
+    .o_menu_sections > button,
+    .o_menu_sections > a,
+    .o_menu_sections .dropdown-toggle {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.85);
+        box-shadow: none;
+        border-radius: 0;
+        border: none;
+        outline: none;
+    }
+
+    .o_menu_sections > .o_nav_entry,
+    .o_menu_sections > .dropdown > .dropdown-toggle,
+    .o_menu_sections > button,
+    .o_menu_sections > a {
+        border-bottom: 3px solid transparent;
+        transition: all 0.15s ease-in-out;
+
+        &:hover,
+        &:focus,
+        &:focus-visible,
+        &.active {
+            background-color: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            border-bottom: 3px solid $o-inco-red;
+            text-decoration: none;
+        }
+    }
+    .o_menu_sections > .dropdown.show > .dropdown-toggle,
+    .o_menu_sections > .dropdown > .dropdown-toggle[aria-expanded="true"] {
+        background-color: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+        border-bottom: 3px solid $o-inco-red;
+    }
+
+    // Desplegables: tarjeta blanca limpia
+    .dropdown-menu {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        padding: 8px 0;
+        min-width: 220px;
+        opacity: 1;
+
+        .dropdown-header,
+        h6,
+        .o_dropdown_title {
+            color: #6c757d;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 18px 2px 18px;
+            margin: 0;
+            border: none;
+        }
+        .dropdown-item,
+        a,
+        button {
+            color: #2c3e50;
+            background-color: transparent;
+            padding: 5px 20px 5px 28px;
+            font-size: 13.5px;
+            font-weight: 400;
+            line-height: 1.4;
+            border: none;
+            text-decoration: none;
+            transition: background-color 0.1s ease, color 0.1s ease;
+
+            &:hover,
+            &:focus,
+            &.active {
+                background-color: #f1f5f9;
+                color: #1a73e8;
+            }
+        }
+        .dropdown-divider {
+            border-top: 1px solid #e9ecef;
+            margin: 4px 0;
+        }
+    }
+
+    .o_navbar_apps_menu,
+    .o_grid_apps_menu,
+    .o_grid_apps_menu__button,
+    .o_menu_brand {
+        border: none;
+        box-shadow: none;
+        outline: none;
+    }
+}
+
+// Menu de aplicaciones
+.app-menu-container,
+.o_grid_apps_menu .app-menu-container,
+.o_menu_apps .dropdown-menu.show {
+    background: url("/web_responsive/static/src/img/home-menu-bg-overlay.svg"), linear-gradient(to bottom, $o-inco-gray, $o-inco-gray-dark);
+    background-origin: border-box;
+    background-size: cover;
+    animation: incoluzFadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.o_grid_apps_menu .o-app-menu-list,
+.app-menu-container {
+    color: #ffffff;
+
+    * , a, span, div {
+        color: #ffffff;
+    }
+}
+.o-app-menu-list > a,
+.o-app-menu-list > div,
+.app-menu-container .o_app {
+    animation: incoluzAppPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    transition: transform 0.2s ease, filter 0.2s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+
+        img {
+            transform: scale(1.06);
+            transition: transform 0.2s ease;
+        }
+    }
+}
+.app-menu-container .search-container .search-input,
+.app-menu-container .search-input {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+
+    .search-icon, i, .fa-search {
+        color: #ffffff;
+        opacity: 0.95;
+        margin-right: 10px;
+    }
+    input, .form-control {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        color: #ffffff;
+        font-size: 15px;
+
+        &::placeholder {
+            color: rgba(255, 255, 255, 0.8);
+            opacity: 1;
+        }
+    }
+}
+.app-menu-container .search-container .search-list {
+    background-color: $o-inco-gray-dark;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+.app-menu-container .search-container .search-item__name {
+    color: #ffffff;
+}
+
+// Layout general y listas
+html .o_web_client > .o_action_manager {
+    flex: 0 0 calc(100% - 46px);
+}
+.o_content .o_list_view .o_list_table tbody > tr > td:not(.o_list_record_selector):not(.o_handle_cell):not(.o_list_button).o_list_text {
+    white-space: nowrap;
+}
+.o_list_view tbody > tr.o_group_header {
+    background-image: none;
+    background-color: #eee;
+
+    &:focus-within {
+        background-image: none;
+    }
+}
+.o_purchase_order .table-striped > tbody > tr:nth-of-type(2n+1),
+.o_sale_order .table-striped > tbody > tr:nth-of-type(2n+1) {
+    background-color: #fff;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+// Vista de formulario: el core aplica aqui especificidad alta o inline,
+// estos !important son los unicos justificadas del fichero
+.o_form_view .o_form_sheet_bg > .o_form_sheet {
+    resize: both !important;
+    overflow: auto !important;
+    max-width: none !important;
+    width: 99% !important;
+}
+.o_chatter_position_sided .o_content .o_form_view:not(.o_form_nosheet) .o_FormRenderer_chatterContainer,
+.o_chatter_position_sided .modal-content .o_form_view:not(.o_form_nosheet) .o_FormRenderer_chatterContainer {
+    flex: 0 0 30% !important;
+}
+.modal-dialog {
+    max-width: none !important;
+}
+.modal-content {
+    resize: both !important;
+    overflow: auto !important;
+    margin: 0 auto !important;
+    width: 80% !important;
+}
+.modal-body .o_form_view {
+    display: block;
+    min-height: auto;
+}
+.oe_title h1 {
+    display: flex;
+}
+.o_sale_order .ribbon + .oe_title {
+    width: auto;
+    max-width: none;
+
+    h1 {
+        display: flex;
+
+        > input:first-child {
+            max-width: 150px;
+            margin-right: 5px;
+        }
+        span {
+            margin: 0 5px;
+        }
+    }
+}
+.o_field_widget .o_pdfview_iframe {
+    width: 100%;
+    height: calc(100vh - 250px);
+    border: 0;
+    margin-top: 0;
+}
+.o_web_client.o_chatter_position_sided .o_Dialog_AttachmentViewer .o_AttachmentViewer {
+    top: 46px !important;
+}
+
+// Blindaje de marca: ocultar entradas de Odoo.com del menu de usuario
+.o_user_menu [data-menu="documentation"],
+.o_user_menu [data-menu="support"],
+.o_user_menu [data-menu="shortcuts"],
+.o_user_menu [data-menu="odoo_account"],
+.dropdown-menu [data-menu="documentation"],
+.dropdown-menu [data-menu="support"],
+.dropdown-menu [data-menu="shortcuts"],
+.dropdown-menu [data-menu="odoo_account"] {
+    display: none !important;
+}
+
+// Animaciones del menu de aplicaciones
+@keyframes incoluzFadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+@keyframes incoluzAppPop {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Barra lateral izquierda (clases propias: cero !important)
+.incoespacio-sidebar-panel {
+    position: fixed;
+    top: 46px;
+    left: 0;
+    bottom: 0;
+    width: 44px;
+    max-width: 44px;
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 0 4px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.incoespacio-sidebar-menu {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 0;
+    gap: 4px;
+    width: 44px;
+    max-width: 44px;
+
+    &::-webkit-scrollbar {
+        display: none;
+        width: 0;
+    }
+}
+.incoespacio-sidebar-item {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    flex-shrink: 0;
+
+    &:hover {
+        background-color: #edeff1;
+        transform: scale(1.08);
+    }
+    &.active {
+        background-color: #e8f0fe;
+        border-left: 3px solid $o-inco-blue;
+        border-radius: 0 6px 6px 0;
+    }
+}
+.incoespacio-sidebar-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    border-radius: 3px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+// Desplazamiento del ActionManager por la sidebar
+@media (min-width: 768px) {
+    .o_action_manager {
+        margin-left: 44px;
+        width: calc(100% - 44px);
+    }
+}
+@media (max-width: 768px) {
+    html .o_web_client > .o_action_manager {
+        flex: auto;
+    }
+}
+@media (max-width: 767.98px) {
+    .incoespacio-sidebar-panel {
+        display: none;
+    }
+    .o_action_manager {
+        margin-left: 0;
+        width: 100%;
+    }
+}
