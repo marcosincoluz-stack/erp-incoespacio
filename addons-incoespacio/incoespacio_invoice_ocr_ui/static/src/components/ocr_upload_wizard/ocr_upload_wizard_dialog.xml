@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="incoespacio_invoice_ocr.OcrUploadWizardDialog">
+        <Dialog title="'Digitalizar facturas con IA'" size="'md'" footer="false">
+            <div class="o_ocr_wizard_container">
+                <!-- Información de cabecera -->
+                <div class="o_ocr_wizard_intro mb-3">
+                    <span class="text-muted fs-6">
+                        Archivos listos para procesar: 
+                        <strong class="text-dark"><t t-out="state.files.length"/></strong>
+                    </span>
+                </div>
+
+                <!-- Lista de Archivos Seleccionados -->
+                <div class="o_ocr_wizard_file_list mb-3" t-if="state.files.length > 0">
+                    <t t-foreach="state.files" t-as="file" t-key="file_index">
+                        <div class="o_ocr_wizard_file_item">
+                            <div class="o_ocr_wizard_file_info">
+                                <i t-if="file.mimetype and file.mimetype.includes('pdf')" class="fa fa-file-pdf-o text-danger o_ocr_file_icon"/>
+                                <i t-else="" class="fa fa-file-image-o text-primary o_ocr_file_icon"/>
+                                <div class="o_ocr_wizard_file_text">
+                                    <span class="o_ocr_wizard_file_name" t-att-title="file.name">
+                                        <t t-out="file.name"/>
+                                    </span>
+                                    <span class="o_ocr_wizard_file_size text-muted">
+                                        <t t-out="formatFileSize(file.size)"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-link text-danger o_ocr_remove_btn" title="Eliminar archivo" t-on-click="() => this.removeFile(file_index)">
+                                <i class="fa fa-times"/>
+                            </button>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Estado Vacío -->
+                <div t-else="" class="o_ocr_wizard_empty text-center p-4 border rounded bg-light mb-3">
+                    <i class="fa fa-files-o fa-2x text-muted mb-2"/>
+                    <p class="text-muted mb-0">No hay archivos en la lista. Pulsa <strong>Subir más archivos</strong> para seleccionar facturas.</p>
+                </div>
+
+                <!-- Zona de arrastre opcional -->
+                <div class="o_ocr_drop_area p-3 mb-3 text-center border border-dashed rounded"
+                     t-att-class="{ 'is-dragging': state.isDragging }"
+                     t-on-dragover="onDragOver"
+                     t-on-dragleave="onDragLeave"
+                     t-on-drop="onDrop">
+                    <i class="fa fa-cloud-upload text-primary mb-1" style="font-size: 20px;"/>
+                    <div class="text-muted small">
+                        Arrastra y suelta más facturas aquí (PDF o imagen)
+                    </div>
+                </div>
+
+                <!-- Botones de Acción (los dos solicitados) -->
+                <div class="o_ocr_wizard_actions d-flex align-items-center justify-content-between pt-2 border-top">
+                    <!-- Botón 1: Subir más archivos -->
+                    <button type="button" class="btn btn-outline-primary" t-on-click="triggerAddFiles" t-att-disabled="state.isProcessing">
+                        <i class="fa fa-plus me-1"/> Subir más archivos
+                    </button>
+                    <input type="file" multiple="true" accept=".pdf,image/*" t-ref="fileInput" t-on-change="onFilesSelected" class="d-none"/>
+
+                    <!-- Botón 2: Procesar -->
+                    <button type="button" class="btn btn-primary px-4" t-att-disabled="state.files.length === 0 || state.isProcessing" t-on-click="processFiles">
+                        <span t-if="state.isProcessing" class="fa fa-spinner fa-spin me-1"/>
+                        <i t-else="" class="fa fa-bolt me-1"/>
+                        Procesar (<t t-out="state.files.length"/>)
+                    </button>
+                </div>
+            </div>
+        </Dialog>
+    </t>
+</templates>

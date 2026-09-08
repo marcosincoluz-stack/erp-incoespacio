@@ -1,0 +1,18 @@
+# Secretos — nunca al repo
+.env
+config/odoo.conf
+nginx/ssl/*.pem
+nginx/ssl/*.key
+backups/
+
+# Legacy Incoluz (fuera de alcance)
+erp-docker-incoluz/
+erp-incoluz/
+
+# OCA vendado (público, se reclona de los repos OCA)
+addons/
+
+# Artefactos
+__pycache__/
+*.pyc
+*.pyo

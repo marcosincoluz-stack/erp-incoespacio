@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_partner_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.view.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_title')]/h1" position="before">
+                    <div class="mb-2">
+                        <span class="badge me-1" style="background-color: transparent !important; border: 1px solid #4285F4 !important; color: #4285F4 !important; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500;" invisible="not is_customer">
+                            Cliente
+                        </span>
+                        <span class="badge" style="background-color: transparent !important; border: 1px solid #4285F4 !important; color: #4285F4 !important; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500;" invisible="not is_supplier">
+                            Proveedor
+                        </span>
+                    </div>
+                </xpath>
+                <field name="company_type" position="after">
+                    <div class="d-flex align-items-center gap-3 my-2">
+                        <div class="d-flex align-items-center gap-1">
+                            <field name="is_customer" id="is_customer"/>
+                            <label for="is_customer" string="Cliente"/>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <field name="is_supplier" id="is_supplier"/>
+                            <label for="is_supplier" string="Proveedor"/>
+                        </div>
+                    </div>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

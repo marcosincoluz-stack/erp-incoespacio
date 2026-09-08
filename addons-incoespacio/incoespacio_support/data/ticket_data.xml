@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Tipos de Incidencia por defecto -->
+        <record id="ticket_type_error" model="incoespacio_support.ticket_type">
+            <field name="name">Error crítico</field>
+            <field name="color">#dc3545</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="ticket_type_bug" model="incoespacio_support.ticket_type">
+            <field name="name">Mal funcionamiento</field>
+            <field name="color">#ffc107</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="ticket_type_feature" model="incoespacio_support.ticket_type">
+            <field name="name">Nueva funcionalidad</field>
+            <field name="color">#17a2b8</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="ticket_type_maintenance" model="incoespacio_support.ticket_type">
+            <field name="name">Mantenimiento</field>
+            <field name="color">#6c757d</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="ticket_type_question" model="incoespacio_support.ticket_type">
+            <field name="name">Duda / Consulta</field>
+            <field name="color">#4285F4</field>
+            <field name="sequence">5</field>
+        </record>
+
+        <!-- Áreas de Negocio por defecto -->
+        <record id="ticket_cat_erp" model="incoespacio_support.ticket_category">
+            <field name="name">ERP &amp; Facturación</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="ticket_cat_contacts" model="incoespacio_support.ticket_category">
+            <field name="name">Clientes y Proveedores</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="ticket_cat_it" model="incoespacio_support.ticket_category">
+            <field name="name">Informática / Conectividad</field>
+            <field name="sequence">3</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="purchase_bot_alert_group_user" model="res.groups">
+            <field name="name">Notificar PO creada por IncoBot</field>
+            <field name="category_id" ref="base.module_category_inventory_purchase"/>
+            <field name="comment">Los usuarios en este grupo recibirán notificaciones en el chatter y actividades automáticas cuando IncoBot (sistema/cron) cree un pedido de compra.</field>
+        </record>
+    </data>
+</odoo>

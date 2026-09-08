@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="web_layout" name="Incoespacio Theme Layout" inherit_id="web.layout">
+            <xpath expr="//title" position="replace">
+                <title t-esc="title or 'INCOESPACIO ERP'"/>
+            </xpath>
+        </template>
+
+        <!-- Logo en alta resolucion para la barra superior del portal -->
+        <template id="portal_frontend_layout_logo" name="Incoespacio Portal Logo HD" inherit_id="portal.frontend_layout">
+            <xpath expr="//a[hasclass('navbar-brand')][hasclass('logo')]/img" position="attributes">
+                <attribute name="t-att-src">'/web/image/res.company/%s/logo' % res_company.id</attribute>
+            </xpath>
+        </template>
+    </data>
+</odoo>

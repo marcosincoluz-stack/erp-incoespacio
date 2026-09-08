@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Suprimir salida de mensaje de marca Odoo sin romper la evaluacion de python -->
+        <template id="own_brand_promotion_message" inherit_id="web.brand_promotion_message">
+            <xpath expr="//t[@t-out]" position="replace"/>
+        </template>
+
+        <!-- Ocultar el bloque de promocion de marca en el portal -->
+        <template id="own_brand_promotion" inherit_id="web.brand_promotion">
+            <xpath expr="//div[hasclass('o_brand_promotion')]" position="replace"/>
+        </template>
+
+        <!-- Ocultar bloque Powered by Odoo en la barra lateral del portal -->
+        <template id="own_portal_record_sidebar" inherit_id="portal.portal_record_sidebar">
+            <xpath expr="//div[hasclass('o_portal_sidebar_content')]//div[hasclass('text-muted')]" position="replace"/>
+        </template>
+    </data>
+</odoo>

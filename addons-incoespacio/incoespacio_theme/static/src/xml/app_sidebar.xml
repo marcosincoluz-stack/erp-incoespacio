@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="incoespacio_theme.AppSidebar">
+        <aside class="incoespacio-sidebar-panel" t-on-dragstart.prevent="">
+            <div class="incoespacio-sidebar-menu">
+                <t t-foreach="apps" t-as="app" t-key="app.id">
+                    <a class="incoespacio-sidebar-item"
+                       t-att-class="{'active': isCurrentApp(app)}"
+                       t-att-data-tooltip="app.name"
+                       data-tooltip-position="right"
+                       data-tooltip-delay="50"
+                       t-att-title="app.name"
+                       draggable="false"
+                       t-on-click.prevent="() => this.onAppClick(app)">
+                        <img t-att-src="'/web/image/ir.ui.menu/' + app.id + '/web_icon_data'"
+                             t-att-alt="app.name"
+                             draggable="false"
+                             class="incoespacio-sidebar-icon"/>
+                    </a>
+                </t>
+            </div>
+        </aside>
+    </t>
+
+</templates>

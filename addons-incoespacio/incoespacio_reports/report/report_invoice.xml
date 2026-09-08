@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Personalización Corporativa de la Factura Oficial Estilo Incoluz -->
+        <template id="report_invoice_document_incoespacio" inherit_id="account.report_invoice_document" priority="20">
+            <!-- Layout Corporativo con Banda Roja 10px y Sellos SGS -->
+            <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+                <attribute name="t-call">incoespacio_reports.external_layout_incoespacio</attribute>
+            </xpath>
+
+            <!-- Bloque de Direcciones Emisor y Receptor en Tarjetas Limpias -->
+            <xpath expr="//div[hasclass('row')][1]" position="replace">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+                <table style="width: 100%; margin-top: 5px; margin-bottom: 20px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
+                    <tr>
+                        <!-- Datos Emisor (Empresa) -->
+                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                EMISOR
+                            </div>
+                            <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
+                                <span t-field="company.name"/>
+                            </div>
+                            <div t-if="company.vat" style="color: #475569;">
+                                <strong>CIF/NIF:</strong> <span t-field="company.vat"/>
+                            </div>
+                            <div t-if="company.street" style="color: #334155;"><span t-field="company.street"/></div>
+                            <div t-if="company.street2" style="color: #334155;"><span t-field="company.street2"/></div>
+                            <div style="color: #334155;">
+                                <span t-if="company.zip" t-field="company.zip"/>
+                                <span t-if="company.city"> <span t-field="company.city"/></span>
+                                <span t-if="company.state_id"> (<span t-out="company.state_id.name"/>)</span>
+                            </div>
+                            <div t-if="company.country_id" style="color: #334155;"><span t-field="company.country_id"/></div>
+                            <div t-if="company.phone" style="color: #475569; margin-top: 3px;"><strong>Tel:</strong> <span class="o_force_ltr" t-field="company.phone"/></div>
+                            <div t-if="company.email" style="color: #475569;"><strong>Email:</strong> <span t-field="company.email"/></div>
+                        </td>
+
+                        <!-- Datos Receptor (Cliente) -->
+                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;" t-if="o.partner_id">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                CLIENTE
+                            </div>
+                            <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
+                                <span t-field="o.partner_id.name"/>
+                            </div>
+                            <div t-if="o.partner_id.vat" style="color: #475569;">
+                                <strong>NIF/CIF:</strong> <span t-field="o.partner_id.vat"/>
+                            </div>
+                            <div t-if="o.partner_id.street" style="color: #334155;"><span t-field="o.partner_id.street"/></div>
+                            <div t-if="o.partner_id.street2" style="color: #334155;"><span t-field="o.partner_id.street2"/></div>
+                            <div style="color: #334155;">
+                                <span t-if="o.partner_id.zip" t-field="o.partner_id.zip"/>
+                                <span t-if="o.partner_id.city"> <span t-field="o.partner_id.city"/></span>
+                                <span t-if="o.partner_id.state_id"> (<span t-out="o.partner_id.state_id.name"/>)</span>
+                            </div>
+                            <div t-if="o.partner_id.country_id" style="color: #334155;"><span t-field="o.partner_id.country_id"/></div>
+                            <div t-if="o.partner_id.phone" style="color: #475569; margin-top: 3px;"><strong>Tel:</strong> <span t-field="o.partner_id.phone"/></div>
+                        </td>
+                    </tr>
+                </table>
+            </xpath>
+
+            <!-- Ocultar h2 redundante y bloque standard de información -->
+            <xpath expr="//h2" position="replace">
+            </xpath>
+            <xpath expr="//div[@id='informations']" position="replace">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 8px 0; font-size: 0.82rem;">
+                    <tr>
+                        <td style="width: 25%; padding: 6px 0;" t-if="o.invoice_date">
+                            <span style="color: #64748b;">Fecha Factura:</span><br/>
+                            <strong style="color: #0f172a;"><span t-field="o.invoice_date"/></strong>
+                        </td>
+                        <td style="width: 25%; padding: 6px 0;" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'">
+                            <span style="color: #64748b;">Vencimiento:</span><br/>
+                            <strong style="color: #0f172a;"><span t-field="o.invoice_date_due"/></strong>
+                        </td>
+                        <td style="width: 25%; padding: 6px 0;" t-if="o.invoice_origin">
+                            <span style="color: #64748b;">Pedido / Origen:</span><br/>
+                            <strong style="color: #0f172a;"><span t-field="o.invoice_origin"/></strong>
+                        </td>
+                        <td style="width: 25%; padding: 6px 0;" t-if="o.ref">
+                            <span style="color: #64748b;">Su Referencia:</span><br/>
+                            <strong style="color: #0f172a;"><span t-field="o.ref"/></strong>
+                        </td>
+                    </tr>
+                </table>
+            </xpath>
+
+            <!-- Eliminar table-borderless y forzar estilos de tabla estructurada -->
+            <xpath expr="//table[hasclass('o_main_table')]" position="attributes">
+                <attribute name="class">table table-sm o_main_table</attribute>
+                <attribute name="style">-webkit-print-color-adjust: exact; width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 25px;</attribute>
+            </xpath>
+
+            <!-- Renombrar cabeceras con fondo, borde y alineación explícita -->
+            <xpath expr="//th[@name='th_description']" position="replace">
+                <th name="th_description" style="text-align: left; width: 52%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;"><span>Descripción</span></th>
+            </xpath>
+            <xpath expr="//th[@name='th_quantity']" position="replace">
+                <th name="th_quantity" style="text-align: right; width: 14%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;"><span>Cantidad</span></th>
+            </xpath>
+            <xpath expr="//th[@name='th_priceunit']" position="replace">
+                <th name="th_priceunit" style="text-align: right; width: 16%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;"><span>P/U</span></th>
+            </xpath>
+            <xpath expr="//th[@name='th_discount']" position="replace">
+                <th name="th_discount" style="text-align: right; width: 10%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;" t-if="display_discount">
+                    <span>Desc.%</span>
+                </th>
+            </xpath>
+            <xpath expr="//th[@name='th_taxes']" position="replace">
+            </xpath>
+            <xpath expr="//th[@name='th_subtotal']" position="replace">
+                <th name="th_subtotal" style="text-align: right; width: 18%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">
+                    <span>Importe</span>
+                </th>
+            </xpath>
+
+            <!-- Forzar líneas de separación y alineación en las celdas -->
+            <xpath expr="//td[@name='account_invoice_line_name']" position="attributes">
+                <attribute name="style">text-align: left; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
+            </xpath>
+
+            <!-- Ocultar celda de impuestos por línea -->
+            <xpath expr="//td[@name='td_taxes']" position="replace">
+            </xpath>
+
+            <!-- Reemplazar bloque de totales por tarjeta limpia anclada a la derecha -->
+            <xpath expr="//div[@id='right-elements']" position="replace">
+                <div class="clearfix" style="margin-top: 20px; margin-bottom: 25px;">
+                    <table class="incoespacio-totals-table" style="-webkit-print-color-adjust: exact; float: right; width: 44%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 20px; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                        <t t-set="tax_totals" t-value="o.tax_totals or {}"/>
+                        <t t-call="account.document_tax_totals"/>
+                    </table>
+                </div>
+            </xpath>
+
+            <!-- Ocultar comentarios huérfanos de Odoo -->
+            <xpath expr="//div[@name='comment']" position="replace">
+            </xpath>
+
+            <!-- Datos bancarios y condiciones de pago al pie debajo de totales estilo Incoluz -->
+            <xpath expr="//div[hasclass('page')]" position="inside">
+                <div style="clear: both; height: 10px;"/>
+                <table style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 25px; page-break-inside: avoid; font-size: 0.82rem;">
+                    <tr>
+                        <!-- Datos bancarios y forma de pago -->
+                        <td style="width: 55%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                FORMA DE PAGO Y DATOS BANCARIOS
+                            </div>
+                            <div t-if="o.invoice_payment_term_id" style="margin-top: 4px; color: #334155;">
+                                <strong>Modo de pago: </strong><span t-field="o.invoice_payment_term_id.name"/>
+                            </div>
+                            <div t-if="o.partner_bank_id" style="margin-top: 4px; color: #334155;">
+                                <strong>Banco destinatario: </strong>
+                                <span t-field="o.partner_bank_id.acc_number"/>
+                                <span t-if="o.partner_bank_id.bank_name"> - <span t-field="o.partner_bank_id.bank_name"/></span>
+                                <span t-if="o.partner_bank_id.bank_bic"> (BIC/SWIFT: <span t-field="o.partner_bank_id.bank_bic"/>)</span>
+                            </div>
+                            <div t-elif="company.partner_id.bank_ids" style="margin-top: 4px; color: #334155;">
+                                <strong>Banco destinatario: </strong>
+                                <span t-field="company.partner_id.bank_ids[0].acc_number"/>
+                                <span t-if="company.partner_id.bank_ids[0].bank_name"> - <span t-field="company.partner_id.bank_ids[0].bank_name"/></span>
+                                <span t-if="company.partner_id.bank_ids[0].bank_bic"> (BIC/SWIFT: <span t-field="company.partner_id.bank_ids[0].bank_bic"/>)</span>
+                            </div>
+                            <div t-if="o.invoice_incoterm_id" style="margin-top: 4px; color: #334155;">
+                                <strong>Incoterm: </strong><span t-field="o.invoice_incoterm_id.code"/> - <span t-field="o.invoice_incoterm_id.name"/>
+                            </div>
+                            <div t-if="o.narration" style="margin-top: 6px; color: #475569;">
+                                <span t-field="o.narration"/>
+                            </div>
+                        </td>
+
+                        <!-- Espacio reservado para información fiscal o registro mercantil -->
+                        <td style="width: 45%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                INFORMACIÓN FISCAL Y REGISTRO
+                            </div>
+                            <div style="font-size: 0.78rem; color: #475569; margin-top: 4px; line-height: 1.45;">
+                                <div style="font-weight: 700; color: #0f172a;"><span t-field="company.name"/></div>
+                                <div t-if="company.vat">CIF/NIF: <span t-field="company.vat"/></div>
+                                <div t-if="company.company_registry"><span t-field="company.company_registry"/></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

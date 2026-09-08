@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: incoespacio_nginx
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    restart: always
+
+  web:
+    build: .
+    image: incoespacio-odoo:17.0
+    container_name: incoespacio_web
+    depends_on:
+      - db
+    ports:
+      - "8070:8069"
+    environment:
+      - HOST=db
+      - USER=${POSTGRES_USER:-odoo}
+      - PASSWORD=${POSTGRES_PASSWORD:-odoo}
+    volumes:
+      - incoespacio_web_data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      - ./addons-incoespacio:/mnt/incoespacio-addons
+    restart: always
+
+  db:
+    image: postgres:16
+    container_name: incoespacio_db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=${POSTGRES_USER:-odoo}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-odoo}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - incoespacio_db_data:/var/lib/postgresql/data/pgdata
+    restart: always
+
+volumes:
+  incoespacio_web_data:
+  incoespacio_db_data:

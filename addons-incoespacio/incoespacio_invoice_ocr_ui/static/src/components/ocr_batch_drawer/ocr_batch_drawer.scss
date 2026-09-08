@@ -1,0 +1,193 @@
+.o_ocr_batch_drawer_container {
+    position: fixed;
+    bottom: 20px;
+    right: 24px;
+    z-index: 1050;
+    font-family: inherit;
+
+    .o_ocr_batch_pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #4285F4;
+        color: #ffffff;
+        padding: 8px 16px;
+        border-radius: 24px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 13px;
+        user-select: none;
+        transition: transform 0.2s, background-color 0.2s;
+
+        &:hover {
+            transform: scale(1.03);
+            background-color: #1266f1;
+        }
+
+        .o_ocr_pill_spinner {
+            animation: spin 1s infinite linear;
+        }
+    }
+
+    .o_ocr_batch_card {
+        width: 380px;
+        max-width: calc(100vw - 32px);
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+        border: 1px solid #dee2e6;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.25s ease-out;
+
+        .o_ocr_header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .o_ocr_title {
+                font-size: 13.5px;
+                font-weight: 600;
+                color: #212529;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .o_ocr_header_actions {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                .btn-icon {
+                    background: none;
+                    border: none;
+                    color: #6c757d;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background: #e9ecef;
+                        color: #212529;
+                    }
+                }
+            }
+        }
+
+        .o_ocr_progress_container {
+            height: 4px;
+            background: #e9ecef;
+            width: 100%;
+
+            .o_ocr_progress_bar {
+                height: 100%;
+                background: #4285F4;
+                transition: width 0.3s ease;
+
+                &.is-complete {
+                    background: #198754;
+                }
+            }
+        }
+
+        .o_ocr_list {
+            max-height: 250px;
+            overflow-y: auto;
+            background: #ffffff;
+
+            .o_ocr_item {
+                padding: 9px 14px;
+                border-bottom: 1px solid #f1f3f5;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 12.5px;
+                transition: background-color 0.15s;
+
+                &.is-clickable {
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                    }
+                }
+
+                .o_ocr_item_left {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    overflow: hidden;
+
+                    .o_ocr_item_name {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        color: #343a40;
+                        font-weight: 500;
+                    }
+
+                    .o_ocr_item_sub {
+                        font-size: 11px;
+                        color: #6c757d;
+                    }
+                }
+
+                .o_ocr_item_right {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    flex-shrink: 0;
+
+                    .o_ocr_item_total {
+                        font-weight: 600;
+                        color: #4285F4;
+                    }
+                }
+            }
+        }
+
+        .o_ocr_footer {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+
+            .btn-add-more {
+                font-size: 12px;
+                font-weight: 500;
+                color: #4285F4;
+                border-color: #4285F4;
+
+                &:hover {
+                    background-color: #4285F4;
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

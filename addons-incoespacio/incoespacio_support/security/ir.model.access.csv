@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ticket_base,incoespacio_support.ticket base,model_incoespacio_support_ticket,base.group_user,1,1,1,0
+access_ticket_user,incoespacio_support.ticket user,model_incoespacio_support_ticket,incoespacio_security.support_group_user,1,0,0,0
+access_ticket_manager,incoespacio_support.ticket manager,model_incoespacio_support_ticket,incoespacio_security.support_group_manager,1,1,1,0
+access_ticket_admin,incoespacio_support.ticket admin,model_incoespacio_support_ticket,incoespacio_security.support_group_admin,1,1,1,1
+access_ticket_type_user,incoespacio_support.ticket_type user,model_incoespacio_support_ticket_type,base.group_user,1,0,0,0
+access_ticket_type_admin,incoespacio_support.ticket_type admin,model_incoespacio_support_ticket_type,incoespacio_security.support_group_admin,1,1,1,1
+access_ticket_category_user,incoespacio_support.ticket_category user,model_incoespacio_support_ticket_category,base.group_user,1,0,0,0
+access_ticket_category_admin,incoespacio_support.ticket_category admin,model_incoespacio_support_ticket_category,incoespacio_security.support_group_admin,1,1,1,1

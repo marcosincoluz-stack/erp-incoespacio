@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- LISTA -->
+        <record id="ticket_type_view_tree" model="ir.ui.view">
+            <field name="name">ticket_type.tree</field>
+            <field name="model">incoespacio_support.ticket_type</field>
+            <field name="arch" type="xml">
+                <tree string="Tipos de Incidencia" default_order="sequence" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="color" widget="color"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- ACCIONES -->
+        <record id="ticket_type_action" model="ir.actions.act_window">
+            <field name="name">Tipos de Incidencias</field>
+            <field name="res_model">incoespacio_support.ticket_type</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="ticket_type_view_tree"/>
+        </record>
+
+        <!-- MENÚ -->
+        <menuitem id="ticket_type_menu" name="Tipos de Incidencias" action="ticket_type_action" groups="incoespacio_security.support_group_admin" parent="support_menu_conf" sequence="20"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_ai_ocr" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.ai.ocr</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='account_vendor_bills']" position="after">
+                <block title="Digitalización OCR de Facturas con IA" id="ai_ocr_settings">
+                    <setting id="gemini_api_key_setting" string="Google Gemini API Key" help="Clave de API de Google Gemini (obtenida gratis en Google AI Studio).">
+                        <field name="gemini_api_key" password="True" placeholder="AIzaSy..."/>
+                    </setting>
+                    <setting id="gemini_model_setting" string="Modelo Gemini" help="Modelo de visión utilizado para procesar los documentos PDF e imágenes.">
+                        <field name="gemini_model"/>
+                    </setting>
+                    <setting id="ocr_auto_create_partner_setting" string="Creación automática de Proveedores" help="Si el CIF de la factura no existe en Odoo, crea automáticamente la ficha del proveedor en borrador (Opción A).">
+                        <field name="ocr_auto_create_partner"/>
+                    </setting>
+                    <setting id="ocr_default_expense_account_setting" string="Cuenta de gasto por defecto" help="Cuenta contable asignada a las líneas si el concepto no tiene una cuenta específica.">
+                        <field name="ocr_default_expense_account_id"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

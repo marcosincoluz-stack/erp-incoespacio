@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_split_view" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.split_view</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_toggle_split_view"
+                        type="object"
+                        string="Ver PDF al lado"
+                        class="btn btn-outline-secondary"
+                        icon="fa-columns"
+                        invisible="not ocr_has_pdf or ocr_show_split_view"/>
+                <button name="action_toggle_split_view"
+                        type="object"
+                        string="Cerrar PDF"
+                        class="btn btn-secondary"
+                        icon="fa-times"
+                        invisible="not ocr_has_pdf or not ocr_show_split_view"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <field name="ocr_has_pdf" invisible="1"/>
+                <field name="ocr_show_split_view" invisible="1"/>
+                <div class="mb-3 border rounded p-2 bg-light" invisible="not ocr_show_split_view or not ocr_has_pdf">
+                    <field name="ocr_pdf_file" widget="pdf_viewer"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

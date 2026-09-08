@@ -1,0 +1,42 @@
+[options]
+admin_passwd = 
+addons_path = 
+    /mnt/extra-addons,
+    /mnt/extra-addons/account-financial-reporting,
+    /mnt/extra-addons/server-ux,
+    /mnt/extra-addons/reporting-engine,
+    /mnt/extra-addons/web-oca,
+    /mnt/extra-addons/l10n-spain,
+    /mnt/extra-addons/community-data-files,
+    /mnt/extra-addons/partner-contact,
+    /mnt/extra-addons/bank-payment,
+    /mnt/extra-addons/account-reconcile,
+    /mnt/extra-addons/bank-statement-import,
+    /mnt/extra-addons/account-payment,
+    /mnt/incoespacio-addons
+data_dir = /var/lib/odoo
+db_host = db
+db_port = 5432
+db_user = odoo
+db_password = odoo
+
+; --- Parámetros de Red y Proxy Inverso ---
+proxy_mode = True
+
+; --- Motor de Búsqueda Insensible a Acentos ---
+unaccent = True
+
+; --- Tiempos de Ejecución y Rendimiento ---
+limit_time_cpu = 60
+limit_time_real = 100000
+limit_time_real_cron = -1
+limit_request = 8192
+limit_memory_hard = 2684354560
+limit_memory_soft = 2147483648
+workers = 2
+max_cron_threads = 2
+db_maxconn = 64
+
+; --- Seguridad y Bases de Datos (Producción) ---
+; list_db = False
+; dbfilter = ^incoespacio$

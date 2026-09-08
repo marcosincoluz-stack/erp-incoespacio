@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Personalización Corporativa del Presupuesto / Pedido de Venta Estilo Incoluz -->
+        <template id="report_saleorder_document_incoespacio" inherit_id="sale.report_saleorder_document" priority="20">
+            <!-- Layout Corporativo con Banda Roja 10px y Sellos SGS -->
+            <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+                <attribute name="t-call">incoespacio_reports.external_layout_incoespacio</attribute>
+            </xpath>
+
+            <!-- Bloque de Direcciones y Metadatos en Tarjetas Limpias -->
+            <xpath expr="//t[@t-set='address']" position="replace">
+                <table style="width: 100%; margin-top: 5px; margin-bottom: 25px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
+                    <tr>
+                        <!-- Tarjeta Cliente -->
+                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                DATOS DEL CLIENTE
+                            </div>
+                            <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
+                                <span t-field="doc.partner_id.name"/>
+                            </div>
+                            <div t-if="doc.partner_id.vat" style="color: #475569;">
+                                <strong>NIF/CIF:</strong> <span t-field="doc.partner_id.vat"/>
+                            </div>
+                            <div t-if="doc.partner_id.street" style="color: #334155;">
+                                <span t-field="doc.partner_id.street"/>
+                            </div>
+                            <div t-if="doc.partner_id.street2" style="color: #334155;">
+                                <span t-field="doc.partner_id.street2"/>
+                            </div>
+                            <div style="color: #334155;">
+                                <span t-if="doc.partner_id.zip" t-field="doc.partner_id.zip"/>
+                                <span t-if="doc.partner_id.city"> <span t-field="doc.partner_id.city"/></span>
+                                <span t-if="doc.partner_id.state_id"> (<span t-out="doc.partner_id.state_id.name"/>)</span>
+                            </div>
+                            <div t-if="doc.partner_id.country_id" style="color: #334155;">
+                                <span t-field="doc.partner_id.country_id"/>
+                            </div>
+                            <div t-if="doc.partner_id.phone" style="color: #475569; margin-top: 3px;">
+                                <strong>Tel:</strong> <span t-field="doc.partner_id.phone"/>
+                            </div>
+                        </td>
+
+                        <!-- Tarjeta Datos de la Oferta -->
+                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                INFORMACIÓN DE LA OFERTA
+                            </div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                                <tr t-if="doc.date_order">
+                                    <td style="padding: 3px 0; color: #475569; width: 45%;"><strong>Fecha de Oferta:</strong></td>
+                                    <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.date_order" t-options='{"widget": "date"}'/></td>
+                                </tr>
+                                <tr t-if="doc.validity_date and doc.state in ['draft', 'sent']">
+                                    <td style="padding: 3px 0; color: #475569;"><strong>Validez de Oferta:</strong></td>
+                                    <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.validity_date"/></td>
+                                </tr>
+                                <tr t-if="doc.client_order_ref">
+                                    <td style="padding: 3px 0; color: #475569;"><strong>Su Referencia:</strong></td>
+                                    <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.client_order_ref"/></td>
+                                </tr>
+                                <tr t-if="doc.user_id.name">
+                                    <td style="padding: 3px 0; color: #475569;"><strong>Comercial:</strong></td>
+                                    <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.user_id.name"/></td>
+                                </tr>
+                                <tr t-if="doc.payment_term_id">
+                                    <td style="padding: 3px 0; color: #475569;"><strong>Forma de pago:</strong></td>
+                                    <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.payment_term_id.name"/></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </xpath>
+
+            <!-- Ocultar bloque redundante de información y h2 estándar -->
+            <xpath expr="//h2[hasclass('mt-4')]" position="replace">
+            </xpath>
+            <xpath expr="//div[@id='informations']" position="replace">
+            </xpath>
+
+            <!-- Eliminar table-borderless y forzar estilos de tabla estructurada -->
+            <xpath expr="//table[hasclass('o_main_table')]" position="attributes">
+                <attribute name="class">table table-sm o_main_table</attribute>
+                <attribute name="style">-webkit-print-color-adjust: exact; width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 25px;</attribute>
+            </xpath>
+
+            <!-- Renombrar cabeceras con fondo, borde y alineación explícita -->
+            <xpath expr="//th[@name='th_description']" position="replace">
+                <th name="th_description" style="text-align: left; width: 52%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">Elemento</th>
+            </xpath>
+            <xpath expr="//th[@name='th_quantity']" position="replace">
+                <th name="th_quantity" style="text-align: right; width: 14%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">Cantidad</th>
+            </xpath>
+            <xpath expr="//th[@name='th_priceunit']" position="replace">
+                <th name="th_priceunit" style="text-align: right; width: 16%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">P/U</th>
+            </xpath>
+            <xpath expr="//th[@name='th_discount']" position="replace">
+                <th name="th_discount" style="text-align: right; width: 10%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;" t-if="display_discount" groups="product.group_discount_per_so_line">
+                    <span>Desc.%</span>
+                </th>
+            </xpath>
+            <xpath expr="//th[@name='th_taxes']" position="replace">
+            </xpath>
+            <xpath expr="//th[@name='th_subtotal']" position="replace">
+                <th name="th_subtotal" style="text-align: right; width: 18%; padding: 8px 10px; background-color: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8; color: #0f172a; font-weight: 700;">
+                    <span>Importe</span>
+                </th>
+            </xpath>
+
+            <!-- Forzar líneas de separación y alineación en las celdas -->
+            <xpath expr="//td[@name='td_name']" position="attributes">
+                <attribute name="style">text-align: left; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
+            </xpath>
+            <xpath expr="//td[@name='td_quantity']" position="attributes">
+                <attribute name="style">text-align: right; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
+            </xpath>
+            <xpath expr="//td[@name='td_priceunit']" position="attributes">
+                <attribute name="style">text-align: right; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
+            </xpath>
+            <xpath expr="//td[@name='td_subtotal']" position="attributes">
+                <attribute name="style">text-align: right; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle;</attribute>
+            </xpath>
+
+            <!-- Ocultar celda de impuestos por línea para mantener la tabla limpia como en Incoluz -->
+            <xpath expr="//td[@name='td_taxes']" position="replace">
+            </xpath>
+
+            <!-- Reemplazar bloque de totales por tarjeta limpia anclada a la derecha -->
+            <xpath expr="//div[@name='so_total_summary']" position="replace">
+                <div class="clearfix" style="margin-top: 20px; margin-bottom: 25px;">
+                    <table class="incoespacio-totals-table" style="-webkit-print-color-adjust: exact; float: right; width: 44%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 20px; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                        <t t-set="tax_totals" t-value="doc.tax_totals"/>
+                        <t t-call="sale.document_tax_totals"/>
+                    </table>
+                </div>
+            </xpath>
+
+            <!-- Ocultar notas de pedido huérfanas en mitad de la página -->
+            <xpath expr="//span[@name='order_note']" position="replace">
+            </xpath>
+
+            <!-- Bloque de condiciones y firma de aceptación al pie estilo Incoluz -->
+            <xpath expr="//div[hasclass('page')]" position="inside">
+                <div style="clear: both; height: 10px;"/>
+                <table style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 25px; page-break-inside: avoid; font-size: 0.82rem;">
+                    <tr>
+                        <!-- Condiciones comerciales -->
+                        <td style="width: 50%; vertical-align: top; background-color: #fafbfc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 14px; line-height: 1.45;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                CONDICIONES Y OBSERVACIONES
+                            </div>
+                            <div t-if="doc.payment_term_id" style="margin-top: 4px; color: #334155;">
+                                <strong>Forma de pago:</strong> <span t-field="doc.payment_term_id.name"/>
+                            </div>
+                            <div t-if="doc.note" style="margin-top: 6px; color: #475569;">
+                                <span t-field="doc.note"/>
+                            </div>
+                        </td>
+
+                        <!-- Recuadro de Firma y Aceptación -->
+                        <td style="width: 50%; vertical-align: top; background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 12px 14px; text-align: center;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #e72228; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px;">
+                                CONFORME Y ACEPTADO POR EL CLIENTE
+                            </div>
+                            <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">
+                                Firma y Sello
+                            </div>
+                            <div style="height: 50px;"/>
+                            <div style="border-top: 1px solid #cbd5e1; width: 80%; margin: 0 auto; padding-top: 4px; font-size: 0.75rem; color: #64748b;">
+                                Fecha: _____ / _____ / 202___
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

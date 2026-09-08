@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Grupo para autorizar la publicación oficial de facturas -->
+        <record id="group_invoice_validator" model="res.groups">
+            <field name="name">Facturación: Validar y Publicar Facturas</field>
+            <field name="category_id" ref="base.module_category_accounting_accounting"/>
+            <field name="implied_ids" eval="[(4, ref('account.group_account_invoice'))]"/>
+            <field name="comment">Los usuarios que tengan este grupo son los únicos que pueden confirmar y emitir facturas oficiales definitivas.</field>
+        </record>
+
+        <!-- El administrador y contable lo tienen por defecto -->
+        <record id="account.group_account_manager" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_invoice_validator'))]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- LISTA -->
+        <record id="ticket_category_view_tree" model="ir.ui.view">
+            <field name="name">ticket_category.tree</field>
+            <field name="model">incoespacio_support.ticket_category</field>
+            <field name="arch" type="xml">
+                <tree string="Áreas de Incidencias" default_order="sequence" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- ACCIONES -->
+        <record id="ticket_category_action" model="ir.actions.act_window">
+            <field name="name">Áreas de Soporte</field>
+            <field name="res_model">incoespacio_support.ticket_category</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="ticket_category_view_tree"/>
+        </record>
+
+        <!-- MENÚ -->
+        <menuitem id="ticket_category_menu" name="Áreas de Soporte" action="ticket_category_action" groups="incoespacio_security.support_group_admin" parent="support_menu_conf" sequence="10"/>
+
+    </data>
+</odoo>

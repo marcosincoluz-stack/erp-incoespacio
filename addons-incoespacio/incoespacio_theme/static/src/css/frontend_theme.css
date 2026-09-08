@@ -1,0 +1,105 @@
+:root {
+	--brand: #e72228ff;
+	--darkbrand: #d1363cff;
+	--lightbrand: #f7686dff;
+	--blue: #007bff;
+	--indigo: #6610f2;
+	--purple: #6f42c1;
+	--pink: #e83e8c;
+	--red: #dc3545;
+	--orange: #fd7e14;
+	--yellow: #ffc107;
+	--green: #28a745;
+	--teal: #20c997;
+	--cyan: #17a2b8;
+	--white: #fff;
+	--gray: #6c757d;
+	--gray-dark: #343a40;
+	--primary: var(--brand);
+	--secondary: #fff;
+	--success: #28a745;
+	--info: #17a2b8;
+	--warning: #ffc107;
+	--danger: #dc3545;
+	--light: #f8f9fa;
+	--dark: #343a40;
+	--alpha: #00a09d;
+	--beta: #875a7b;
+	--gamma: #5c5b80;
+	--delta: #5b899e;
+	--epsilon: #e46f78;
+	--breakpoint-xs: 0;
+	--breakpoint-sm: 576px;
+	--breakpoint-md: 768px;
+	--breakpoint-lg: 992px;
+	--breakpoint-xl: 1200px;
+	--font-family-sans-serif: "Noto", "Lucida Grande", Helvetica, Verdana, Arial, sans-serif;
+	--font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* MAIN */
+
+.bg-100 {
+	background-color: #fff !important;
+	color: #212529;
+}
+
+main {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+main > .container img {
+	height: 45px;
+}
+
+/* BUTTONS */
+.btn.btn-primary {
+	background-color: var(--brand);
+	border-color: var(--brand);
+}
+.btn.btn-primary:hover {
+	background-color: var(--darkbrand);
+	border-color: var(--darkbrand);
+}
+
+.btn.btn-link,
+a {
+	color: var(--delta);
+}
+.btn.btn-link:hover,
+a:hover {
+	color: var(--blue);
+}
+
+/* FORMS */
+
+.form-control:focus {
+	border-color: var(--delta);
+	box-shadow: 0 0 0 0.2rem #5b899e42;
+}
+
+/* BRANDING DEBRAND */
+.o_brand_promotion,
+.o_portal_sidebar_content .text-muted:has(a[href*="odoo.com"]) {
+	display: none !important;
+}
+
+/* LOGO DE ALTA DEFINICIÓN EN CABECERA */
+header .navbar-brand.logo {
+	padding-top: 0.35rem;
+	padding-bottom: 0.35rem;
+	display: flex;
+	align-items: center;
+}
+
+header .navbar-brand.logo img {
+	height: 30px !important;
+	max-height: 30px !important;
+	width: auto !important;
+	object-fit: contain;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+
