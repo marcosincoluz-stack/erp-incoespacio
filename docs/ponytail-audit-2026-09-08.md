@@ -48,3 +48,55 @@
 ## Net
 
 `net: -740 líneas, -1 dep (schwifty, o úsalo), -1 módulo (invoice_notes) posibles.`
+
+---
+
+# Cierre (2026-09-08, tandas B1-B9 aplicadas)
+
+Git: repo local iniciado con lista negra de secretos; commits por tanda `a8088f0..HEAD`.
+Diff final: **33 ficheros, +329 / −905 = net −576 líneas** (incluye el módulo `incoespacio_invoice_notes` desinstalado y borrado).
+
+## Estado por hallazgo
+
+- 1 CSS duplicado informes → aplicado (B2): `report_styles.css` fuente única, `<style>` inline fuera.
+- 2 `.olcards` → aplicado (B1).
+- 3 selectores legacy → aplicado PARCIAL (B1): tras verificar contra el core 17, `o_blockUI`, `o_list_button_add` y `o_purchase_dashboard` están VIVOS y se quedaron; fuera `worksheet_pdf`, `work_note/bom_note`, `o_open_tab_cell`, `record_title`, `o_cp_top_left`, `custom-control`, clases de chat ≤15, reglas vacías y el bloque CSS roto de la 532.
+- 4 subida JS x3 → aplicado (B3): `ocr_upload_utils.js` compartido.
+- 5 tarjetas/th/td inline → aplicado (B2): clases `.inco-card`/`.inco-card-title` y CSS.
+- 6 campos/configs muertos → aplicado (B5/B8): `ai_ocr_processed`, `ocr_mismatch_type`, `ocr_pdf_url`, `it_groups.xml`; los 2 ajustes Gemini muertos verificados y… ver nota.
+- 7 diario duplica creación → aplicado (B6): `_create_move_with_attachment`.
+- 8 botones ticket → aplicado (B7): `_transition`.
+- 9 retry a mano → aplicado (B4): `urllib3.Retry`.
+- 10 find_or_create x2 → aplicado (B5): `_find_or_create_partner`.
+- 11 triple blindaje menú → aplicado (B1): `registry.remove` + CSS; filtro JS, renames de items ocultos, `getIncoluzElements` y `usermenu_template.xml` fuera.
+- 12 app_sidebar ruido → aplicado (B1).
+- 13 detect_mimetype → aplicado (B4): `guess_mimetype` del core.
+- 14 cuentas 600/700 → aplicado (B5): cuenta nativa del asiento/diario.
+- 15 CSS duplicado theme → aplicado (B1).
+- 16 bucles fiscal x2 → aplicado (B5): `_match_other_company`.
+- 17 is_customer/is_supplier → aplicado (B8): compute+inverse desde `customer_rank`/`supplier_rank`.
+- 18 alerta chatter inline → aplicado (B5): `alert alert-warning`.
+- 19 IBAN a mano → aplicado (B5): `schwifty.IBAN`.
+- 20 ticket_type.color → aplicado (B7).
+- 21 paperformat doble → aplicado (B2).
+- 22 ramas searchModel → aplicado (B3).
+- 23 fences → aplicado (B4).
+- 24 import datetime → aplicado (B7).
+- 25 invoice_notes → aplicado (B9): desinstalado (0 filas de datos) y carpeta borrada.
+
+Nota hallazgo 6: los ajustes `ocr_auto_create_partner` y `ocr_default_expense_account_id` siguen en `res.config.settings` (se decidió no tocar la UX de Ajustes en esta pasada); quedan como deuda conocida: o se cablean en la lógica o se retiran.
+
+## ponytail-review del diff (skill oficial)
+
+3 hallazgos, los 3 aplicados en el commit de cierre: `Retry(connect/read)` redundante, splat condicional `journal_id`, `{ context: {} }` en `orm.call`. `net: -3 lines` incluido en el −576.
+
+## ponytail-debt (skill oficial)
+
+1 marcador `ponytail:` (comment de chatter en ocr/account_move.py:528) sin ceiling ni trigger → no era deuda real (describía una reducción ya hecha), retirado. Ledger: **0 markers. Clean ledger.**
+
+## Verificación
+
+- Upgrades `-u` por tanda sin WARNING/ERROR; `web: 200` tras cada restart.
+- PDFs de factura y pedido renderizan (`%PDF`, 94 KB / 1,2 KB) tras B2.
+- Columnas `ai_ocr_processed`/`ocr_mismatch_type` confirmadas fuera de `information_schema`.
+- Grupos IT huérfanos eliminados por el propio upgrade.
