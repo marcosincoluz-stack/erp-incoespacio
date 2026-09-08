@@ -400,26 +400,26 @@ html .o_web_client > .o_action_manager {
     background-color: rgba(0, 0, 0, 0.04);
 }
 
-// Vista de formulario: el core aplica aqui especificidad alta o inline,
-// estos !important son los unicos justificadas del fichero
+// Vista de formulario: este fichero carga despues del core en el bundle,
+// asi que a igual especificidad la cascada gana sin !important
 .o_form_view .o_form_sheet_bg > .o_form_sheet {
-    resize: both !important;
-    overflow: auto !important;
-    max-width: none !important;
-    width: 99% !important;
+    resize: both;
+    overflow: auto;
+    max-width: none;
+    width: 99%;
 }
 .o_chatter_position_sided .o_content .o_form_view:not(.o_form_nosheet) .o_FormRenderer_chatterContainer,
 .o_chatter_position_sided .modal-content .o_form_view:not(.o_form_nosheet) .o_FormRenderer_chatterContainer {
-    flex: 0 0 30% !important;
+    flex: 0 0 30%;
 }
 .modal-dialog {
-    max-width: none !important;
+    max-width: none;
 }
 .modal-content {
-    resize: both !important;
-    overflow: auto !important;
-    margin: 0 auto !important;
-    width: 80% !important;
+    resize: both;
+    overflow: auto;
+    margin: 0 auto;
+    width: 80%;
 }
 .modal-body .o_form_view {
     display: block;
@@ -451,7 +451,7 @@ html .o_web_client > .o_action_manager {
     margin-top: 0;
 }
 .o_web_client.o_chatter_position_sided .o_Dialog_AttachmentViewer .o_AttachmentViewer {
-    top: 46px !important;
+    top: 46px;
 }
 
 // Blindaje de marca: ocultar entradas de Odoo.com del menu de usuario
@@ -463,7 +463,7 @@ html .o_web_client > .o_action_manager {
 .dropdown-menu [data-menu="support"],
 .dropdown-menu [data-menu="shortcuts"],
 .dropdown-menu [data-menu="odoo_account"] {
-    display: none !important;
+    display: none;
 }
 
 // Animaciones del menu de aplicaciones

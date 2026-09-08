@@ -1,4 +1,4 @@
-:root {
+﻿:root {
 	--brand: #e72228ff;
 	--darkbrand: #d1363cff;
 	--lightbrand: #f7686dff;
@@ -40,7 +40,7 @@
 /* MAIN */
 
 .bg-100 {
-	background-color: #fff !important;
+	background-color: #fff;
 	color: #212529;
 }
 
@@ -83,10 +83,10 @@ a:hover {
 /* BRANDING DEBRAND */
 .o_brand_promotion,
 .o_portal_sidebar_content .text-muted:has(a[href*="odoo.com"]) {
-	display: none !important;
+	display: none;
 }
 
-/* LOGO DE ALTA DEFINICIÓN EN CABECERA */
+/* LOGO DE ALTA DEFINICIÃ“N EN CABECERA */
 header .navbar-brand.logo {
 	padding-top: 0.35rem;
 	padding-bottom: 0.35rem;
@@ -95,9 +95,9 @@ header .navbar-brand.logo {
 }
 
 header .navbar-brand.logo img {
-	height: 30px !important;
-	max-height: 30px !important;
-	width: auto !important;
+	height: 30px;
+	max-height: 30px;
+	width: auto;
 	object-fit: contain;
 	image-rendering: -webkit-optimize-contrast;
 }
