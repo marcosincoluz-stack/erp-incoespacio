@@ -166,6 +166,8 @@ class AiOcrService:
         :param filename: Nombre original del archivo
         :return: dict con los datos fiscales de la factura
         """
+        # sudo justificado: ir.config_parameter es lectura admin-only y la clave
+        # Gemini no debe exponerse vía ACL al usuario que sube la factura
         icp = env['ir.config_parameter'].sudo()
         api_key = icp.get_param('incoespacio_invoice_ocr.gemini_api_key', default='').strip()
         if not api_key:

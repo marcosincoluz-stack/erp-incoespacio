@@ -97,10 +97,10 @@
                 <t t-set="o" t-value="doc"/>
             </t>
             <t t-if="o and 'company_id' in o and o.company_id">
-                <t t-set="company" t-value="o.company_id.sudo()"/>
+                <t t-set="company" t-value="o.company_id"/>
             </t>
             <t t-elif="doc and 'company_id' in doc and doc.company_id">
-                <t t-set="company" t-value="doc.company_id.sudo()"/>
+                <t t-set="company" t-value="doc.company_id"/>
             </t>
             <t t-else="">
                 <t t-set="company" t-value="res_company"/>

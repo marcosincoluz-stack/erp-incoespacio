@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import logging
 from odoo import api, models, _
 
@@ -9,12 +9,12 @@ class AccountJournal(models.Model):
     _inherit = 'account.journal'
 
     def create_document_from_attachment(self, attachment_ids):
-        """Sobrescribe la redirección tras subir archivos para no forzar la vista formulario
-        cuando la IA está activa, manteniendo al usuario en la vista de lista con el
-        cajón flotante estilo Drive abajo a la derecha y permitiendo añadir más facturas.
+        """Sobrescribe la redirecciÃ³n tras subir archivos para no forzar la vista formulario
+        cuando la IA estÃ¡ activa, manteniendo al usuario en la vista de lista con el
+        cajÃ³n flotante estilo Drive abajo a la derecha y permitiendo aÃ±adir mÃ¡s facturas.
         """
         action_vals = super().create_document_from_attachment(attachment_ids)
-        icp = self.env['ir.config_parameter'].sudo()
+        icp = self.env['ir.config_parameter'].sudo()  # sudo justificado: icp es lectura admin-only (clave Gemini)
         api_key = icp.get_param('incoespacio_invoice_ocr.gemini_api_key', default='').strip()
         if api_key and action_vals and action_vals.get('res_model') == 'account.move':
             action_vals.update({
@@ -25,15 +25,15 @@ class AccountJournal(models.Model):
         return action_vals
 
     def _create_document_from_attachment(self, attachment_ids):
-        """Sobrescribe la creación de documentos desde archivos adjuntos para que,
-        cuando se use el botón 'Subir' con la IA activa, cree los borradores al instante
-        y delegue la extracción al hilo en segundo plano del servidor (inmune a cierres de sesión).
+        """Sobrescribe la creaciÃ³n de documentos desde archivos adjuntos para que,
+        cuando se use el botÃ³n 'Subir' con la IA activa, cree los borradores al instante
+        y delegue la extracciÃ³n al hilo en segundo plano del servidor (inmune a cierres de sesiÃ³n).
         """
-        icp = self.env['ir.config_parameter'].sudo()
+        icp = self.env['ir.config_parameter'].sudo()  # sudo justificado: icp es lectura admin-only (clave Gemini)
         api_key = icp.get_param('incoespacio_invoice_ocr.gemini_api_key', default='').strip()
         move_type = self._context.get("default_move_type", "entry")
 
-        # Si no hay API key o no es factura contable, usar el comportamiento estándar de Odoo
+        # Si no hay API key o no es factura contable, usar el comportamiento estÃ¡ndar de Odoo
         allowed_types = ('in_invoice', 'in_receipt', 'in_refund', 'out_invoice', 'out_refund', 'out_receipt')
         if not api_key or move_type not in allowed_types:
             return super()._create_document_from_attachment(attachment_ids)

@@ -210,6 +210,8 @@ class AccountMove(models.Model):
         return False
 
     def _match_other_company(self, vat, name):
+        # sudo justificado: la ir.rule multi-compañía limita res.company a company_ids
+        # del usuario, y el cortafuegos fiscal debe poder ver todo el grupo
         for comp in self.env['res.company'].sudo().search([]).filtered(lambda c: c.id != self.company_id.id):
             if self._matches_company(comp, vat, name):
                 return comp

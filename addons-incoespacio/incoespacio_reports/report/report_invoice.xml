@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
 
-        <!-- Personalización Corporativa de la Factura Oficial Estilo Incoluz -->
+        <!-- PersonalizaciÃ³n Corporativa de la Factura Oficial Estilo Incoluz -->
         <template id="report_invoice_document_incoespacio" inherit_id="account.report_invoice_document" priority="20">
             <!-- Layout Corporativo con Banda Roja 10px y Sellos SGS -->
             <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
@@ -11,7 +11,7 @@
 
             <!-- Bloque de Direcciones Emisor y Receptor en Tarjetas Limpias -->
             <xpath expr="//div[hasclass('row')][1]" position="replace">
-                <t t-set="company" t-value="o.company_id.sudo()"/>
+                <t t-set="company" t-value="o.company_id"/>
                 <table style="width: 100%; margin-top: 5px; margin-bottom: 20px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
                     <tr>
                         <!-- Datos Emisor (Empresa) -->
@@ -62,7 +62,7 @@
                 </table>
             </xpath>
 
-            <!-- Ocultar h2 redundante y bloque standard de información -->
+            <!-- Ocultar h2 redundante y bloque standard de informaciÃ³n -->
             <xpath expr="//h2" position="replace">
             </xpath>
             <xpath expr="//div[@id='informations']" position="replace">
@@ -95,7 +95,7 @@
 
             <!-- Renombrar cabeceras; el estilo vive en report_styles.css -->
             <xpath expr="//th[@name='th_description']" position="replace">
-                <th name="th_description"><span>Descripción</span></th>
+                <th name="th_description"><span>DescripciÃ³n</span></th>
             </xpath>
             <xpath expr="//th[@name='th_quantity']" position="replace">
                 <th name="th_quantity"><span>Cantidad</span></th>
@@ -116,7 +116,7 @@
                 </th>
             </xpath>
 
-            <!-- Ocultar celda de impuestos por línea -->
+            <!-- Ocultar celda de impuestos por lÃ­nea -->
             <xpath expr="//td[@name='td_taxes']" position="replace">
             </xpath>
 
@@ -130,7 +130,7 @@
                 </div>
             </xpath>
 
-            <!-- Ocultar comentarios huérfanos de Odoo -->
+            <!-- Ocultar comentarios huÃ©rfanos de Odoo -->
             <xpath expr="//div[@name='comment']" position="replace">
             </xpath>
 
@@ -167,10 +167,10 @@
                             </div>
                         </td>
 
-                        <!-- Espacio reservado para información fiscal o registro mercantil -->
+                        <!-- Espacio reservado para informaciÃ³n fiscal o registro mercantil -->
                         <td class="inco-card" style="width: 45%; vertical-align: top;">
                             <div class="inco-card-title">
-                                INFORMACIÓN FISCAL Y REGISTRO
+                                INFORMACIÃ“N FISCAL Y REGISTRO
                             </div>
                             <div style="font-size: 0.78rem; color: #475569; margin-top: 4px; line-height: 1.45;">
                                 <div style="font-weight: 700; color: #0f172a;"><span t-field="company.name"/></div>
