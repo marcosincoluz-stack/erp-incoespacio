@@ -53,17 +53,7 @@ class AccountJournal(models.Model):
 
         all_invoices = self.env['account.move']
         for attachment in attachments:
-            invoice = self.env['account.move'].create({
-                'journal_id': self.id,
-                'move_type': move_type,
-                'ocr_status': 'pending',
-            })
-            attachment.write({'res_model': 'account.move', 'res_id': invoice.id})
-            invoice.with_context(
-                account_predictive_bills_disable_prediction=True,
-                no_new_invoice=True,
-            ).message_post(attachment_ids=attachment.ids)
-            all_invoices |= invoice
+            all_invoices |= self.env['account.move']._create_move_with_attachment(attachment, move_type, self.id)
 
         if all_invoices:
             _logger.info("Subida de %d facturas recibida en diario %s. Encolando para OCR en segundo plano...", len(all_invoices), self.name)

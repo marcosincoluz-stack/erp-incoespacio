@@ -12,6 +12,20 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     @api.model
+    def _create_move_with_attachment(self, attachment, move_type, journal_id, ctx=None):
+        move = self.with_context(ctx or {}).create({
+            'move_type': move_type,
+            'ocr_status': 'pending',
+            **({'journal_id': journal_id} if journal_id else {}),
+        })
+        attachment.write({'res_model': 'account.move', 'res_id': move.id})
+        move.with_context(
+            account_predictive_bills_disable_prediction=True,
+            no_new_invoice=True,
+        ).message_post(attachment_ids=attachment.ids)
+        return move
+
+    @api.model
     def upload_bills_batch(self, files, context_vals=None):
         if not files:
             return []
@@ -36,30 +50,12 @@ class AccountMove(models.Model):
 
         for f in files:
             filename = f.get('name') or 'factura.pdf'
-            file_b64 = f.get('data') or ''
-            mimetype = f.get('mimetype') or 'application/pdf'
-
-            move_vals = {
-                'move_type': move_type,
-                'ocr_status': 'pending',
-            }
-            if journal_id:
-                move_vals['journal_id'] = journal_id
-
-            move = self.with_context(ctx).create(move_vals)
             attachment = self.env['ir.attachment'].create({
                 'name': filename,
-                'datas': file_b64,
-                'mimetype': mimetype,
-                'res_model': 'account.move',
-                'res_id': move.id,
+                'datas': f.get('data') or '',
+                'mimetype': f.get('mimetype') or 'application/pdf',
             })
-
-            move.with_context(
-                account_predictive_bills_disable_prediction=True,
-                no_new_invoice=True,
-            ).message_post(attachment_ids=attachment.ids)
-
+            move = self._create_move_with_attachment(attachment, move_type, journal_id, ctx)
             created_moves.append({
                 'id': move.id,
                 'filename': filename,
