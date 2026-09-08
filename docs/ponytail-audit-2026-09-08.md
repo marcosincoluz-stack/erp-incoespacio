@@ -100,3 +100,24 @@ Nota hallazgo 6: los ajustes `ocr_auto_create_partner` y `ocr_default_expense_ac
 - PDFs de factura y pedido renderizan (`%PDF`, 94 KB / 1,2 KB) tras B2.
 - Columnas `ai_ocr_processed`/`ocr_mismatch_type` confirmadas fuera de `information_schema`.
 - Grupos IT huérfanos eliminados por el propio upgrade.
+
+---
+
+# Frente theme CSS + modularidad (2026-09-08, tarde)
+
+## Conversión SCSS (commit e2b1a15)
+- `backend_theme.css` (771 líneas, 209 `!important`) → `backend_theme.scss` (583 líneas, 15 `!important`).
+- Los 15 restantes pelean con especificidad alta/inline del core (sheet redimensionable, modales, chatter 30%, attachment viewer, blindaje de marca); el resto gana por cascada: el SCSS propio carga después del core en `web.assets_backend`.
+- Reglas de color eliminadas por redundantes: las variables SCSS (`$o-brand-primary`, `$o-action`, `$o-component-active-*`, mapa `$o-btns-bs-override`, `$form-check-input-checked-bg-color`, `$link-color`) ya producían el azul; solo quedan los añadidos de diseño (mayúsculas, hover exacto, focus).
+- Navbar vía custom properties `--NavBar-*` sin `!important` (el `navbar.scss` del core no usa ninguno).
+- Bonus: fuera `:focus-visible { outline: none !important }` (devuelve el foco de accesibilidad nativo).
+- Verificado: bundle `web.assets_backend` compila (949 KB, theme presente); web 200.
+
+## Congelaciones y política (commit C2)
+- `report_styles.css`: 53 `!important` CONGELADOS con cabecera que explica el porqué (wkhtmltopdf, PDF legal). No es deuda: es una excepción aceptada.
+- `AGENTS.md`: política de micro-modularidad (módulos nuevos ≤ ~500 líneas, un propósito; comprobar encaje antes de crear) con las tres excepciones documentadas (theme, familia OCR, reports). La media 380 líneas/módulo frente a los 173 de Incoluz queda explicada por esas excepciones, no perseguida con splits artificiales.
+
+## Métricas tras el frente theme
+- `!important` propios: 268 → 74 (15 backend + 53 reports congelados + 5 frontend + 1 report_theme).
+- `incoespacio_theme`: 976 → ~788 líneas.
+- `addons-incoespacio/`: 4.560 → ~4.372 líneas desde el pre-audit (5.136): −14,9%.

@@ -6,3 +6,9 @@ Usamos el ponytail oficial del repo, no resúmenes a mano:
 - Fuente de verdad del ruleset y los skills: https://github.com/DietrichGebert/ponytail
 - Comandos: `/ponytail` (nivel lite|full|ultra|off), `/ponytail-review`, `/ponytail-audit`, `/ponytail-debt`.
 - Alcance del audit propio: `addons-incoespacio/`.
+
+## Micro-modularidad
+- Módulos nuevos: ≤ ~500 líneas y un solo propósito de negocio. Antes de crear uno, comprobar si encaja en uno existente.
+- Excepciones documentadas: `incoespacio_theme` (chrome corporativo completo), familia OCR (`incoespacio_invoice_ocr` / `_async` / `_ui` = una suite de negocio por capas), `incoespacio_reports` (factura + pedido legales y paperformat).
+- Theme backend: los colores vienen de las variables SCSS del core (`primary_variables.scss`); `backend_theme.scss` solo viste chrome sin variable y carga tras el core (cascada, no `!important`).
+- CSS de informes (`report_styles.css`): `!important` congelados a propósito (wkhtmltopdf, PDF legal).
