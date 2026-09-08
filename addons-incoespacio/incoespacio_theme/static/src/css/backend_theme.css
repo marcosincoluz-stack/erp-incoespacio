@@ -230,30 +230,14 @@ svg.o_spinner circle,
 .badge-primary,
 .badge.text-bg-primary {
     background-color: #4285F4 !important;
+    border-color: #4285F4 !important;
     color: #ffffff !important;
 }
 
 
-.btn-link:hover {
-    color: #75a5f4;
-    text-decoration: none;
-}
-
 .o_ChatterTopbar_button:hover {
     background-color: #fff;
 }   
-
-.o_form_view .o_form_uri {
-    color: var(--primary) !important;
-}
-
-.o_form_view .o_form_uri > span:first-child {
-    color: var(--primary) !important;
-}
-
-.o_list_view .o_list_table .text-primary {
-    color: var(--primary) !important;
-}
 
 .o_form_view .oe_button_box .btn.oe_stat_button > .o_stat_info .o_stat_value, .o_form_view .oe_button_box .btn.oe_stat_button > span .o_stat_value {
     color: var(--primary);
@@ -278,10 +262,6 @@ svg.o_spinner circle,
 
 .badge-danger {
     border: 1px solid #dc3545 !important;
-}
-.badge-primary {
-    background-color: var(--primary) !important;
-    border-color: var(--primary) !important;
 }
 
 .ui-menu-item a {
@@ -529,8 +509,6 @@ div.dropdown-menu .dropdown-divider {
 .app-menu-container .search-container .search-item__name {
     color: #ffffff !important;
 }
-    box-shadow: none;
-}
 
 .o_menu_apps .dropdown-menu .search-container.has-results .search-results .dropdown-item:hover,
 .o_menu_apps .dropdown-menu .search-container.has-results .search-results .dropdown-item.active,
@@ -548,16 +526,6 @@ html .o_web_client > .o_action_manager {
     html .o_web_client > .o_action_manager {
         flex: auto;
     }
-    .o_cp_top_left{
-        max-width: 100%;
-    }
-}
-
-/* CHECKBOX */
-.custom-control.custom-checkbox
-	.custom-control-input:not(:checked):not(:indeterminate)
-	~ .custom-control-label::before {
-	outline: none;
 }
 
 /* CELDA TREE VIEW */
@@ -579,39 +547,11 @@ html .o_web_client > .o_action_manager {
     background-color: #eee !important;
 }
 .o_purchase_order .table-striped > tbody > tr:nth-of-type(2n+1),
-.o_sale_order .table-striped > tbody > tr:nth-of-type(2n+1),
-.o_tickets .table-striped > tbody > tr:nth-of-type(2n+1) {
+.o_sale_order .table-striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #fff;
 }
 .table-hover tbody tr:hover {
     background-color: rgba(0, 0, 0, 0.04) !important;
-}
-
-.o_tickets [data-name="name"] {
-    min-width: 110px !important;
-  }
-
-/* CHAT */
-.o_ChatWindow .o_ChatWindowHeader {
-	background-color: var(--dark);
-}
-.o_ChatWindow .o_ChatWindowHeader .fa {
-	color: white;
-}
-.o_Discuss .o_DiscussSidebar {
-	background-color: #fff;
-    color: #4c4c4c;
-    border-right: 1px solid #ccc;
-    border-top: 1px solid #ccc;
-}
-.o_DiscussSidebar_separator {
-    background-color: #ccc;
-}
-.o_Discuss .o_DiscussSidebar .o_DiscussSidebarItem:hover {
-	background-color: #e8e8e8;
-}
-.o_Discuss .o_DiscussSidebar .o_DiscussSidebarItem .o_DiscussSidebarItem_activeIndicator.o-item-active {
-	background-color: var(--brand);
 }
 
 /* FORM VIEW */
@@ -644,19 +584,7 @@ html .o_web_client > .o_action_manager {
     display: flex;
 }
 
-.record_title {
-	margin: 0;
-	font-weight: normal;
-	background: #f1f1f1;
-	color: #000;
-	padding: 0.4rem;
-	font-size: 1rem;
-}
-
 /* PRESUPUESTOS */
-.o_sale_order{
-
-}
 .o_sale_order .ribbon + .oe_title {
 	width: auto;
     max-width: none;
@@ -672,10 +600,6 @@ html .o_web_client > .o_action_manager {
     margin: 0 5px;
 }
 
-/* ORDEN DE TRABAJO */
-.worksheet_pdf {
-}
-.worksheet_pdf .o_field_widget.o_field_pdfviewer,
 .o_field_widget .o_pdfview_iframe {
 	width: 100%;
 	height: calc(100vh - 250px);
@@ -683,18 +607,8 @@ html .o_web_client > .o_action_manager {
 	margin-top: 0;
 }
 
-.work_note, .bom_note {
-    width: auto !important;
-}
-
 .o_web_client.o_chatter_position_sided .o_Dialog_AttachmentViewer .o_AttachmentViewer {
     top: 46px !important;
-}
-
-.o_open_tab_cell {
-    min-width: 30px !important;
-    width: 30px !important;
-    max-width: 74px !important;
 }
 
 /* Blindaje CSS: ocultar completamente opciones de Odoo.com en el menu de usuario */

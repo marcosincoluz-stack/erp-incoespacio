@@ -12,29 +12,17 @@ export class IncoespacioAppSidebar extends Component {
     }
 
     get apps() {
-        try {
-            return this.menuService?.getApps?.() || [];
-        } catch (e) {
-            return [];
-        }
+        return this.menuService.getApps();
     }
 
     isCurrentApp(app) {
-        try {
-            const currentApp = this.menuService?.getCurrentApp?.();
-            return Boolean(currentApp && app && currentApp.id === app.id);
-        } catch (e) {
-            return false;
-        }
+        const currentApp = this.menuService.getCurrentApp();
+        return Boolean(currentApp && app && currentApp.id === app.id);
     }
 
     onAppClick(app) {
-        try {
-            if (app) {
-                this.menuService.selectMenu(app);
-            }
-        } catch (e) {
-            console.error("Error selecting app:", e);
+        if (app) {
+            this.menuService.selectMenu(app);
         }
     }
 }

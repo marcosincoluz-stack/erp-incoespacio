@@ -21,29 +21,13 @@ patch(UserMenu.prototype, {
         }
     },
 
-    getIncoluzElements() {
-        return this.getElements();
-    },
-
     getElements() {
-        const elements = super.getElements();
-
-        // Filtrar 'Mi cuenta Odoo.com' para que nunca aparezca
-        const filtered = elements.filter(
-            (el) => el.id !== "account" && el.id !== "odoo_account"
-        );
+        // account/odoo_account ya se eliminan del registro en setup()
+        const filtered = super.getElements();
 
         // Adaptar nombres y secuencias según el estándar Incoluz
         for (const item of filtered) {
-            if (item.id === "documentation") {
-                item.description = _t("Documentación Odoo");
-                item.sequence = 10;
-            } else if (item.id === "support") {
-                item.description = _t("Ayuda");
-                item.sequence = 20;
-            } else if (item.id === "shortcuts") {
-                item.sequence = 25;
-            } else if (item.id === "settings" || item.id === "profile") {
+            if (item.id === "settings" || item.id === "profile") {
                 item.description = _t("Mi perfil");
                 item.sequence = 40;
             } else if (item.id === "logout") {

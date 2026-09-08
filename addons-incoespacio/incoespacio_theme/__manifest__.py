@@ -21,7 +21,6 @@
         'web.assets_backend': [
             'incoespacio_theme/static/src/css/backend_theme.css',
             'incoespacio_theme/static/src/js/web_title_widget.js',
-            'incoespacio_theme/static/src/xml/usermenu_template.xml',
             'incoespacio_theme/static/src/js/app_sidebar.js',
             'incoespacio_theme/static/src/xml/app_sidebar.xml',
         ],
