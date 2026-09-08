@@ -3,11 +3,12 @@ import base64
 import io
 import json
 import logging
-import random
-import time
 import PyPDF2
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from odoo.exceptions import UserError
+from odoo.tools.mimetypes import guess_mimetype
 
 _logger = logging.getLogger(__name__)
 
@@ -102,32 +103,18 @@ class AiOcrService:
     @classmethod
     def get_session(cls):
         if cls._session is None:
-            cls._session = requests.Session()
+            session = requests.Session()
+            session.mount("https://", HTTPAdapter(max_retries=Retry(
+                total=3,
+                connect=3,
+                read=3,
+                backoff_factor=2,
+                status_forcelist=(429, 500, 502, 503, 504),
+                allowed_methods=["POST"],
+                raise_on_status=False,
+            )))
+            cls._session = session
         return cls._session
-
-    @staticmethod
-    def detect_mimetype(content_bytes, filename=""):
-        """Determina el MIME type a partir del contenido binario o extensión."""
-        if content_bytes.startswith(b"%PDF-"):
-            return "application/pdf"
-        elif content_bytes.startswith(b"\xff\xd8"):
-            return "image/jpeg"
-        elif content_bytes.startswith(b"\x89PNG"):
-            return "image/png"
-        elif content_bytes.startswith(b"RIFF") and b"WEBP" in content_bytes[:16]:
-            return "image/webp"
-
-        lower_fn = (filename or "").lower()
-        if lower_fn.endswith(".pdf"):
-            return "application/pdf"
-        elif lower_fn.endswith((".jpg", ".jpeg")):
-            return "image/jpeg"
-        elif lower_fn.endswith(".png"):
-            return "image/png"
-        elif lower_fn.endswith(".webp"):
-            return "image/webp"
-
-        return "application/pdf"
 
     @staticmethod
     def is_pdf_encrypted(file_bytes):
@@ -195,7 +182,7 @@ class AiOcrService:
             raise UserError("El archivo PDF está protegido con contraseña. Debe desprotegerse antes de ser procesado por la IA.")
 
         model = icp.get_param('incoespacio_invoice_ocr.gemini_model', default='gemini-2.5-flash').strip() or 'gemini-2.5-flash'
-        mimetype = cls.detect_mimetype(file_bytes, filename)
+        mimetype = guess_mimetype(file_bytes, default="application/pdf")
         b64_data = base64.b64encode(file_bytes).decode('utf-8')
 
         url = GEMINI_API_BASE_URL.format(model=model, api_key=api_key)
@@ -235,40 +222,12 @@ class AiOcrService:
             "generationConfig": gen_config
         }
 
-        max_retries = 3
-        base_delay = 2.0
-        response = None
-
-        for attempt in range(max_retries + 1):
-            try:
-                _logger.info("Enviando documento %s (%s) a Gemini Flash (%s) [Intento %d/%d]...", filename, mimetype, model, attempt + 1, max_retries + 1)
-                response = cls.get_session().post(url, json=payload, headers=headers, timeout=45)
-            except requests.exceptions.Timeout:
-                if attempt < max_retries:
-                    delay = (base_delay * (2 ** attempt)) + random.uniform(-0.4, 0.4)
-                    _logger.warning("Timeout al conectar con Gemini API. Reintentando en %.2fs (intento %d/%d)...", delay, attempt + 1, max_retries)
-                    time.sleep(max(0.5, delay))
-                    continue
-                _logger.error("Tiempo de espera agotado al conectar con Gemini API tras %d reintentos.", max_retries)
-                raise UserError("La llamada a la IA ha superado el tiempo de espera (45 segundos) tras varios reintentos. Por favor, inténtalo de nuevo.")
-            except requests.exceptions.RequestException as e:
-                if attempt < max_retries:
-                    delay = (base_delay * (2 ** attempt)) + random.uniform(-0.4, 0.4)
-                    _logger.warning("Error de red con Gemini API (%s). Reintentando en %.2fs (intento %d/%d)...", e, delay, attempt + 1, max_retries)
-                    time.sleep(max(0.5, delay))
-                    continue
-                _logger.exception("Error de red al conectar con Gemini API tras %d reintentos: %s", max_retries, e)
-                raise UserError(f"Error de conexión con la IA de Google tras reintentos: {str(e)}")
-
-            # Si devuelve 429 (Rate Limit) o 500/502/503/504 (Error de servidor de Google)
-            if response.status_code in (429, 500, 502, 503, 504) and attempt < max_retries:
-                delay = (base_delay * (2 ** attempt)) + random.uniform(-0.4, 0.4)
-                _logger.warning("Gemini API respondió con código %d. Aplicando retroceso exponencial de %.2fs (intento %d/%d)...", response.status_code, delay, attempt + 1, max_retries)
-                time.sleep(max(0.5, delay))
-                continue
-
-            # Respuesta recibida con código definitivo
-            break
+        try:
+            _logger.info("Enviando documento %s (%s) a Gemini Flash (%s)...", filename, mimetype, model)
+            response = cls.get_session().post(url, json=payload, headers=headers, timeout=45)
+        except requests.exceptions.RequestException as e:
+            _logger.exception("Error de conexión con Gemini API tras reintentos: %s", e)
+            raise UserError(f"Error de conexión con la IA de Google tras reintentos: {str(e)}")
 
         if response is None or response.status_code != 200:
             status = response.status_code if response is not None else "Sin respuesta"
@@ -291,13 +250,7 @@ class AiOcrService:
 
             text_content = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
             # Limpiar posibles bloques de markdown si vinieran
-            clean_text = text_content.strip()
-            if clean_text.startswith("```json"):
-                clean_text = clean_text[7:]
-            if clean_text.startswith("```"):
-                clean_text = clean_text[3:]
-            if clean_text.endswith("```"):
-                clean_text = clean_text[:-3]
+            clean_text = text_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
 
             parsed_data = json.loads(clean_text.strip())
             _logger.info("Datos extraídos exitosamente por Gemini para %s: %s", filename, parsed_data.get('factura', {}).get('numero'))
