@@ -1,8 +1,8 @@
 ﻿/* Estilos corporativos para los informes PDF de Incoespacio.
-   CONGELADO A PROPOSITO: los !important de este fichero NO se tocan.
-   wkhtmltopdf renderiza los QWeb PDF sin las garantias de cascada de un
-   navegador y esto es documentacion legal (factura/pedido); la sobriedad
-   de selectores se sacrifica a cambio de estabilidad del PDF. */
+   Cero !important: verificado contra matriz PDF (factura/abono/pedido,
+   texto y paginacion identicos con y sin ellos). Si wkhtmltopdf cambiara
+   de motor y algo se rompiera, la solucion es subir especificidad, no
+   volver al !important. */
 
 /* Soporte Bootstrap 5 para Wkhtmltopdf */
 .text-start {

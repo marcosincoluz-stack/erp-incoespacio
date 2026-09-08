@@ -121,3 +121,13 @@ Nota hallazgo 6: los ajustes `ocr_auto_create_partner` y `ocr_default_expense_ac
 - `!important` propios: 268 → 74 (15 backend + 53 reports congelados + 5 frontend + 1 report_theme).
 - `incoespacio_theme`: 976 → ~788 líneas.
 - `addons-incoespacio/`: 4.560 → ~4.372 líneas desde el pre-audit (5.136): −14,9%.
+
+---
+
+# Frentes S1-S3 + reorganizacion (cierre definitivo)
+
+- S1 sudo: 7 -> 4, todos justificados (ir.rule multi-compañia en res.company; icp admin-only). Los 3 sudo de XML de reports eran redundantes y cayeron.
+- S2 backend/frontend: 22 !important -> 0 (cascada tras el core + especificidad donde hacia falta).
+- S3 reports: 53 !important -> 0, verificado con matriz PDF (factura borrador, abono, pedido: paginacion y texto identicos al baseline). **Total propio: 268 -> 0 declaraciones** (David: 39).
+- Layout: `addons-incoespacio/` reorganizado como Incoluz (transversales en raiz, dominios en `extras/invoice|partner|purchases`); `addons_path` ampliado en conf y example; 12 modulos installed verificados tras el move.
+- Registros de prueba de la matriz PDF eliminados de la BD.
