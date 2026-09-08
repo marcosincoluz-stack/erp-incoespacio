@@ -200,7 +200,6 @@ class AccountMove(models.Model):
                 'iban_status': self.ocr_iban_status,
                 'mismatch': getattr(self, 'ocr_company_mismatch', False),
                 'mismatch_details': getattr(self, 'ocr_mismatch_details', '') or '',
-                'mismatch_type': getattr(self, 'ocr_mismatch_type', '') or '',
             }
             # Enviar notificación a ambos canales para compatibilidad total
             target = self.env.user.partner_id

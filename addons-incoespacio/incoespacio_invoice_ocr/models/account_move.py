@@ -7,6 +7,7 @@ from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from schwifty import IBAN
 
 _logger = logging.getLogger(__name__)
 
@@ -14,12 +15,6 @@ _logger = logging.getLogger(__name__)
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    ai_ocr_processed = fields.Boolean(
-        string="Procesado por IA",
-        default=False,
-        copy=False,
-        help="Indica si esta factura ha sido digitalizada automáticamente con Gemini Flash."
-    )
     ocr_status = fields.Selection([
         ('pending', 'En cola'),
         ('processing', 'Digitalizando...'),
@@ -34,11 +29,6 @@ class AccountMove(models.Model):
         copy=False,
         help="Indica si el emisor o receptor del documento no coincide con la compañía de la factura."
     )
-    ocr_mismatch_type = fields.Selection([
-        ('other_company', 'Pertenece a otra empresa del grupo'),
-        ('unknown_company', 'Emisor/Receptor desconocido'),
-        ('inverted_type', 'Tipo invertido (compra en ventas o venta en compras)'),
-    ], string="Tipo de Discrepancia", copy=False, readonly=True)
     ocr_mismatch_details = fields.Text(string="Detalle de Discrepancia", copy=False, readonly=True)
     ocr_raw_extracted_json = fields.Text(string="JSON Extraído por IA", copy=False, readonly=True)
 
@@ -209,17 +199,32 @@ class AccountMove(models.Model):
             vat = vat[2:]
         return vat
 
+    def _matches_company(self, comp, vat, name):
+        c_vat = self._clean_vat(comp.vat)
+        if vat and c_vat and (c_vat == vat or c_vat.endswith(vat) or vat.endswith(c_vat)):
+            return True
+        c_name = (comp.name or '').strip().lower()
+        if name and len(name) >= 4 and c_name:
+            if c_name in name.lower() or name.lower() in c_name:
+                return True
+        return False
+
+    def _match_other_company(self, vat, name):
+        for comp in self.env['res.company'].sudo().search([]).filtered(lambda c: c.id != self.company_id.id):
+            if self._matches_company(comp, vat, name):
+                return comp
+        return False
+
     def _check_fiscal_identity(self, emisor_data, receptor_data):
         """Valida que la factura pertenezca a la empresa activa y al tipo contable correcto.
-        
-        Retorna (is_mismatch, mismatch_type, details_dict)
+
+        Retorna (is_mismatch, details_dict)
         """
         self.ensure_one()
         is_customer = self.move_type in ('out_invoice', 'out_refund', 'out_receipt')
 
         my_company = self.company_id
         my_vat = self._clean_vat(my_company.vat)
-        my_name = (my_company.name or '').strip().lower()
 
         emisor_vat = self._clean_vat(emisor_data.get('cif'))
         emisor_name = (emisor_data.get('nombre') or '').strip()
@@ -227,27 +232,15 @@ class AccountMove(models.Model):
         receptor_vat = self._clean_vat(receptor_data.get('cif'))
         receptor_name = (receptor_data.get('nombre') or '').strip()
 
-        all_companies = self.env['res.company'].sudo().search([])
-
-        def _matches_company(comp, vat, name):
-            c_vat = self._clean_vat(comp.vat)
-            if vat and c_vat and (c_vat == vat or c_vat.endswith(vat) or vat.endswith(c_vat)):
-                return True
-            c_name = (comp.name or '').strip().lower()
-            if name and len(name) >= 4 and c_name:
-                if c_name in name.lower() or name.lower() in c_name:
-                    return True
-            return False
-
         # 1. Facturas de Clientes (out_invoice): El emisor DEBE ser nuestra empresa
         if is_customer:
             if emisor_vat or emisor_name:
-                if _matches_company(my_company, emisor_vat, emisor_name):
-                    return False, False, {}
+                if self._matches_company(my_company, emisor_vat, emisor_name):
+                    return False, {}
 
                 # Caso Inversión: Si el receptor somos nosotros y el emisor no, es una factura de proveedor
-                if _matches_company(my_company, receptor_vat, receptor_name):
-                    return True, 'inverted_type', {
+                if self._matches_company(my_company, receptor_vat, receptor_name):
+                    return True, {
                         'title': 'Factura de Proveedor detectada en Clientes',
                         'detected_company': my_company,
                         'msg': f"Este documento es una factura de gasto recibida de '{emisor_name or emisor_vat}', "
@@ -255,19 +248,18 @@ class AccountMove(models.Model):
                                f"Debes registrarla en 'Facturas de Proveedor'."
                     }
 
-                # ¿Coincide el emisor con otra empresa registrada en Odoo (ej. Incoluz)?
-                for other_comp in all_companies.filtered(lambda c: c.id != my_company.id):
-                    if _matches_company(other_comp, emisor_vat, emisor_name):
-                        return True, 'other_company', {
-                            'title': f'Factura de otra empresa ({other_comp.name})',
-                            'detected_company': other_comp,
-                            'msg': f"El documento fue emitido por '{other_comp.name}' (CIF: {emisor_vat or other_comp.vat}), "
-                                   f"pero tu compañía activa en la factura es '{my_company.name}'. "
-                                   f"Cambia al entorno de {other_comp.name} para gestionarla."
-                        }
+                other_comp = self._match_other_company(emisor_vat, emisor_name)
+                if other_comp:
+                    return True, {
+                        'title': f'Factura de otra empresa ({other_comp.name})',
+                        'detected_company': other_comp,
+                        'msg': f"El documento fue emitido por '{other_comp.name}' (CIF: {emisor_vat or other_comp.vat}), "
+                               f"pero tu compañía activa en la factura es '{my_company.name}'. "
+                               f"Cambia al entorno de {other_comp.name} para gestionarla."
+                    }
 
                 # Si no coincide con ninguna empresa conocida:
-                return True, 'unknown_company', {
+                return True, {
                     'title': 'Emisor no coincide con la empresa',
                     'detected_company': False,
                     'msg': f"El emisor de la factura '{emisor_name}' ({emisor_vat}) no coincide con tu empresa '{my_company.name}' ({my_vat})."
@@ -277,8 +269,8 @@ class AccountMove(models.Model):
         else:
             # Caso Inversión: Si el emisor somos nosotros, es una factura de cliente
             if emisor_vat or emisor_name:
-                if _matches_company(my_company, emisor_vat, emisor_name):
-                    return True, 'inverted_type', {
+                if self._matches_company(my_company, emisor_vat, emisor_name):
+                    return True, {
                         'title': 'Factura de Cliente detectada en Proveedores',
                         'detected_company': my_company,
                         'msg': f"Este documento fue emitido por tu propia empresa '{my_company.name}'. "
@@ -287,21 +279,20 @@ class AccountMove(models.Model):
 
             # Si viene receptor en la factura, comprobar que pertenezca a nuestra empresa
             if receptor_vat or receptor_name:
-                if _matches_company(my_company, receptor_vat, receptor_name):
-                    return False, False, {}
+                if self._matches_company(my_company, receptor_vat, receptor_name):
+                    return False, {}
 
-                # ¿Coincide el receptor con otra empresa de Odoo (ej. Incoluz)?
-                for other_comp in all_companies.filtered(lambda c: c.id != my_company.id):
-                    if _matches_company(other_comp, receptor_vat, receptor_name):
-                        return True, 'other_company', {
-                            'title': f'Factura dirigida a otra empresa ({other_comp.name})',
-                            'detected_company': other_comp,
-                            'msg': f"Esta factura de gasto está dirigida a '{other_comp.name}' (CIF: {receptor_vat or other_comp.vat}), "
-                                   f"pero tu compañía activa es '{my_company.name}'. "
-                                   f"Cambia al entorno de {other_comp.name} para registrar este gasto."
-                        }
+                other_comp = self._match_other_company(receptor_vat, receptor_name)
+                if other_comp:
+                    return True, {
+                        'title': f'Factura dirigida a otra empresa ({other_comp.name})',
+                        'detected_company': other_comp,
+                        'msg': f"Esta factura de gasto está dirigida a '{other_comp.name}' (CIF: {receptor_vat or other_comp.vat}), "
+                               f"pero tu compañía activa es '{my_company.name}'. "
+                               f"Cambia al entorno de {other_comp.name} para registrar este gasto."
+                    }
 
-        return False, False, {}
+        return False, {}
 
     def _apply_ai_extracted_data(self, data, force=False):
         self.ensure_one()
@@ -315,45 +306,37 @@ class AccountMove(models.Model):
 
         # Cortafuegos Fiscal: Comprobar identidad de emisor/receptor antes de crear registros
         if not force:
-            is_mismatch, mismatch_type, details = self._check_fiscal_identity(emisor_data, receptor_data)
+            is_mismatch, details = self._check_fiscal_identity(emisor_data, receptor_data)
             if is_mismatch:
                 self.write({
                     'ocr_status': 'mismatch',
                     'ocr_company_mismatch': True,
-                    'ocr_mismatch_type': mismatch_type,
                     'ocr_mismatch_details': details.get('msg', ''),
-                    'ai_ocr_processed': False,
                     'ocr_error_message': False,
                 })
                 title = details.get('title', 'Discrepancia de Empresa')
                 msg = details.get('msg', '')
-                body = Markup(f"""
-<div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-left: 5px solid #f59e0b; padding: 12px 16px; border-radius: 4px; margin-bottom: 8px;">
-    <div style="display: flex; align-items: center; margin-bottom: 6px;">
-        <span style="font-size: 15px; font-weight: bold; color: #b45309;">{title}</span>
-    </div>
-    <div style="color: #92400e; font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
-        {msg}
-    </div>
-    <div style="background-color: #fef3c7; padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #78350f;">
-        <b>Cómo resolverlo:</b> Cambia de empresa en el selector superior de Odoo antes de registrar esta factura. Si deseas procesarla en esta empresa de todos modos, pulsa el botón <b>"Forzar procesado de todos modos"</b>.
-    </div>
-</div>
-""")
+                body = Markup(
+                    f"<div class='alert alert-warning'>"
+                    f"<b>{title}:</b> {msg}<br/>"
+                    f"<b>Cómo resolverlo:</b> Cambia de empresa en el selector superior de Odoo antes de registrar esta factura. "
+                    f"Si deseas procesarla en esta empresa de todos modos, pulsa el botón <b>\"Forzar procesado de todos modos\"</b>."
+                    f"</div>"
+                )
                 self.message_post(body=body, subtype_xmlid='mail.mt_note')
                 return False
 
         # Si no hay discrepancia o se ha forzado manualmente, limpiar estados de discrepancia
         self.write({
             'ocr_company_mismatch': False,
-            'ocr_mismatch_type': False,
             'ocr_mismatch_details': False,
         })
 
         if not is_customer:
-            partner, was_created = self._find_or_create_supplier(emisor_data)
+            partner, was_created = self._find_or_create_partner(emisor_data, is_supplier=True)
         else:
-            partner, was_created = self._find_or_create_customer(receptor_data if receptor_data.get('cif') else emisor_data)
+            partner, was_created = self._find_or_create_partner(
+                receptor_data if receptor_data.get('cif') else emisor_data, is_supplier=False)
 
         if not self.partner_id and partner:
             self.partner_id = partner.id
@@ -381,7 +364,6 @@ class AccountMove(models.Model):
 
         if lineas_data:
             self.invoice_line_ids = [(5, 0, 0)]
-            account_id = self._get_default_income_account() if is_customer else self._get_default_expense_account()
             new_lines = []
 
             for line in lineas_data:
@@ -396,15 +378,12 @@ class AccountMove(models.Model):
                 else:
                     taxes = self._find_matching_purchase_taxes(pct_iva, pct_irpf)
 
-                line_vals = {
+                new_lines.append((0, 0, {
                     'name': desc,
                     'quantity': qty,
                     'price_unit': price,
                     'tax_ids': [(6, 0, taxes.ids)],
-                }
-                if account_id:
-                    line_vals['account_id'] = account_id.id
-                new_lines.append((0, 0, line_vals))
+                }))
 
             self.invoice_line_ids = new_lines
 
@@ -417,55 +396,18 @@ class AccountMove(models.Model):
         total_factura = float(factura_data.get('total') or 0.0)
         self._check_invoice_duplicate(partner, num_factura, total_factura)
 
-        self.write({'ocr_status': 'done', 'ai_ocr_processed': True, 'ocr_error_message': False})
+        self.write({'ocr_status': 'done', 'ocr_error_message': False})
         self._post_ai_chatter_summary(data, was_created, partner)
         return True
 
-    def _find_or_create_supplier(self, emisor_data):
-        cif = (emisor_data.get('cif') or '').strip().upper()
-        nombre = (emisor_data.get('nombre') or '').strip()
+    def _find_or_create_partner(self, data, is_supplier):
+        cif = (data.get('cif') or '').strip().upper()
+        nombre = (data.get('nombre') or '').strip()
         partner_obj = self.env['res.partner']
 
         if cif:
             cif_clean = re.sub(r'[^A-Za-z0-9]', '', cif)
-            domain = ['|', ('vat', '=ilike', cif), ('vat', '=ilike', cif_clean)]
-            partner = partner_obj.search(domain, limit=1)
-            if partner:
-                return partner, False
-
-        if nombre:
-            partner = partner_obj.search([('name', '=ilike', nombre)], limit=1)
-            if partner:
-                return partner, False
-
-        vals = {
-            'name': nombre or cif or _("Proveedor Nuevo (OCR IA)"),
-            'vat': cif or False,
-            'is_company': True,
-            'customer_rank': 0,
-            'supplier_rank': 1,
-            'street': (emisor_data.get('direccion') or '').strip() or False,
-            'zip': (emisor_data.get('codigo_postal') or '').strip() or False,
-            'city': (emisor_data.get('ciudad') or '').strip() or False,
-            'phone': (emisor_data.get('telefono') or '').strip() or False,
-            'email': (emisor_data.get('email') or '').strip() or False,
-        }
-        country_name = (emisor_data.get('pais') or '').strip()
-        if country_name:
-            country = self.env['res.country'].search([('name', '=ilike', country_name)], limit=1)
-            if country:
-                vals['country_id'] = country.id
-
-        new_partner = partner_obj.create(vals)
-        return new_partner, True
-
-    def _find_or_create_customer(self, receptor_data):
-        cif = (receptor_data.get('cif') or '').strip().upper()
-        nombre = (receptor_data.get('nombre') or '').strip()
-        partner_obj = self.env['res.partner']
-
-        if cif:
-            partner = partner_obj.search([('vat', '=ilike', cif)], limit=1)
+            partner = partner_obj.search(['|', ('vat', '=ilike', cif), ('vat', '=ilike', cif_clean)], limit=1)
             if partner:
                 return partner, False
         if nombre:
@@ -474,29 +416,26 @@ class AccountMove(models.Model):
                 return partner, False
 
         vals = {
-            'name': nombre or cif or _("Cliente Nuevo (OCR IA)"),
+            'name': nombre or cif or (_("Proveedor Nuevo (OCR IA)") if is_supplier else _("Cliente Nuevo (OCR IA)")),
             'vat': cif or False,
             'is_company': True,
-            'customer_rank': 1,
-            'supplier_rank': 0,
+            'customer_rank': 0 if is_supplier else 1,
+            'supplier_rank': 1 if is_supplier else 0,
         }
+        if is_supplier:
+            vals.update({
+                'street': (data.get('direccion') or '').strip() or False,
+                'zip': (data.get('codigo_postal') or '').strip() or False,
+                'city': (data.get('ciudad') or '').strip() or False,
+                'phone': (data.get('telefono') or '').strip() or False,
+                'email': (data.get('email') or '').strip() or False,
+            })
+            country_name = (data.get('pais') or '').strip()
+            if country_name:
+                country = self.env['res.country'].search([('name', '=ilike', country_name)], limit=1)
+                if country:
+                    vals['country_id'] = country.id
         return partner_obj.create(vals), True
-
-    def _get_default_expense_account(self):
-        Account = self.env['account.account']
-        comp = self.company_id or self.env.company
-        acc = Account.search([('code', '=like', '600%'), ('company_id', '=', comp.id)], limit=1)
-        if not acc:
-            acc = Account.search([('account_type', '=', 'expense'), ('company_id', '=', comp.id)], limit=1)
-        return acc
-
-    def _get_default_income_account(self):
-        Account = self.env['account.account']
-        comp = self.company_id or self.env.company
-        acc = Account.search([('code', '=like', '700%'), ('company_id', '=', comp.id)], limit=1)
-        if not acc:
-            acc = Account.search([('account_type', '=', 'income'), ('company_id', '=', comp.id)], limit=1)
-        return acc
 
     def _find_matching_purchase_taxes(self, pct_iva, pct_irpf=0.0):
         Tax = self.env['account.tax']
@@ -549,16 +488,6 @@ class AccountMove(models.Model):
             self.is_duplicate_detected = False
             self.duplicate_move_id = False
 
-    # Ponytail: 4-line standard ISO 7064 Modulo 97 SEPA check
-    @staticmethod
-    def _validate_iban_checksum(iban):
-        if not iban or len(iban) < 15:
-            return False
-        clean = re.sub(r'[^A-Z0-9]', '', iban.upper())
-        rearranged = clean[4:] + clean[:4]
-        num_str = ''.join(str(ord(c) - 55) if c.isalpha() else c for c in rearranged)
-        return num_str.isdigit() and int(num_str) % 97 == 1
-
     def _process_iban_verification(self, partner, raw_iban, bank_name=None):
         self.ensure_one()
         if not partner or not raw_iban:
@@ -579,7 +508,11 @@ class AccountMove(models.Model):
             _logger.warning("Alerta IBAN factura %s: %s no coincide con cuentas de %s: %s", self.id, clean_iban, partner.name, partner_ibans)
             return
 
-        if self._validate_iban_checksum(clean_iban) or (clean_iban.startswith('ES') and len(clean_iban) == 24):
+        try:
+            iban_valid = IBAN(clean_iban).is_valid
+        except Exception:
+            iban_valid = False
+        if iban_valid:
             try:
                 self.env['res.partner.bank'].create({
                     'acc_number': clean_iban,
