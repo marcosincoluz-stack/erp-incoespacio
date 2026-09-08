@@ -13,7 +13,10 @@ addons_path =
     /mnt/extra-addons/account-reconcile,
     /mnt/extra-addons/bank-statement-import,
     /mnt/extra-addons/account-payment,
-    /mnt/incoespacio-addons
+    /mnt/incoespacio-addons,
+    /mnt/incoespacio-addons/extras/invoice,
+    /mnt/incoespacio-addons/extras/partner,
+    /mnt/incoespacio-addons/extras/purchases
 data_dir = /var/lib/odoo
 db_host = db
 db_port = 5432
