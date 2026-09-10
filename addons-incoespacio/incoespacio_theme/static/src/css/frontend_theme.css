@@ -1,4 +1,4 @@
-﻿:root {
+:root {
 	--brand: #e72228ff;
 	--darkbrand: #d1363cff;
 	--lightbrand: #f7686dff;
@@ -86,7 +86,7 @@ a:hover {
 	display: none;
 }
 
-/* LOGO DE ALTA DEFINICIÃ“N EN CABECERA */
+/* LOGO DE ALTA DEFINICIÓN EN CABECERA */
 header .navbar-brand.logo {
 	padding-top: 0.35rem;
 	padding-bottom: 0.35rem;

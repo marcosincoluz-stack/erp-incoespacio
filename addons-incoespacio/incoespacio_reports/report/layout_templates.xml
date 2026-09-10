@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
 
@@ -15,7 +15,7 @@
                                 <t t-if="o and o._name == 'account.move'">
                                     <h1 t-if="o.move_type in ('out_refund','in_refund')" style="font-size: 1.45rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px;">ABONO</h1>
                                     <h1 t-elif="o.move_type == 'out_invoice' and o.state == 'draft'" style="font-size: 1.3rem; font-weight: bold; margin: 0; color: #6c757d; letter-spacing: -0.5px;">BORRADOR FACTURA</h1>
-                                    <h1 t-else="" style="font-size: 1.45rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px;">FACTURA NÂº</h1>
+                                    <h1 t-else="" style="font-size: 1.45rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px;">FACTURA Nº</h1>
                                 </t>
                                 <t t-elif="doc and doc._name == 'sale.order'">
                                     <h1 t-if="doc.state not in ['draft','sent']" style="font-size: 1.45rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px;">PEDIDO DE VENTA</h1>
@@ -30,7 +30,7 @@
                                 </t>
                             </div>
                             <div style="font-size: 1.15rem; margin-top: 4px; color: #212529; font-weight: 500;">
-                                <span>NÂº </span>
+                                <span>Nº </span>
                                 <span t-if="o and o.name" t-field="o.name" style="font-weight: 700;"/>
                                 <span t-elif="doc and doc.name" t-field="doc.name" style="font-weight: 700;"/>
                                 <span style="margin-left: 12px; color: #495057;">
@@ -57,7 +57,7 @@
                 <div style="width: 100%; overflow: hidden;">
                     <div style="float: left; width: 25%; text-align: left; padding-top: 10px;">
                             <div t-if="report_type == 'pdf'" style="color: #6c757d; font-weight: 500;">
-                                PÃ¡gina: <span class="page"/> / <span class="topage"/>
+                                Página: <span class="page"/> / <span class="topage"/>
                             </div>
                     </div>
 

@@ -1,4 +1,4 @@
-﻿/* Estilos corporativos para los informes PDF de Incoespacio.
+/* Estilos corporativos para los informes PDF de Incoespacio.
    Cero !important: verificado contra matriz PDF (factura/abono/pedido,
    texto y paginacion identicos con y sin ellos). Si wkhtmltopdf cambiara
    de motor y algo se rompiera, la solucion es subir especificidad, no
@@ -147,7 +147,7 @@
     padding-bottom: 8px;
 }
 
-/* EliminaciÃ³n estricta de bordes en cabecera y pie de pÃ¡gina para evitar marcos no deseados al imprimir */
+/* Eliminación estricta de bordes en cabecera y pie de página para evitar marcos no deseados al imprimir */
 .header table, .header table tr, .header table td, .header table th, .header div,
 .footer table, .footer table tr, .footer table td, .footer table th, .footer div {
     border: none;

@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
 
         <!-- Tipos de Incidencia por defecto -->
         <record id="ticket_type_error" model="incoespacio_support.ticket_type">
-            <field name="name">Error crÃ­tico</field>
+            <field name="name">Error crítico</field>
             <field name="sequence">1</field>
         </record>
         <record id="ticket_type_bug" model="incoespacio_support.ticket_type">
@@ -24,9 +24,9 @@
             <field name="sequence">5</field>
         </record>
 
-        <!-- Ãreas de Negocio por defecto -->
+        <!-- Áreas de Negocio por defecto -->
         <record id="ticket_cat_erp" model="incoespacio_support.ticket_category">
-            <field name="name">ERP &amp; FacturaciÃ³n</field>
+            <field name="name">ERP &amp; Facturación</field>
             <field name="sequence">1</field>
         </record>
         <record id="ticket_cat_contacts" model="incoespacio_support.ticket_category">
@@ -34,7 +34,7 @@
             <field name="sequence">2</field>
         </record>
         <record id="ticket_cat_it" model="incoespacio_support.ticket_category">
-            <field name="name">InformÃ¡tica / Conectividad</field>
+            <field name="name">Informática / Conectividad</field>
             <field name="sequence">3</field>
         </record>
 
