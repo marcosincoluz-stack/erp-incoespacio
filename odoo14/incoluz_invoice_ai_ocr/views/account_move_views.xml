@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_ai_ocr" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.ai.ocr</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_scan_with_ai"
+                        type="object"
+                        string="Escanear con IA"
+                        class="btn-primary"
+                        attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('move_type', 'not in', ['in_invoice', 'in_receipt', 'in_refund', 'out_invoice', 'out_refund', 'out_receipt'])]}"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <field name="ocr_status" invisible="1"/>
+                <field name="ocr_error_message" invisible="1"/>
+                <field name="is_duplicate_detected" invisible="1"/>
+                <field name="duplicate_move_id" invisible="1"/>
+                <field name="ocr_extracted_iban" invisible="1"/>
+                <field name="ocr_iban_status" invisible="1"/>
+                <field name="ocr_company_mismatch" invisible="1"/>
+                <field name="ocr_mismatch_details" invisible="1"/>
+
+                <div class="alert alert-warning d-flex align-items-center justify-content-between mb-2"
+                     role="alert"
+                     attrs="{'invisible': [('ocr_company_mismatch', '=', False)]}">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-building fa-2x mr-3 text-warning" title="Discrepancia de empresa"/>
+                        <div>
+                            <strong>DISCREPANCIA FISCAL DE EMPRESA:</strong><br/>
+                            <field name="ocr_mismatch_details" readonly="1" class="d-inline"/>
+                        </div>
+                    </div>
+                    <button name="action_force_process_ocr"
+                            type="object"
+                            string="Forzar procesado de todos modos"
+                            class="btn btn-sm btn-primary ml-3 text-nowrap"
+                            confirm="¿Estás seguro de forzar el procesado de este documento en esta empresa? Podría corresponder a otra razón social."/>
+                </div>
+
+                <div class="alert alert-danger d-flex align-items-center mb-2"
+                     role="alert"
+                     attrs="{'invisible': ['|', ('is_duplicate_detected', '=', False), ('duplicate_move_id', '=', False)]}">
+                    <i class="fa fa-exclamation-triangle fa-2x mr-3 text-danger" title="Factura duplicada"/>
+                    <div>
+                        <strong>ALERTA DE FACTURA DUPLICADA:</strong><br/>
+                        Ya existe en el sistema la factura <field name="duplicate_move_id" readonly="1" class="font-weight-bold"/> para este proveedor con el mismo número o importe.
+                    </div>
+                </div>
+
+                <div class="alert alert-danger d-flex align-items-center mb-2"
+                     role="alert"
+                     attrs="{'invisible': [('ocr_iban_status', '!=', 'mismatch')]}">
+                    <i class="fa fa-shield fa-2x mr-3 text-danger" title="Alerta IBAN"/>
+                    <div>
+                        <strong>ALERTA DE SEGURIDAD ANTIFRAUDE (IBAN):</strong><br/>
+                        El IBAN de la factura (<strong><field name="ocr_extracted_iban" readonly="1"/></strong>) <u>no coincide</u> con las cuentas bancarias autorizadas del proveedor.
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mb-2"
+                     role="alert"
+                     attrs="{'invisible': [('ocr_status', '!=', 'error')]}">
+                    <i class="fa fa-exclamation-circle mr-2"/>
+                    <strong>Error en extracción OCR:</strong>
+                    <field name="ocr_error_message" readonly="1" class="d-inline"/>
+                </div>
+
+                <div class="alert alert-info mb-2"
+                     role="alert"
+                     attrs="{'invisible': [('ocr_status', '!=', 'processing')]}">
+                    <i class="fa fa-spinner fa-spin mr-2"/>
+                    Digitalizando documento con Inteligencia Artificial...
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="incoluz_invoice_ai_ocr.OcrBatchDrawer">
+        <div t-if="state.visible" class="o_ocr_batch_drawer_container">
+            <!-- Modo Minimizado: Pastilla Flotante -->
+            <div t-if="state.minimized" class="o_ocr_batch_pill" t-on-click="toggleMinimize" title="Haz clic para expandir">
+                <span t-if="!isComplete" class="fa fa-spinner fa-spin o_ocr_pill_spinner"/>
+                <span t-else="" class="fa fa-check-circle text-success"/>
+                <span>
+                    <t t-if="isComplete">
+                        Facturas procesadas (<t t-esc="doneCount"/>/<t t-esc="totalCount"/>)
+                    </t>
+                    <t t-else="">
+                        Digitalizando con IA (<t t-esc="doneCount"/>/<t t-esc="totalCount"/>) · <t t-esc="progressPercent"/>%
+                    </t>
+                </span>
+                <i class="fa fa-window-maximize ml-1" style="font-size: 11px; opacity: 0.8;"/>
+                <button type="button" class="close ml-2 text-white" style="font-size: 14px;" t-on-click.stop="close" title="Cerrar">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <!-- Modo Expandido: Ventana Estilo Google Drive -->
+            <div t-else="" class="o_ocr_batch_card">
+                <div class="o_ocr_header">
+                    <div class="o_ocr_title">
+                        <i t-if="!isComplete" class="fa fa-cogs text-primary mr-2"/>
+                        <i t-else="" class="fa fa-check-circle text-success mr-2"/>
+                        <span t-if="!isComplete">Digitalizando facturas con IA</span>
+                        <span t-else="">Digitalización completada</span>
+                        <span class="badge badge-secondary ml-1" style="font-size: 11px;">
+                            <t t-esc="doneCount"/>/<t t-esc="totalCount"/>
+                        </span>
+                    </div>
+                    <div class="o_ocr_header_actions">
+                        <button type="button" class="btn-icon" t-on-click="toggleMinimize" title="Minimizar">
+                            <i class="fa fa-minus"/>
+                        </button>
+                        <button type="button" class="btn-icon" t-on-click="close" title="Cerrar">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="o_ocr_progress_container">
+                    <div class="o_ocr_progress_bar"
+                         t-att-class="{ 'is-complete': isComplete }"
+                         t-att-style="'width: ' + progressPercent + '%;'"/>
+                </div>
+
+                <div class="o_ocr_list">
+                    <t t-foreach="state.items" t-as="item" t-key="item.id">
+                        <div class="o_ocr_item is-clickable" t-on-click="() => this.openInvoice(item.id)" title="Haz clic para abrir la factura">
+                            <div class="o_ocr_item_left">
+                                <span t-if="item.status === 'done'" class="fa fa-check-circle text-success" style="font-size: 15px;"/>
+                                <span t-elif="item.status === 'mismatch'" class="fa fa-building text-warning" style="font-size: 15px;"/>
+                                <span t-elif="item.status === 'processing'" class="fa fa-circle-o-notch fa-spin text-primary" style="font-size: 15px;"/>
+                                <span t-elif="item.status === 'pending'" class="fa fa-clock-o text-muted" style="font-size: 15px;"/>
+                                <span t-elif="item.status === 'failed'" class="fa fa-exclamation-triangle text-danger" style="font-size: 15px;"/>
+
+                                <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                    <span class="o_ocr_item_name">
+                                        <t t-if="item.partner"><t t-esc="item.partner"/></t>
+                                        <t t-else=""><t t-esc="item.filename"/></t>
+                                        <span t-if="item.status === 'mismatch'" class="badge badge-warning ml-1" style="font-size: 10px;">Discrepancia de empresa</span>
+                                        <span t-if="item.is_duplicate" class="badge badge-danger ml-1" style="font-size: 10px;">Posible Duplicada</span>
+                                    </span>
+                                    <span class="o_ocr_item_sub">
+                                        <t t-if="item.status === 'done'">
+                                            <span class="badge badge-primary mr-1" t-if="item.name and item.name !== '/'"><t t-esc="item.name"/></span>
+                                            <t t-esc="item.filename"/>
+                                            <t t-if="item.ref"> · Nº <t t-esc="item.ref"/></t>
+                                        </t>
+                                        <t t-elif="item.status === 'mismatch'">
+                                            <span class="text-warning font-weight-bold"><t t-esc="item.mismatch_details || 'Pertenece a otra empresa'"/></span>
+                                        </t>
+                                        <t t-elif="item.status === 'processing'">Procesando con IA...</t>
+                                        <t t-elif="item.status === 'pending'">En cola en el servidor...</t>
+                                        <t t-elif="item.status === 'failed'">
+                                            <span class="text-danger"><t t-esc="item.error || 'Requiere revisión manual'"/></span>
+                                        </t>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="o_ocr_item_right">
+                                <span t-if="item.status === 'done' and item.amount_total" class="o_ocr_item_total">
+                                    <t t-esc="formatCurrency(item.amount_total)"/>
+                                </span>
+                                <i class="fa fa-external-link text-muted ml-1" style="font-size: 11px; opacity: 0.6;"/>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
