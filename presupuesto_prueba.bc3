@@ -1,0 +1,15 @@
+~V|Fixture sintetico bc3-skill|FIEBDC-3/2024\01012026|bc3-skill|Presupuesto de prueba\EUR-2026\|ANSI|Datos inventados, sin relacion con ningun banco real|1||||
+~K|2\2\2\2\2\2\2\2\EUR\|5\13\6\0\21|2\2\\2\3\\2\2\2\2\2\2\2\2\EUR\||
+~C|T01##\||Presupuesto sintetico de prueba|953.40\|01012026\|OB|
+~D|T01##|C01#\\1\|
+~C|C01#\||Movimiento de tierras|953.40\|01012026\||
+~D|C01#|UO01\1\10\|
+~M|C01#\UO01|001\|10|\Zona A\10\\\\|
+~C|UO01\|m3|Excavacion en zanja con medios mecanicos|90.80\|01012026\|EU|
+~T|UO01|Excavacion de zanja en terreno compacto con medios mecanicos,
+incluida carga sobre camion y parte proporcional de medios auxiliares.
+Criterio de medicion: m3 de volumen teorico excavado.|
+~D|UO01|MO01\1\2\MT01\1\1\MO%AUX\1\0.02\|
+~C|MO01|h|Peon ordinario|20.00\|01012026\|1|
+~C|MT01|m3|Material de aportacion seleccionado|50.00\|01012026\|3|
+~C|MO%AUX|%|Medios auxiliares sobre mano de obra|1\|\|0|%|

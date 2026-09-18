@@ -11,8 +11,22 @@
                         string="Escanear con IA"
                         class="btn-primary"
                         attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('move_type', 'not in', ['in_invoice', 'in_receipt', 'in_refund', 'out_invoice', 'out_refund', 'out_receipt'])]}"/>
+                <button name="action_toggle_split_view"
+                        type="object"
+                        string="Ver PDF al lado"
+                        class="o_btn_ocr_split o_btn_ocr_open_split"
+                        icon="fa-columns"
+                        attrs="{'invisible': ['|', ('ocr_has_pdf', '=', False), ('ocr_show_split_view', '=', True)]}"/>
+                <button name="action_toggle_split_view"
+                        type="object"
+                        string="Cerrar PDF"
+                        class="o_btn_ocr_split o_btn_ocr_close_split"
+                        icon="fa-times"
+                        attrs="{'invisible': ['|', ('ocr_has_pdf', '=', False), ('ocr_show_split_view', '=', False)]}"/>
             </xpath>
             <xpath expr="//sheet" position="before">
+                <field name="ocr_has_pdf" invisible="1"/>
+                <field name="ocr_show_split_view" invisible="1"/>
                 <field name="ocr_status" invisible="1"/>
                 <field name="ocr_error_message" invisible="1"/>
                 <field name="is_duplicate_detected" invisible="1"/>
@@ -62,7 +76,7 @@
                 <div class="alert alert-warning mb-2"
                      role="alert"
                      attrs="{'invisible': [('ocr_status', '!=', 'error')]}">
-                    <i class="fa fa-exclamation-circle mr-2"/>
+                    <i class="fa fa-exclamation-circle mr-2" title="Error de extracción"/>
                     <strong>Error en extracción OCR:</strong>
                     <field name="ocr_error_message" readonly="1" class="d-inline"/>
                 </div>
@@ -70,10 +84,36 @@
                 <div class="alert alert-info mb-2"
                      role="alert"
                      attrs="{'invisible': [('ocr_status', '!=', 'processing')]}">
-                    <i class="fa fa-spinner fa-spin mr-2"/>
+                    <i class="fa fa-spinner fa-spin mr-2" title="Procesando"/>
                     Digitalizando documento con Inteligencia Artificial...
+                </div>
+
+                <div class="o_invoice_pdf_split_panel" attrs="{'invisible': ['|', ('ocr_show_split_view', '=', False), ('ocr_has_pdf', '=', False)]}">
+                    <div class="o_pdf_panel_header">
+                        <span><i class="fa fa-file-pdf-o text-danger mr-1"/> Documento original</span>
+                        <div class="o_pdf_panel_actions">
+                            <button name="action_toggle_split_view" type="object" class="btn btn-sm o_btn_ocr_split_close" title="Cerrar visor PDF">
+                                <i class="fa fa-times"/>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="o_pdf_panel_content">
+                        <field name="ocr_pdf_file" widget="pdf_viewer" readonly="1" nolabel="1"/>
+                    </div>
                 </div>
             </xpath>
         </field>
     </record>
+
+    <record id="ocr_upload_wizard_client_action" model="ir.actions.client">
+        <field name="name">Digitalizar facturas con IA</field>
+        <field name="tag">incoluz_invoice_ai_ocr.upload_wizard_action</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="ocr_upload_wizard_menu"
+              name="Digitalizar facturas con IA"
+              parent="account.menu_finance"
+              action="ocr_upload_wizard_client_action"
+              sequence="55"/>
 </odoo>

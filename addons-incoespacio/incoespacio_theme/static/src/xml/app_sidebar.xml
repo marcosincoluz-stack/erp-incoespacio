@@ -23,4 +23,15 @@
         </aside>
     </t>
 
+    <t t-inherit="web_responsive.AppsMenuOdooSearchBar" t-inherit-mode="extension">
+        <xpath expr="//input" position="attributes">
+            <attribute name="placeholder">Buscar...</attribute>
+        </xpath>
+    </t>
+    <t t-inherit="web_responsive.AppsMenuCanonicalSearchBar" t-inherit-mode="extension">
+        <xpath expr="//input" position="attributes">
+            <attribute name="placeholder">Buscar...</attribute>
+        </xpath>
+    </t>
+
 </templates>

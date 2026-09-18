@@ -2,8 +2,9 @@
     position: fixed;
     bottom: 20px;
     right: 24px;
-    z-index: 1050;
+    z-index: 1055;
     font-family: inherit;
+    pointer-events: auto;
 
     .o_ocr_batch_pill {
         display: inline-flex;
@@ -27,6 +28,21 @@
 
         .o_ocr_pill_spinner {
             animation: spin 1s infinite linear;
+        }
+
+        .close {
+            color: #ffffff !important;
+            opacity: 0.85;
+            line-height: 1;
+            text-shadow: none;
+            padding: 0;
+            margin: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            &:hover {
+                opacity: 1;
+            }
         }
     }
 
@@ -191,3 +207,311 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.o_ocr_wizard_container {
+    .o_ocr_wizard_file_list {
+        max-height: 220px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        background: #ffffff;
+
+        .o_ocr_wizard_file_item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f3f5;
+            transition: background-color 0.15s ease;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: #f8f9fa;
+            }
+
+            .o_ocr_wizard_file_info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                overflow: hidden;
+
+                .o_ocr_file_icon {
+                    font-size: 20px;
+                    flex-shrink: 0;
+                }
+
+                .o_ocr_wizard_file_text {
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+
+                    .o_ocr_wizard_file_name {
+                        font-weight: 500;
+                        font-size: 13px;
+                        color: #212529;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    .o_ocr_wizard_file_size {
+                        font-size: 11px;
+                        color: #6c757d;
+                    }
+                }
+            }
+
+            .o_ocr_remove_btn {
+                padding: 2px 6px;
+                opacity: 0.6;
+                transition: opacity 0.15s ease;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .o_ocr_drop_area {
+        background-color: #fafbfc;
+        border: 2px dashed #ced4da;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        &.is-dragging {
+            background-color: #e7f1ff;
+            border-color: #0d6efd;
+        }
+    }
+}
+
+/* ==========================================================================
+   Botones de Acción de Vista Dividida en Statusbar (Texto Nítido y Visible)
+   ========================================================================== */
+.o_form_statusbar {
+    .o_btn_ocr_split,
+    button[name="action_toggle_split_view"] {
+        color: #212529 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ced4da !important;
+        font-weight: 500 !important;
+        padding: 4px 10px !important;
+        border-radius: 4px !important;
+        align-items: center !important;
+        gap: 5px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        text-shadow: none !important;
+
+        i.fa {
+            color: #495057 !important;
+            font-size: 13px !important;
+        }
+
+        &:hover, &:focus, &:active {
+            color: #121416 !important;
+            background-color: #e9ecef !important;
+            border-color: #adb5bd !important;
+
+            i.fa {
+                color: #212529 !important;
+            }
+        }
+
+        /* Si Odoo marca el botón como invisible, NUNCA debe mostrarse */
+        &.o_invisible_modifier {
+            display: none !important;
+        }
+    }
+
+    /* Estado por defecto (split no activo): solo el botón de abrir es visible */
+    .o_btn_ocr_open_split:not(.o_invisible_modifier) {
+        display: inline-flex !important;
+    }
+    .o_btn_ocr_close_split {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   Vista Dividida Lado a Lado (Split View) para Facturas de Proveedor / Cliente
+   ========================================================================== */
+.o_invoice_split_view_active {
+    .o_form_statusbar {
+        .o_btn_ocr_open_split {
+            display: none !important;
+        }
+        .o_btn_ocr_close_split:not(.o_invisible_modifier) {
+            display: inline-flex !important;
+        }
+    }
+
+    .o_form_sheet_bg {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 16px 24px 16px !important;
+        gap: 16px !important;
+        align-items: flex-start !important;
+
+        /* La barra de estado ocupa el 100% de la fila superior */
+        > .o_form_statusbar {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            order: 0 !important;
+            margin: 0 -16px 12px -16px !important;
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+        }
+
+        /* Alertas de discrepancia fiscal / duplicados a ancho completo */
+        > .alert {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            order: 0 !important;
+            margin: 0 0 12px 0 !important;
+        }
+
+        /* Columna Izquierda: Formulario estándar de Odoo */
+        > .o_form_sheet {
+            flex: 1 1 calc(50% - 10px) !important;
+            width: calc(50% - 10px) !important;
+            max-width: calc(50% - 10px) !important;
+            min-width: 420px !important;
+            order: 1 !important;
+            margin: 0 !important;
+            padding: 20px 24px !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+            overflow-x: auto !important;
+        }
+
+        /* Columna Derecha: Visor PDF anclado (Sticky) */
+        > .o_invoice_pdf_split_panel {
+            flex: 1 1 calc(50% - 10px) !important;
+            width: calc(50% - 10px) !important;
+            max-width: calc(50% - 10px) !important;
+            min-width: 420px !important;
+            order: 2 !important;
+            margin: 0 !important;
+            position: sticky !important;
+            top: 10px !important;
+            height: calc(100vh - 120px) !important;
+            min-height: 600px !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+            overflow: hidden !important;
+            flex-direction: column !important;
+            z-index: 10 !important;
+
+            &:not(.o_invisible_modifier) {
+                display: flex !important;
+            }
+            &.o_invisible_modifier {
+                display: none !important;
+            }
+
+            .o_pdf_panel_header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 8px 14px;
+                background: #f8f9fa;
+                border-bottom: 1px solid #dee2e6;
+                font-size: 13px;
+                font-weight: 600;
+                color: #343a40;
+
+                .o_btn_ocr_split_close {
+                    padding: 3px 8px !important;
+                    font-size: 13px !important;
+                    line-height: 1 !important;
+                    color: #6c757d !important;
+                    background: #ffffff !important;
+                    border: 1px solid #ced4da !important;
+                    border-radius: 4px !important;
+
+                    &:hover {
+                        color: #dc3545 !important;
+                        border-color: #dc3545 !important;
+                        background: #fff5f5 !important;
+                    }
+                }
+            }
+
+            .o_pdf_panel_content {
+                flex: 1 1 auto;
+                height: calc(100% - 40px);
+                width: 100%;
+                overflow: hidden;
+                background: #525659;
+
+                .o_field_pdfviewer,
+                iframe.o_pdfview_iframe {
+                    width: 100% !important;
+                    height: 100% !important;
+                    min-height: 100% !important;
+                    border: 0 !important;
+                    margin: 0 !important;
+                    display: block;
+                }
+            }
+        }
+
+        /* Chatter en la parte inferior a 100% de ancho */
+        > .oe_chatter {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            order: 3 !important;
+            margin-top: 20px !important;
+        }
+    }
+}
+
+/* En resoluciones móviles y tablets (< 992px) conmuta a diseño vertical apilado */
+@media (max-width: 991.98px) {
+    .o_invoice_split_view_active {
+        .o_form_sheet_bg {
+            flex-direction: column !important;
+
+            > .o_form_sheet,
+            > .o_invoice_pdf_split_panel {
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 100% !important;
+                position: static !important;
+            }
+
+            > .o_invoice_pdf_split_panel {
+                height: 550px !important;
+                min-height: 550px !important;
+                margin-top: 16px !important;
+
+                .o_pdf_panel_content {
+                    height: 500px !important;
+
+                    .o_field_pdfviewer,
+                    iframe.o_pdfview_iframe {
+                        min-height: 500px !important;
+                        height: 500px !important;
+                    }
+                }
+            }
+        }
+    }
+}
+
+

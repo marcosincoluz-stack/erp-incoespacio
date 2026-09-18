@@ -12,17 +12,31 @@
                     <div class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane"/>
                         <div class="o_setting_right_pane">
-                            <label for="gemini_api_key" string="Google Gemini API Key"/>
-                            <div class="text-muted">Clave de API de Google Gemini (obtenida gratis en Google AI Studio).</div>
-                            <field name="gemini_api_key" password="True" placeholder="AIzaSy..."/>
+                            <label for="gemini_api_key"/>
+                            <span class="fa fa-lg fa-key" title="API Key" aria-label="API Key" role="img"/>
+                            <div class="text-muted">
+                                Clave de API de Google Gemini (obtenida gratis en Google AI Studio).
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="gemini_api_key" class="o_light_label" password="True" placeholder="AIzaSy..."/>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane"/>
                         <div class="o_setting_right_pane">
-                            <label for="gemini_model" string="Modelo Gemini"/>
-                            <div class="text-muted">Modelo de visión utilizado para procesar los documentos PDF e imágenes.</div>
-                            <field name="gemini_model"/>
+                            <label for="gemini_model"/>
+                            <span class="fa fa-lg fa-cogs" title="Modelo" aria-label="Modelo" role="img"/>
+                            <div class="text-muted">
+                                Modelo de visión utilizado para procesar los documentos PDF e imágenes.
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="gemini_model" class="o_light_label"/>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

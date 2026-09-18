@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_certification_line_lens,certification.line.lens,model_certification_line_lens,account.group_account_invoice,1,1,1,1
+access_certification_line_lens_bill,certification.line.lens.bill,model_certification_line_lens_bill,account.group_account_invoice,1,1,1,1

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" name="Incoluz OCR Backend Assets" inherit_id="web.assets_backend">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" type="text/scss" href="/incoluz_invoice_ai_ocr/static/src/scss/ocr_drawer.scss"/>
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/incoluz_invoice_ai_ocr/static/src/js/ocr_drawer.js"/>
+        </xpath>
+    </template>
+</odoo>

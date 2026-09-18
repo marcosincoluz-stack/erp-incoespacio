@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ocr_obra_split_wizard_form" model="ir.ui.view">
+        <field name="name">ocr.obra.split.wizard.form</field>
+        <field name="model">ocr.obra.split.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Repartir entre partidas">
+                <group>
+                    <group>
+                        <field name="line_id" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="amount_total"/>
+                    </group>
+                    <group>
+                        <field name="amount_remaining"/>
+                    </group>
+                </group>
+                <field name="split_line_ids">
+                    <tree editable="bottom">
+                        <field name="project_id" column_invisible="True"/>
+                        <field name="currency_id" column_invisible="True"/>
+                        <field name="construction_line_id"
+                               context="{'short_construction_line': True}"
+                               options="{'no_create': True, 'no_quick_create': True}"/>
+                        <field name="amount"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Repartir" class="btn-primary"/>
+                    <button special="cancel" string="Cancelar" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ocr_obra_assign_wizard_form" model="ir.ui.view">
+        <field name="name">ocr.obra.assign.wizard.form</field>
+        <field name="model">ocr.obra.assign.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Imputar a partidas">
+                <field name="move_id" invisible="1"/>
+                <field name="project_id" invisible="1"/>
+                <field name="line_ids">
+                    <tree editable="bottom" create="0" delete="0">
+                        <field name="move_line_id" column_invisible="True"/>
+                        <field name="project_id" column_invisible="True"/>
+                        <field name="construction_section_id" column_invisible="True"/>
+                        <field name="currency_id" column_invisible="True"/>
+                        <field name="name"/>
+                        <field name="construction_line_id"
+                               context="{'short_construction_line': True}"
+                               options="{'no_create': True, 'no_quick_create': True}"/>
+                        <field name="amount"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Imputar" class="btn-primary"/>
+                    <button special="cancel" string="Cancelar" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

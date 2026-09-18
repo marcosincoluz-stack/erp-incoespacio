@@ -8,6 +8,7 @@
     'license': 'LGPL-3',
     'depends': [
         'account',
+        'incoespacio_security',
         'incoespacio_ai_core',
         'incoespacio_partner_is_customer_or_supplier',
     ],

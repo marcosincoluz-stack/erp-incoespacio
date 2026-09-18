@@ -1,0 +1,5 @@
+// Odoo already sticks thead; x2many lists grow with content so it never triggers.
+.o_certification_lines .o_list_renderer {
+    // ponytail: 18rem ≈ control panel + cabecera de ficha; ajustar si crece el formulario
+    max-height: calc(100vh - 18rem);
+}

@@ -46,7 +46,7 @@
                     <i class="fa fa-exclamation-triangle fa-2x me-3 text-danger" title="Factura duplicada"/>
                     <div>
                         <strong>ALERTA DE FACTURA DUPLICADA:</strong><br/>
-                        Ya existe en el sistema la factura <field name="duplicate_move_id" readonly="1" class="fw-bold"/> para este proveedor con el mismo número o importe.
+                        Ya existe en el sistema la factura <field name="duplicate_move_id" readonly="1" class="fw-bold"/> para este proveedor con el mismo número.
                     </div>
                 </div>
 

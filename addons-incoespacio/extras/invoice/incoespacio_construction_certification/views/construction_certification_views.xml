@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- FORM VIEW -->
+    <record id="view_construction_certification_form" model="ir.ui.view">
+        <field name="name">construction.certification.form</field>
+        <field name="model">construction.certification</field>
+        <field name="arch" type="xml">
+            <form string="Certificación de Obra">
+                <header>
+                    <button name="action_confirm_and_invoice" string="Aprobar y crear factura" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Aprobar Certificación" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_create_invoice" string="Crear Factura" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_print_certification" string="Imprimir Certificación" type="object" class="btn-secondary" icon="fa-print"/>
+                    <button name="action_draft" string="Volver a Borrador" type="object" invisible="state not in ('confirmed', 'cancel')"/>
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state in ('draft', 'cancel') or invoice_id"/>
+                    <button name="action_toggle_lines_editable" string="Editar partidas" type="object" icon="fa-pencil" invisible="lines_editable or state != 'draft'"/>
+                    <button name="action_toggle_lines_editable" string="Bloquear partidas" type="object" icon="fa-lock" invisible="not lines_editable or state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,invoiced"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not invoice_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Factura</span>
+                                <span class="o_stat_value"><field name="invoice_id" readonly="1"/></span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <span class="o_form_label">Certificación de Obra a Origen</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <field name="lines_editable" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="order_id" readonly="state != 'draft'"/>
+                            <field name="partner_id"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="number" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="retention_rate" readonly="state != 'draft'"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Partidas y Mediciones" name="lines">
+                            <field name="line_ids" class="o_certification_lines" readonly="state != 'draft'">
+                                <tree editable="bottom" create="parent.lines_editable" delete="parent.lines_editable" decoration-info="display_type == 'line_section'" decoration-muted="display_type == 'line_note'" decoration-warning="is_modification">
+                                    <field name="sequence" widget="handle" readonly="not parent.lines_editable"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="tax_ids" column_invisible="True"/>
+                                    <field name="is_modification" column_invisible="True"/>
+                                    <field name="code" readonly="not parent.lines_editable or display_type != False" string="Cód."/>
+                                    <field name="name" widget="section_and_note_text" readonly="not parent.lines_editable" string="Concepto / Partida"/>
+                                    <field name="product_uom_id" readonly="not parent.lines_editable or display_type != False" string="Ud."/>
+                                    <field name="price_unit" readonly="not parent.lines_editable or display_type != False" string="P.U. (€)"/>
+                                    <field name="qty_budget" readonly="not parent.lines_editable or display_type != False" string="Med. Pto."/>
+                                    <field name="qty_previous" readonly="1" string="Med. Ant."/>
+                                    <field name="qty_origin" readonly="display_type != False" string="Med. Origen"/>
+                                    <field name="qty_period" readonly="display_type != False" string="Med. Periodo"/>
+                                    <field name="percentage_origin" readonly="1" string="% Orig."/>
+                                    <field name="amount_origin" widget="monetary" readonly="1" string="Imp. Origen"/>
+                                    <field name="amount_period" widget="monetary" readonly="1" string="Imp. Periodo"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_total_budget" widget="monetary"/>
+                                <field name="amount_previous_origin" widget="monetary"/>
+                                <field name="amount_total_origin" widget="monetary"/>
+                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                    <label for="amount_period_untaxed"/>
+                                </div>
+                                <field name="amount_period_untaxed" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                <field name="amount_retention" widget="monetary"/>
+                                <field name="amount_net_period" widget="monetary"/>
+                                <field name="amount_period_tax" widget="monetary"/>
+                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                    <label for="amount_period_total"/>
+                                </div>
+                                <field name="amount_period_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>
+                            <div class="oe_clear"/>
+                        </page>
+                        <page string="Observaciones" name="notes">
+                            <field name="notes" placeholder="Observaciones técnicas o administrativas de la certificación..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- TREE VIEW -->
+    <record id="view_construction_certification_tree" model="ir.ui.view">
+        <field name="name">construction.certification.tree</field>
+        <field name="model">construction.certification</field>
+        <field name="arch" type="xml">
+            <tree string="Certificaciones de Obra" decoration-info="state == 'draft'" decoration-success="state == 'invoiced'">
+                <field name="name"/>
+                <field name="number"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <field name="date"/>
+                <field name="amount_total_origin" widget="monetary"/>
+                <field name="amount_period_untaxed" widget="monetary"/>
+                <field name="amount_retention" widget="monetary"/>
+                <field name="amount_period_total" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-primary="state == 'confirmed'" decoration-success="state == 'invoiced'" decoration-danger="state == 'cancel'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_construction_certification_search" model="ir.ui.view">
+        <field name="name">construction.certification.search</field>
+        <field name="model">construction.certification</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Certificación">
+                <field name="name" string="Referencia o Nº" filter_domain="['|', ('name', 'ilike', self), ('number', 'ilike', self)]"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Aprobadas" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Facturadas" name="invoiced" domain="[('state', '=', 'invoiced')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Presupuesto / Obra" name="group_order" context="{'group_by': 'order_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_construction_certification" model="ir.actions.act_window">
+        <field name="name">Certificaciones de Obra</field>
+        <field name="res_model">construction.certification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_construction_certification_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Cree la primera certificación de obra a origen
+            </p>
+            <p>
+                Gestione las mediciones acumuladas a origen, importes de periodo y retenciones de garantía de buena ejecución.
+            </p>
+        </field>
+    </record>
+
+    <!-- MENU ITEM -->
+    <menuitem id="menu_construction_certification"
+              name="Certificaciones de Obra"
+              action="action_construction_certification"
+              parent="sale.sale_order_menu"
+              sequence="12"/>
+
+</odoo>

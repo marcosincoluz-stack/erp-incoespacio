@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_ocr_obra" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.ocr.obra</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_move_form_inherit_construction"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='project_id']" position="attributes">
+                <attribute name="domain">['|', ('id', '=', project_id), ('id', 'in', ocr_obra_open_ids)]</attribute>
+                <attribute name="invisible">ocr_obra_not_job</attribute>
+            </xpath>
+            <xpath expr="//group[@name='construction_obra_actions']" position="inside">
+                <field name="ocr_obra_open_ids" invisible="1"/>
+                <field name="ocr_obra_suggested_id" readonly="1"
+                       invisible="not ocr_obra_suggested_id or project_id"/>
+                <field name="ocr_obra_state" widget="badge" string="Estado"
+                       decoration-info="ocr_obra_state == 'suggested'"
+                       decoration-success="ocr_obra_state == 'confirmed'"
+                       decoration-warning="ocr_obra_state == 'none'"
+                       decoration-muted="ocr_obra_state == 'skipped'"/>
+                <field name="ocr_obra_not_job" string="No es de obra (luz, oficina…)"/>
+                <button name="action_confirm_obra" type="object" string="Usar obra sugerida"
+                        class="btn-primary"
+                        invisible="project_id or not ocr_obra_suggested_id or ocr_obra_not_job"/>
+                <button name="action_confirm_obra" type="object" string="Rellenar capítulos"
+                        class="btn-primary"
+                        invisible="not project_id or ocr_obra_not_job"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="mode">tree</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='product_id']" position="after">
+                <field name="construction_section_id"
+                       string="Capítulo"
+                       optional="show"
+                       options="{'no_create': True, 'no_quick_create': True}"
+                       domain="[('display_type', '=', 'line_section'), ('order_id.project_id', '=', parent.project_id)]"
+                       column_invisible="parent.move_type not in ('in_invoice', 'in_refund')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_form_inherit_ocr_obra_banner" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.ocr.obra.banner</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info mb-2" role="alert"
+                     invisible="move_type not in ('in_invoice', 'in_refund') or project_id or not ocr_obra_suggested_id or ocr_obra_not_job or state != 'draft'">
+                    <strong>Obra sugerida, no aplicada.</strong>
+                    Este proveedor ya ha facturado esa obra. Elige en el desplegable o pulsa <em>Usar obra sugerida</em>.
+                </div>
+                <div class="alert alert-warning mb-2" role="alert"
+                     invisible="move_type not in ('in_invoice', 'in_refund') or project_id or ocr_obra_suggested_id or ocr_obra_not_job or state != 'draft'">
+                    <strong>Esta factura no está imputada a ninguna obra.</strong>
+                    Elige el proyecto en el bloque <em>Obra / tajo</em> (encima de las líneas) o marca <em>No es de obra</em>.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_ocr_obra" model="ir.ui.view">
+        <field name="name">account.move.search.inherit.ocr.obra</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Gastos sin obra" name="gastos_sin_obra"
+                        domain="[('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '=', 'posted'), ('project_id', '=', False), ('ocr_obra_state', '!=', 'skipped')]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

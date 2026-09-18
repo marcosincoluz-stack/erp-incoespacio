@@ -32,9 +32,7 @@ export class OcrBatchDrawer extends Component {
             }
         });
 
-        // Escuchar eventos en vivo desde el servidor mediante WebSockets (ambos tipos de notificación)
         if (this.busService) {
-            this.busService.subscribe("incoespacio_ocr_batch_event", this.onOcrEvent.bind(this));
             this.busService.subscribe("ocr_batch_status", this.onOcrEvent.bind(this));
         }
 

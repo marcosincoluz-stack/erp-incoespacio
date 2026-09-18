@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form_inherit_certification" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.certification</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_create_certification"
+                        string="Nueva Certificación"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state not in ('sale', 'done')"/>
+                <button name="action_return_retention"
+                        string="Devolver retención"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="not can_return_retention"/>
+                <button name="action_add_modification"
+                        string="Añadir modificado"
+                        type="object"
+                        invisible="state not in ('sale', 'done')"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_certifications"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-calculator">
+                    <field name="certification_count" widget="statinfo" string="Certificaciones"/>
+                </button>
+                <button name="action_view_retention_return"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-undo"
+                        invisible="not retention_return_invoice_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Dev. retención</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_header']" position="attributes">
+                <attribute name="col">3</attribute>
+            </xpath>
+            <xpath expr="//group[@name='partner_details']/field[@name='partner_id']" position="attributes">
+                <attribute name="context">{'res_partner_search_mode': 'customer'}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='order_details']" position="after">
+                <group name="job_details" invisible="not project_id">
+                    <field name="project_id" readonly="1"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+                <field name="is_modification" optional="hide"/>
+                <field name="modification_ref" optional="show"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Certificaciones de Obra" name="certifications">
+                    <group>
+                        <group string="Retención">
+                            <field name="amount_retention_held" widget="monetary"/>
+                            <field name="amount_retention_returned" widget="monetary"/>
+                            <field name="amount_retention_to_return" widget="monetary"/>
+                            <field name="can_return_retention" invisible="1"/>
+                            <field name="retention_return_invoice_id" invisible="1"/>
+                        </group>
+                        <group string="Margen de obra">
+                            <field name="amount_certified_origin" widget="monetary"/>
+                            <field name="amount_job_cost" widget="monetary"/>
+                            <field name="amount_job_po" widget="monetary"/>
+                            <field name="amount_job_margin" widget="monetary"/>
+                        </group>
+                    </group>
+                    <field name="certification_ids" readonly="1">
+                        <tree string="Certificaciones">
+                            <field name="name"/>
+                            <field name="number"/>
+                            <field name="date"/>
+                            <field name="amount_total_origin" widget="monetary"/>
+                            <field name="amount_period_untaxed" widget="monetary"/>
+                            <field name="amount_retention" widget="monetary"/>
+                            <field name="amount_period_total" widget="monetary"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'draft'"
+                                   decoration-primary="state == 'confirmed'"
+                                   decoration-success="state == 'invoiced'"
+                                   decoration-danger="state == 'cancel'"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

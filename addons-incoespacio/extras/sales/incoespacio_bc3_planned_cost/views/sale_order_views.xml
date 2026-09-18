@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_planned_cost" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.bc3.planned.cost</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="bc3_importer.view_sales_order_bc3"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bc3']" position="after">
+                <field name="planned_percent" invisible="not bc3"/>
+                <field name="amount_planned" widget="monetary" invisible="not bc3"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+                <field name="price_planned_manual" column_invisible="1"/>
+                <field name="price_planned" optional="show" invisible="not parent.bc3"
+                       decoration-info="price_planned_manual"/>
+                <button name="action_reset_price_planned" type="object" icon="fa-refresh"
+                        title="Recalcular objetivo"
+                        invisible="not price_planned_manual or not parent.bc3"/>
+                <field name="qty_planned" optional="show" invisible="not parent.bc3"/>
+                <field name="amount_planned" optional="hide" widget="monetary"
+                       invisible="not parent.bc3"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

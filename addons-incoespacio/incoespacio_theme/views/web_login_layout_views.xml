@@ -2,6 +2,9 @@
 <odoo>
     <data>
         <template id="login_layout" name="Incoespacio Theme Login Layout" inherit_id="web.login_layout">
+            <xpath expr="//img" position="attributes">
+                <attribute name="t-attf-src">/web/image/res.company/{{res_company.id}}/logo</attribute>
+            </xpath>
             <xpath expr="//div[hasclass('card-body')]/div[last()]" position="replace">
                 <div class="text-center small mt-3">
                     <span>INCOESPACIO S.L.</span><br/>

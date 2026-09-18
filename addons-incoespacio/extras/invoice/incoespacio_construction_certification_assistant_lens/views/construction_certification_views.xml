@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_construction_certification_form_lens" model="ir.ui.view">
+        <field name="name">construction.certification.form.lens</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification_assistant.view_construction_certification_form_assistant"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_apply_suggested']" position="after">
+                <button name="action_open_lens" type="object" icon="fa-search"
+                        title="Comparar con presupuesto"
+                        invisible="not pending_cost_amount and not cost_alert"
+                        column_invisible="parent.state != 'draft'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

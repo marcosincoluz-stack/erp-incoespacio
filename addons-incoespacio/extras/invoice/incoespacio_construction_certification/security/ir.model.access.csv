@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_construction_certification_user,construction.certification.user,model_construction_certification,sales_team.group_sale_salesman,1,1,1,0
+access_construction_certification_manager,construction.certification.manager,model_construction_certification,sales_team.group_sale_manager,1,1,1,1
+access_construction_certification_line_user,construction.certification.line.user,model_construction_certification_line,sales_team.group_sale_salesman,1,1,1,0
+access_construction_certification_line_manager,construction.certification.line.manager,model_construction_certification_line,sales_team.group_sale_manager,1,1,1,1

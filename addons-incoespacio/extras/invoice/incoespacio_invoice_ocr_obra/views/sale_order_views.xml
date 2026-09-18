@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_ocr_obra" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.ocr.obra</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_order_form_inherit_certification"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_job_margin']" position="after">
+                <field name="amount_cost_in_chapter" widget="monetary"/>
+                <field name="amount_cost_no_chapter" widget="monetary"
+                       decoration-danger="amount_cost_no_chapter > 0"/>
+                <field name="chapter_cost_text" widget="text" placeholder="Sin gasto imputado a capítulos"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

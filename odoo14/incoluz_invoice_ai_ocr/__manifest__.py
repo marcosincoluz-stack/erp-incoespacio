@@ -13,21 +13,14 @@ Autor: Incoespacio (ingenieria@incoespacio.com).
     'license': 'LGPL-3',
     'depends': ['account', 'mail'],
     'data': [
-        'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
         'views/res_config_settings_views.xml',
         'views/account_move_views.xml',
-        'wizard/ocr_upload_wizard_views.xml',
+        'views/templates.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'incoluz_invoice_ai_ocr/static/src/scss/ocr_drawer.scss',
-            'incoluz_invoice_ai_ocr/static/src/js/ocr_drawer.js',
-        ],
-        'web.assets_qweb': [
-            'incoluz_invoice_ai_ocr/static/src/xml/ocr_drawer.xml',
-        ],
-    },
+    'qweb': [
+        'static/src/xml/ocr_drawer.xml',
+    ],
     'installable': True,
     'application': False,
     'auto_install': False,

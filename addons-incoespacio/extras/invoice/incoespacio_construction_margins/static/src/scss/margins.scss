@@ -1,0 +1,71 @@
+.o_construction_margins_kpis {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    .o_margin_kpi {
+        flex: 1;
+        min-width: 0;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+
+        .o_margin_kpi_title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 0.15rem;
+        }
+
+        > .o_field_widget {
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+
+        .o_margin_kpi_sub {
+            font-size: 0.8rem;
+            margin-top: 0.35rem;
+            line-height: 1.35;
+
+            .o_field_widget {
+                display: inline;
+                font-size: inherit;
+                font-weight: 500;
+            }
+        }
+    }
+}
+
+.o_construction_margin_lines {
+    .o_list_renderer {
+        // ponytail: 24rem ≈ cabecera de ficha + KPIs; ajustar si crece el resumen
+        max-height: calc(100vh - 24rem);
+    }
+
+    th[data-name="price_planned"],
+    td[name="price_planned"],
+    th[data-name="progress_percent"],
+    td[name="progress_percent"],
+    th[data-name="amount_vendor_cost"],
+    td[name="amount_vendor_cost"],
+    th[data-name="margin_percent"],
+    td[name="margin_percent"] {
+        border-left: 1px solid #dee2e6;
+    }
+}
+
+.o_margin_partida_form {
+    .o_margin_partida_blocks > .o_group {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .o_margin_partida_blocks .o_list_footer,
+    .o_margin_partida_blocks .o_td_label + td,
+    .o_margin_partida_blocks .o_field_monetary {
+        text-align: end;
+    }
+}

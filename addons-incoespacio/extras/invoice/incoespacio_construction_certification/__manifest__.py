@@ -1,0 +1,35 @@
+{
+    "name": "Incoespacio - Certificaciones de Obra y Retenciones",
+    "summary": "Gestión de certificaciones a origen y retenciones de garantía en obras",
+    "version": "17.0.1.5.3",
+    "category": "Accounting/Sales",
+    "author": "Incoespacio",
+    "license": "LGPL-3",
+    "depends": [
+        "sale_management",
+        "account",
+        "project",
+        "purchase",
+        "bc3_importer",
+        "incoespacio_reports",
+        "incoespacio_security",
+    ],
+    "data": [
+        "security/ir.model.access.csv",
+        "security/construction_security.xml",
+        "data/ir_sequence_data.xml",
+        "views/construction_certification_views.xml",
+        "views/sale_order_views.xml",
+        "views/account_move_views.xml",
+        "views/purchase_order_views.xml",
+        "report/certification_reports.xml",
+        "report/report_certification_template.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "incoespacio_construction_certification/static/src/scss/certification.scss",
+        ],
+    },
+    "installable": True,
+    "application": False,
+}

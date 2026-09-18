@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_margins" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.construction.margins</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_order_form_inherit_certification"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='certifications']" position="after">
+                <page string="Márgenes" name="margins" invisible="not bc3 and not project_id">
+                    <field name="planned_percent" invisible="1"/>
+                    <div class="o_construction_margins_kpis">
+                        <div class="o_margin_kpi">
+                            <div class="o_margin_kpi_title">Venta</div>
+                            <field name="amount_untaxed" widget="monetary" nolabel="1"/>
+                            <div class="o_margin_kpi_sub text-muted" invisible="amount_certified_origin == 0">
+                                Certificado a origen <field name="amount_certified_origin" widget="monetary" nolabel="1"/>
+                                · <field name="progress_percent" nolabel="1"/> % avance
+                            </div>
+                            <div class="o_margin_kpi_sub text-muted" invisible="amount_certified_origin != 0">
+                                Sin certificación facturada
+                            </div>
+                        </div>
+                        <div class="o_margin_kpi">
+                            <div class="o_margin_kpi_title">Objetivo</div>
+                            <field name="amount_planned" widget="monetary" nolabel="1"/>
+                            <div class="o_margin_kpi_sub text-muted" invisible="planned_percent == 0 or amount_margin_planned &lt; 0">
+                                Margen objetivo <field name="amount_margin_planned" widget="monetary" nolabel="1"/>
+                                · <field name="margin_percent_planned" nolabel="1"/> %
+                            </div>
+                            <div class="o_margin_kpi_sub text-danger" invisible="planned_percent == 0 or amount_margin_planned &gt;= 0">
+                                Margen objetivo <field name="amount_margin_planned" widget="monetary" nolabel="1"/>
+                                · <field name="margin_percent_planned" nolabel="1"/> %
+                            </div>
+                            <div class="o_margin_kpi_sub text-muted" invisible="planned_percent != 0">
+                                Sin objetivo definido
+                            </div>
+                        </div>
+                        <div class="o_margin_kpi">
+                            <div class="o_margin_kpi_title">Coste real</div>
+                            <field name="amount_cost_partida" widget="monetary" nolabel="1"/>
+                            <div class="o_margin_kpi_sub text-muted" invisible="amount_cost_partida != 0 or amount_certified_origin != 0">
+                                Sin coste imputado
+                            </div>
+                            <div class="o_margin_kpi_sub" invisible="amount_certified_origin == 0">
+                                Objetivo ejecutado <field name="amount_planned_done" widget="monetary" nolabel="1"/>
+                                · Desv.
+                                <span class="text-danger" invisible="amount_cost_deviation &lt;= 0">
+                                    <field name="amount_cost_deviation" widget="monetary" nolabel="1"/>
+                                </span>
+                                <span class="text-success" invisible="amount_cost_deviation &gt; 0">
+                                    <field name="amount_cost_deviation" widget="monetary" nolabel="1"/>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="o_margin_kpi">
+                            <div class="o_margin_kpi_title">Margen real</div>
+                            <field name="amount_margin_real" widget="monetary" nolabel="1"
+                                   decoration-danger="amount_margin_real &lt; 0"/>
+                            <div class="o_margin_kpi_sub text-muted" invisible="amount_certified_origin != 0">
+                                Sin certificación facturada
+                            </div>
+                            <div class="o_margin_kpi_sub text-success"
+                                 invisible="amount_certified_origin == 0 or planned_percent == 0 or margin_percent_real &lt; margin_percent_planned">
+                                <field name="margin_percent_real" nolabel="1"/> %
+                                · objetivo <field name="margin_percent_planned" nolabel="1"/> %
+                            </div>
+                            <div class="o_margin_kpi_sub text-danger"
+                                 invisible="amount_certified_origin == 0 or planned_percent == 0 or margin_percent_real &gt;= margin_percent_planned">
+                                <field name="margin_percent_real" nolabel="1"/> %
+                                · objetivo <field name="margin_percent_planned" nolabel="1"/> %
+                            </div>
+                            <div class="o_margin_kpi_sub text-muted"
+                                 invisible="amount_certified_origin == 0 or planned_percent != 0">
+                                <field name="margin_percent_real" nolabel="1"/> %
+                            </div>
+                        </div>
+                    </div>
+                    <group invisible="amount_cost_unassigned == 0">
+                        <label for="amount_cost_unassigned"/>
+                        <div>
+                            <field name="amount_cost_unassigned" widget="monetary" class="oe_inline"
+                                   decoration-danger="amount_cost_unassigned &gt; 0"/>
+                            <button name="action_view_gastos_sin_partida" type="object"
+                                    string="Ver gastos" class="btn-link"
+                                    invisible="not project_id"/>
+                        </div>
+                    </group>
+                    <field name="order_line" widget="construction_margin_lines" readonly="1"
+                           nolabel="1" string="Partida" class="o_construction_margin_lines">
+                        <tree create="0" delete="0"
+                              decoration-danger="amount_cost_deviation &gt; 0 and qty_cert_origin &gt; 0 and not display_type"
+                              decoration-muted="qty_cert_origin == 0 and amount_vendor_cost == 0 and not display_type">
+                            <field name="display_type" column_invisible="1"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="bc3_level" column_invisible="1"/>
+                            <field name="qty_cert_origin" column_invisible="1"/>
+                            <field name="bc3_code" string="Cód." optional="show"/>
+                            <field name="name" widget="section_and_note_text" string="Partida"/>
+                            <field name="product_uom" string="Ud." optional="hide"/>
+                            <field name="product_uom_qty" string="Med."/>
+                            <field name="price_unit" string="P.U."/>
+                            <field name="price_subtotal" widget="monetary" string="Venta" sum="Venta"/>
+                            <field name="qty_planned" string="Med. obj" optional="hide"/>
+                            <field name="price_planned" string="P.U. obj"/>
+                            <field name="amount_planned" widget="monetary" string="Objetivo" sum="Objetivo"/>
+                            <field name="progress_percent" string="Avance %"/>
+                            <field name="amount_planned_done" widget="monetary" string="Obj. ejecutado" sum="Obj. ejecutado"/>
+                            <field name="amount_cert_origin" widget="monetary" string="Cert. a origen" optional="hide"/>
+                            <field name="amount_vendor_cost" widget="monetary" string="Coste" sum="Coste"/>
+                            <field name="amount_cost_deviation" widget="monetary" string="Desv." sum="Desv."/>
+                            <field name="amount_margin" widget="monetary" string="Margen" optional="hide" sum="Margen"/>
+                            <field name="margin_percent" string="Margen %"/>
+                        </tree>
+                        <form create="0" edit="0" class="o_margin_partida_form">
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="bc3_code"/>
+                                        <field name="bc3_section_id"/>
+                                        <field name="product_uom"/>
+                                    </group>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="display_type" invisible="1"/>
+                                    </group>
+                                </group>
+                                <group col="3" class="o_margin_partida_blocks">
+                                    <group string="Venta">
+                                        <field name="product_uom_qty" string="Medición"/>
+                                        <field name="price_unit" string="P.U."/>
+                                        <field name="price_subtotal" widget="monetary" string="Importe"/>
+                                    </group>
+                                    <group string="Objetivo">
+                                        <field name="qty_planned" string="Medición"/>
+                                        <field name="price_planned" string="P.U."/>
+                                        <field name="amount_planned" widget="monetary" string="Importe"/>
+                                        <field name="amount_planned_done" widget="monetary"/>
+                                    </group>
+                                    <group string="Coste real">
+                                        <label for="qty_cert_origin" string="Med. certificada"/>
+                                        <div class="o_row">
+                                            <field name="qty_cert_origin" nolabel="1"/>
+                                            <span class="text-muted">·</span>
+                                            <field name="progress_percent" nolabel="1"/>
+                                            <span class="text-muted">%</span>
+                                        </div>
+                                        <field name="price_unit_real"/>
+                                        <field name="amount_vendor_cost" widget="monetary" string="Coste"/>
+                                    </group>
+                                </group>
+                                <group string="Resultado">
+                                    <field name="amount_cert_origin" widget="monetary"/>
+                                    <field name="amount_cost_deviation" widget="monetary"
+                                           decoration-danger="amount_cost_deviation &gt; 0"
+                                           decoration-success="amount_cost_deviation &lt; 0"/>
+                                    <field name="amount_margin" widget="monetary"/>
+                                    <field name="margin_percent"/>
+                                </group>
+                                <separator string="Facturas imputadas"/>
+                                <div class="text-muted" invisible="vendor_cost_line_ids">
+                                    Sin facturas imputadas a esta partida
+                                </div>
+                                <field name="vendor_cost_line_ids" nolabel="1"
+                                       invisible="not vendor_cost_line_ids">
+                                    <tree create="0" delete="0" no_open="1">
+                                        <field name="move_id" string="Factura"/>
+                                        <field name="partner_id" string="Proveedor"/>
+                                        <field name="date"/>
+                                        <field name="name" string="Concepto"/>
+                                        <field name="price_subtotal" widget="monetary" string="Importe" sum="Coste"/>
+                                    </tree>
+                                </field>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

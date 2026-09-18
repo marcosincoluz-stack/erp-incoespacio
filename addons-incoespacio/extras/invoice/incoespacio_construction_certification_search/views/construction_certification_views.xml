@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_construction_certification_form_search" model="ir.ui.view">
+        <field name="name">construction.certification.form.search</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_construction_certification_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="widget">certification_lines</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree" position="attributes">
+                <attribute name="limit">1000</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

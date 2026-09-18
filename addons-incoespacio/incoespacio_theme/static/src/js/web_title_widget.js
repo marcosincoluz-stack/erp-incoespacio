@@ -1,10 +1,18 @@
 /** @odoo-module **/
 
 import { patch } from "@web/core/utils/patch";
+import { WebClient } from "@web/webclient/webclient";
 import { UserMenu } from "@web/webclient/user_menu/user_menu";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
+
+patch(WebClient.prototype, {
+    setup() {
+        super.setup();
+        this.title.setParts({ zopenerp: "INCOESPACIO" });
+    },
+});
 
 const userMenuRegistry = registry.category("user_menuitems");
 

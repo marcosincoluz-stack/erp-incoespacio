@@ -226,7 +226,11 @@ svg.o_spinner circle,
         box-shadow: none;
         border-radius: 0;
         border: none;
-        outline: none;
+        outline: 2px solid transparent;
+
+        &:focus-visible {
+            outline-color: rgba(255, 255, 255, 0.85);
+        }
     }
 
     .o_menu_sections > .o_nav_entry,
@@ -305,7 +309,11 @@ svg.o_spinner circle,
     .o_menu_brand {
         border: none;
         box-shadow: none;
-        outline: none;
+        outline: 2px solid transparent;
+
+        &:focus-visible {
+            outline-color: rgba(255, 255, 255, 0.85);
+        }
     }
 }
 
@@ -319,10 +327,10 @@ svg.o_spinner circle,
     animation: incoluzFadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .o_grid_apps_menu .o-app-menu-list,
-.app-menu-container {
+.app-menu-container .o-app-menu-list {
     color: #ffffff;
 
-    * , a, span, div {
+    .o_app, a, span, div {
         color: #ffffff;
     }
 }
@@ -341,40 +349,104 @@ svg.o_spinner circle,
         }
     }
 }
-.app-menu-container .search-container .search-input,
-.app-menu-container .search-input {
-    background-color: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    padding: 6px 14px;
 
-    .search-icon, i, .fa-search {
-        color: #ffffff;
-        opacity: 0.95;
-        margin-right: 10px;
-    }
-    input, .form-control {
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        color: #ffffff;
-        font-size: 15px;
+// Buscador del menu de aplicaciones (estilo oscuro coherente con alto contraste)
+.app-menu-container .search-container,
+.o_grid_apps_menu .search-container {
+    .search-input {
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        padding: 6px 14px;
 
-        &::placeholder {
-            color: rgba(255, 255, 255, 0.8);
-            opacity: 1;
+        .search-icon, i, .fa-search {
+            color: #ffffff;
+            opacity: 0.95;
+            margin-right: 10px;
+        }
+        input, .form-control {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            color: #ffffff;
+            font-size: 15px;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+                opacity: 1;
+            }
         }
     }
-}
-.app-menu-container .search-container .search-list {
-    background-color: $o-inco-gray-dark;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-}
-.app-menu-container .search-container .search-item__name {
-    color: #ffffff;
+
+    .search-list {
+        background-color: rgba(28, 27, 34, 0.95);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 6px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .search-item {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        margin: 3px 0;
+        box-shadow: none;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+
+        .search-item__link {
+            padding: 8px 12px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .search-item__name {
+            color: #e2e8f0;
+            text-shadow: none;
+            font-size: 13.5px;
+            font-weight: 400;
+
+            b {
+                color: #60a5fa;
+                font-weight: 700;
+            }
+        }
+
+        &.highlight,
+        &:hover {
+            background-color: rgba(66, 133, 244, 0.25);
+            border-color: rgba(66, 133, 244, 0.6);
+            box-shadow: none;
+
+            .search-item__link {
+                color: #ffffff;
+            }
+
+            .search-item__name {
+                color: #ffffff;
+
+                b {
+                    color: #93c5fd;
+                }
+            }
+        }
+    }
+
+    .search-item-divider hr {
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        background-color: transparent;
+        margin: 6px 0;
+    }
+
+    .empty-search-item {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 16px;
+        font-size: 14px;
+        text-align: center;
+    }
 }
 
 // Layout general y listas
@@ -398,6 +470,12 @@ html .o_web_client > .o_action_manager {
 }
 .table-hover tbody tr:hover {
     background-color: rgba(0, 0, 0, 0.04);
+}
+
+// Subscroll de lineas en fichas (pedido, factura, cert.): Odoo ya deja thead
+// sticky; sin tope la lista crece y scrollea la ficha entera.
+.o_form_view .o_field_x2many .o_list_renderer {
+    max-height: calc(100vh - 18rem);
 }
 
 // Vista de formulario: este fichero carga despues del core en el bundle,
@@ -427,6 +505,18 @@ html .o_web_client > .o_action_manager {
 }
 .oe_title h1 {
     display: flex;
+}
+// Cabecera del pedido: las columnas rellenan el ancho de la ficha
+// (si no, quedan pegadas a la izquierda y sobra blanco a la derecha).
+.o_sale_order .o_form_sheet > .o_group.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    width: 100%;
+    column-gap: 1.5rem;
+}
+.o_sale_order .o_form_sheet > .o_group.row > .o_inner_group {
+    width: 100%;
+    max-width: none;
 }
 .o_sale_order .ribbon + .oe_title {
     width: auto;

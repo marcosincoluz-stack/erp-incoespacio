@@ -18,8 +18,16 @@ class ResPartner(models.Model):
 
     def _inverse_is_customer(self):
         for partner in self:
-            partner.customer_rank = 1 if partner.is_customer else 0
+            if partner.is_customer:
+                if partner.customer_rank <= 0:
+                    partner.customer_rank = 1
+            else:
+                partner.customer_rank = 0
 
     def _inverse_is_supplier(self):
         for partner in self:
-            partner.supplier_rank = 1 if partner.is_supplier else 0
+            if partner.is_supplier:
+                if partner.supplier_rank <= 0:
+                    partner.supplier_rank = 1
+            else:
+                partner.supplier_rank = 0

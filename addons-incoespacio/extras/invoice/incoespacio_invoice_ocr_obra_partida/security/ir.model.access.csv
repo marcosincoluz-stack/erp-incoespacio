@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ocr_obra_split_wizard,ocr.obra.split.wizard,model_ocr_obra_split_wizard,account.group_account_invoice,1,1,1,1
+access_ocr_obra_split_wizard_line,ocr.obra.split.wizard.line,model_ocr_obra_split_wizard_line,account.group_account_invoice,1,1,1,1
+access_ocr_obra_assign_wizard,ocr.obra.assign.wizard,model_ocr_obra_assign_wizard,account.group_account_invoice,1,1,1,1
+access_ocr_obra_assign_wizard_line,ocr.obra.assign.wizard.line,model_ocr_obra_assign_wizard_line,account.group_account_invoice,1,1,1,1

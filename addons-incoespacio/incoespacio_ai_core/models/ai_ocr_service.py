@@ -258,3 +258,35 @@ class AiOcrService:
         except Exception as e:
             _logger.exception("Error parseando el JSON devuelto por Gemini: %s", e)
             raise UserError(f"No se pudo interpretar el resultado de la IA: {str(e)}")
+
+    @classmethod
+    def complete_json(cls, env, user_prompt, system_prompt="Responde únicamente un objeto JSON válido."):
+        """Llamada de texto a Gemini (sin PDF). Devuelve dict o {} si falla."""
+        icp = env["ir.config_parameter"].sudo()
+        api_key = icp.get_param("incoespacio_invoice_ocr.gemini_api_key", default="").strip()
+        if not api_key:
+            return {}
+        model = (
+            icp.get_param("incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash").strip()
+            or "gemini-2.5-flash"
+        )
+        url = GEMINI_API_BASE_URL.format(model=model, api_key=api_key)
+        gen_config = {"temperature": 0.1, "response_mime_type": "application/json"}
+        if "gemini-2.5" in model:
+            gen_config["thinkingConfig"] = {"thinkingBudget": 0}
+        payload = {
+            "systemInstruction": {"parts": [{"text": system_prompt}]},
+            "contents": [{"parts": [{"text": user_prompt}]}],
+            "generationConfig": gen_config,
+        }
+        try:
+            response = cls.get_session().post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=20)
+            if response.status_code != 200:
+                _logger.warning("complete_json Gemini %s: %s", response.status_code, response.text[:200])
+                return {}
+            text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+            clean = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+            return json.loads(clean)
+        except Exception as e:
+            _logger.warning("complete_json falló: %s", e)
+            return {}

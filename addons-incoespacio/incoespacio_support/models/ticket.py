@@ -65,6 +65,8 @@ class Ticket(models.Model):
         return tickets
 
     def write(self, vals):
+        if 'state' in vals:
+            self._check_ticket_permission()
         if 'assigned_user_id' in vals and vals['assigned_user_id']:
             new_user = self.env['res.users'].browse(vals['assigned_user_id'])
             for rec in self:
@@ -86,7 +88,7 @@ class Ticket(models.Model):
                 if rec.assigned_user_id and rec.assigned_user_id != user:
                     raise UserError(_("Solo puedes cambiar el estado de los tickets que tienes asignados."))
             return True
-        return True
+        raise UserError(_("No tienes permiso para cambiar el estado de este ticket."))
 
     def _transition(self, state, msg_fn, require_resolution=False):
         self._check_ticket_permission()

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_certification_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="incoespacio_reports.external_layout_incoespacio">
+                    <div class="page" style="font-size: 12px; font-family: sans-serif; color: #212529;">
+                        <table style="width: 100%; margin-top: 5px; margin-bottom: 20px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
+                            <tr>
+                                <td class="inco-card" style="width: 50%; vertical-align: top;">
+                                    <div class="inco-card-title">OBRA</div>
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
+                                        <span t-field="o.order_id.name"/>
+                                    </div>
+                                    <div t-if="o.project_id" style="color: #334155;">
+                                        <strong>Proyecto:</strong> <span t-field="o.project_id.name"/>
+                                    </div>
+                                </td>
+                                <td class="inco-card" style="width: 50%; vertical-align: top;">
+                                    <div class="inco-card-title">CLIENTE</div>
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
+                                        <span t-field="o.partner_id.name"/>
+                                    </div>
+                                    <div t-if="o.partner_id.vat" style="color: #475569;">
+                                        <strong>CIF/NIF:</strong> <span t-field="o.partner_id.vat"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- PARTIDAS TABLE -->
+                        <table class="table table-sm table-bordered" style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 9.5px;">
+                            <thead>
+                                <tr style="background-color: #f1f3f5; text-align: center; font-weight: bold;">
+                                    <th style="width: 4%;">Ud.</th>
+                                    <th style="width: 28%;">Concepto / Unidad de Obra</th>
+                                    <th style="width: 7%;">Med. Presup.</th>
+                                    <th style="width: 8%;">P.U. (€)</th>
+                                    <th style="width: 9%;">Imp. Presup.</th>
+                                    <th style="width: 7%;">Med. Orig.</th>
+                                    <th style="width: 9%;">Imp. Origen</th>
+                                    <th style="width: 6%;">Med. Ant.</th>
+                                    <th style="width: 7%;">Med. Periodo</th>
+                                    <th style="width: 9%;">Imp. Periodo</th>
+                                    <th style="width: 6%;">% Orig.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o._get_report_lines()" t-as="l">
+                                    <t t-if="l.display_type == 'line_section'">
+                                        <tr style="background-color: #e9ecef; font-weight: bold;">
+                                            <td colspan="11" style="padding-left: 8px;">
+                                                <span t-esc="l._get_report_name()"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="l.display_type == 'line_note'">
+                                        <tr style="font-style: italic; color: #6c757d;">
+                                            <td colspan="11" style="padding-left: 12px;">
+                                                <span t-field="l.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                            <td style="text-align: center;"><span t-field="l.product_uom_id.name"/></td>
+                                            <td style="font-size: 8.5px; line-height: 1.25;"><span t-esc="l._get_report_name()"/></td>
+                                            <td style="text-align: right;"><span t-field="l.qty_budget"/></td>
+                                            <td style="text-align: right;"><span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td style="text-align: right;"><span t-field="l.amount_budget" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td style="text-align: right;"><span t-field="l.qty_origin"/></td>
+                                            <td style="text-align: right;"><span t-field="l.amount_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td style="text-align: right;"><span t-field="l.qty_previous"/></td>
+                                            <td style="text-align: right; font-weight: bold;"><span t-field="l.qty_period"/></td>
+                                            <td style="text-align: right; font-weight: bold;"><span t-field="l.amount_period" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td style="text-align: right;"><span t-esc="round(l.percentage_origin, 1)"/> %</td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- LIQUIDATION SUMMARY TABLE -->
+                        <div class="row">
+                            <div class="col-6">
+                                <div t-if="o.notes" style="border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; background-color: #fcfcfc;">
+                                    <strong>Observaciones:</strong>
+                                    <div t-field="o.notes"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm" style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                    <tr>
+                                        <td><strong>Presupuesto Contratado:</strong></td>
+                                        <td style="text-align: right;"><span t-field="o.amount_total_budget" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Ejecutado a Origen:</strong></td>
+                                        <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_total_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Menos Certificado Anteriormente:</td>
+                                        <td style="text-align: right; color: #666;">- <span t-field="o.amount_previous_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr style="border-top: 1px solid #333; background-color: #f8f9fa;">
+                                        <td><strong>Base Imponible del Periodo:</strong></td>
+                                        <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_period_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr t-if="o.retention_rate > 0">
+                                        <td>Menos Retención de Garantía (<span t-esc="round(o.retention_rate, 1)"/>%):</td>
+                                        <td style="text-align: right; color: #c00;">- <span t-field="o.amount_retention" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Base Neta del Periodo:</td>
+                                        <td style="text-align: right;"><span t-field="o.amount_net_period" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>IVA del Periodo:</td>
+                                        <td style="text-align: right;"><span t-field="o.amount_period_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr style="border-top: 2px solid #000; background-color: #e9ecef; font-size: 13px;">
+                                        <td><strong>TOTAL A PERCIBIR (IVA inc.):</strong></td>
+                                        <td style="text-align: right; font-weight: bold; color: #000;"><span t-field="o.amount_period_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- FORMAL SIGNATURE BOXES (LOE ESPAÑA) -->
+                        <div style="margin-top: 40px; page-break-inside: avoid;">
+                            <div style="font-weight: bold; font-size: 11px; margin-bottom: 12px; text-transform: uppercase; color: #495057;">
+                                Conforme y Aprobación de la Certificación (Dirección Facultativa y Propiedad)
+                            </div>
+                            <div class="row text-center" style="font-size: 10px;">
+                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
+                                    <strong>LA CONSTRUCTORA</strong><br/>
+                                    <span t-field="o.company_id.name"/><br/><br/>
+                                    <span style="color: #888;">Firma y Sello</span>
+                                </div>
+                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
+                                    <strong>DIRECCIÓN DE OBRA</strong><br/>
+                                    <span>(Arquitecto / Ingeniero)</span><br/><br/>
+                                    <span style="color: #888;">Firma y Sello</span>
+                                </div>
+                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
+                                    <strong>DIRECCIÓN DE EJECUCIÓN</strong><br/>
+                                    <span>(Arquitecto Técnico / Aparejador)</span><br/><br/>
+                                    <span style="color: #888;">Firma y Sello</span>
+                                </div>
+                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
+                                    <strong>LA PROPIEDAD / PROMOTOR</strong><br/>
+                                    <span t-field="o.partner_id.name"/><br/><br/>
+                                    <span style="color: #888;">Firma y Aceptación</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

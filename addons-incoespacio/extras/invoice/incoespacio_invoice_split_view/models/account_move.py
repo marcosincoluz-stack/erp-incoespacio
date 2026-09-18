@@ -13,18 +13,14 @@ class AccountMove(models.Model):
         help="Muestra el PDF original de la factura al lado del formulario."
     )
 
-    @api.depends('attachment_ids')
+    @api.depends('attachment_ids', 'ocr_show_split_view')
     def _compute_ocr_pdf_file(self):
         for move in self:
             pdf_attach = move.attachment_ids.filtered(
                 lambda a: a.mimetype == 'application/pdf' or (a.name and a.name.lower().endswith('.pdf'))
             )
-            if pdf_attach:
-                move.ocr_has_pdf = True
-                move.ocr_pdf_file = pdf_attach[0].datas
-            else:
-                move.ocr_has_pdf = False
-                move.ocr_pdf_file = False
+            move.ocr_has_pdf = bool(pdf_attach)
+            move.ocr_pdf_file = pdf_attach[0].datas if move.ocr_show_split_view and pdf_attach else False
 
     def action_toggle_split_view(self):
         self.ensure_one()

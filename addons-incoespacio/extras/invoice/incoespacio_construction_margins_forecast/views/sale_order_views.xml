@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_margins_forecast" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.construction.margins.forecast</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="incoespacio_construction_margins.view_order_form_inherit_margins"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_cost_partida']" position="after">
+                <div class="o_margin_kpi_sub text-muted" invisible="amount_po_partida == 0">
+                    Comprometido <field name="amount_po_partida" widget="monetary" nolabel="1"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[hasclass('o_construction_margins_kpis')]" position="inside">
+                <div class="o_margin_kpi">
+                    <div class="o_margin_kpi_title">Fin de obra previsto</div>
+                    <field name="amount_cost_forecast" widget="monetary" nolabel="1"/>
+                    <div class="o_margin_kpi_sub text-muted" invisible="amount_cost_forecast != 0">
+                        Sin previsión
+                    </div>
+                    <div class="o_margin_kpi_sub text-success"
+                         invisible="amount_cost_forecast == 0 or margin_percent_forecast &lt; margin_percent_planned">
+                        Margen previsto <field name="amount_margin_forecast" widget="monetary" nolabel="1"/>
+                        · <field name="margin_percent_forecast" nolabel="1"/> %
+                        vs objetivo <field name="margin_percent_planned" nolabel="1"/> %
+                    </div>
+                    <div class="o_margin_kpi_sub text-danger"
+                         invisible="amount_cost_forecast == 0 or margin_percent_forecast &gt;= margin_percent_planned">
+                        Margen previsto <field name="amount_margin_forecast" widget="monetary" nolabel="1"/>
+                        · <field name="margin_percent_forecast" nolabel="1"/> %
+                        vs objetivo <field name="margin_percent_planned" nolabel="1"/> %
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='amount_vendor_cost']" position="after">
+                <field name="amount_po_cost" widget="monetary" string="Comprometido" optional="show" sum="Comprometido"/>
+                <field name="amount_cost_incurred" widget="monetary" string="Incurrido" optional="show" sum="Incurrido"/>
+                <field name="amount_cost_forecast" widget="monetary" string="Coste prev." optional="show" sum="Coste prev."
+                       decoration-danger="margin_percent_forecast &lt; parent.margin_percent_planned and not display_type"/>
+                <field name="margin_percent_forecast" string="Margen prev. %" optional="show"
+                       decoration-danger="margin_percent_forecast &lt; parent.margin_percent_planned and not display_type"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_construction_certification" model="ir.actions.report">
+        <field name="name">Certificación de Obra a Origen</field>
+        <field name="model">construction.certification</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">incoespacio_construction_certification.report_certification_document</field>
+        <field name="report_file">incoespacio_construction_certification.report_certification_document</field>
+        <field name="print_report_name">'Certificacion_%s_%s' % (object.number, object.order_id.name)</field>
+        <field name="binding_model_id" ref="model_construction_certification"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="incoespacio_reports.paperformat_incoespacio"/>
+    </record>
+</odoo>

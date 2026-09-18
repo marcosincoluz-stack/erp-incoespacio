@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_construction_certification_form_pending_bills" model="ir.ui.view">
+        <field name="name">construction.certification.form.pending.bills</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_construction_certification_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <field name="pending_bill_count" invisible="1"/>
+                <div class="alert alert-warning mb-2" role="alert"
+                     invisible="state != 'draft' or not pending_bill_count">
+                    <strong>
+                        <field name="pending_bill_count" class="oe_inline"/> facturas de proveedor de esta obra
+                        (<field name="pending_bill_amount" widget="monetary" class="oe_inline"/>)
+                        aún no están en ninguna certificación.
+                    </strong>
+                    Revísalas antes de medir.
+                    <button name="action_view_pending_bills" type="object"
+                            string="Ver facturas" class="btn-link"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

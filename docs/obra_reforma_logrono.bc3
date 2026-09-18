@@ -1,0 +1,56 @@
+~V|SOFT S.A.|FIEBDC-3/2002|Presto 8.8|Reforma local Logrono\EUR\|ANSI|Obra prueba Incoespacio — no es un banco real|1||||
+~C|T01##||Reforma interior y cimentacion. Local en Logrono|29355.50\|11092026\|OB|
+~D|T01##|C01#\1\1\C02#\1\1\C03#\1\1\C04#\1\1\C05#\1\1\C06#\1\1\|
+~C|C01#||Movimiento de tierras|2612.00\|11092026\|CA|
+~D|C01#|UO0101\1\25\UO0102\1\12\|
+~C|C02#||Cimentacion|6222.00\|11092026\|CA|
+~D|C02#|UO0201\1\80\UO0202\1\18\UO0203\1\1200\|
+~C|C03#||Estructura|7608.00\|11092026\|CA|
+~D|C03#|UO0301\1\95\UO0302\1\8\|
+~C|C04#||Tabiqueria y pladur|8475.00\|11092026\|CA|
+~D|C04#|UO0401\1\180\UO0402\1\90\UO0403\1\110\|
+~C|C05#||Instalacion electrica|2262.50\|11092026\|CA|
+~D|C05#|UO0501\1\40\UO0502\1\25\|
+~C|C06#||Pintura|2176.00\|11092026\|CA|
+~D|C06#|UO0601\1\320\|
+~C|UO0101|m3|Excavacion en zanja con medios mecanicos|90.80\|11092026\|EU|
+~T|UO0101|Excavacion de zanja en terreno compacto con medios mecanicos, incluida carga sobre camion y parte proporcional de medios auxiliares. Criterio de medicion: m3 de volumen teorico excavado.|
+~D|UO0101|MO01\1\2\|
+~C|UO0102|m3|Relleno y compactado de zanja|28.50\|11092026\|EU|
+~T|UO0102|Relleno con material seleccionado y compactado por tongadas. Criterio de medicion: m3 neto en obra.|
+~D|UO0102|MO01\1\0.5\MT01\1\1\|
+~C|UO0201|m2|Hormigon de limpieza H-15 e=10 cm|8.40\|11092026\|EU|
+~T|UO0201|Capa de hormigon de limpieza H-15 de 10 cm de espesor bajo cimentacion, incluso extendido y nivelado.|
+~D|UO0201|MO01\1\0.2\|
+~C|UO0202|m3|Zapata de hormigon HA-25|185.00\|11092026\|EU|
+~T|UO0202|Zapata de hormigon armado HA-25/B/20/IIa, incluso encofrado, vertido, vibrado y curado. Acero medido aparte.|
+~D|UO0202|MO01\1\4\|
+~C|UO0203|kg|Acero B 500 S en cimentacion|1.85\|11092026\|EU|
+~T|UO0203|Acero corrugado B 500 S en zapatas y riostras, cortado, figurado y colocado. Criterio: kg de acero en obra.|
+~D|UO0203|MO01\1\0.02\|
+~C|UO0301|m2|Forjado unidireccional de hormigon|62.40\|11092026\|EU|
+~T|UO0301|Forjado unidireccional con vigueta y bovedilla, capa de compression incluida. Criterio: m2 de planta.|
+~D|UO0301|MO01\1\1.5\|
+~C|UO0302|m3|Pilar de hormigon HA-25|210.00\|11092026\|EU|
+~T|UO0302|Pilar de hormigon armado HA-25, encofrado, armado, vertido y vibrado. Acero incluido en el precio.|
+~D|UO0302|MO01\1\5\|
+~C|UO0401|m2|Tabique de pladur 15+15 sobre estructura|22.80\|11092026\|EU|
+~T|UO0401|Tabique autoportante de placa de yeso laminado 15 mm a cada cara, montantes cada 40 cm, incluso pastas y cintas. Criterio: m2 de paramento.|
+~D|UO0401|MO01\1\0.8\|
+~C|UO0402|m2|Trasdosado de pladur sobre millar|18.50\|11092026\|EU|
+~T|UO0402|Trasdosado directo de placa de yeso laminado 15 mm sobre tabique existente, incluso maestras y pastas.|
+~D|UO0402|MO01\1\0.6\|
+~C|UO0403|m2|Falso techo continuo de pladur|24.60\|11092026\|EU|
+~T|UO0403|Falso techo continuo de placa de yeso laminado 13 mm sobre perfilería oculta, incluso pastas. Criterio: m2 de techo.|
+~D|UO0403|MO01\1\0.7\|
+~C|UO0501|ud|Punto de luz empotrado en techo|45.00\|11092026\|EU|
+~T|UO0501|Punto de luz en falso techo, tubo, cable 1,5 mm2 y caja de conexion. Mecanismo no incluido.|
+~D|UO0501|MO01\1\0.4\|
+~C|UO0502|ud|Mecanismo empotrado (interruptor o base)|18.50\|11092026\|EU|
+~T|UO0502|Interruptor o base de enchufe empotrado, incluso caja y cableado hasta caja de registro.|
+~D|UO0502|MO01\1\0.25\|
+~C|UO0601|m2|Pintura plastica lisa en paramentos interiores|6.80\|11092026\|EU|
+~T|UO0601|Pintura plastica lisa color a elegir, dos manos sobre pladur o yeso, incluso plastecido de juntas. Criterio: m2 de paramento.|
+~D|UO0601|MO01\1\0.15\|
+~C|MO01|h|Oficial 1a construccion|22.00\|11092026\|1|
+~C|MT01|m3|Material de aportacion seleccionado|50.00\|11092026\|3|

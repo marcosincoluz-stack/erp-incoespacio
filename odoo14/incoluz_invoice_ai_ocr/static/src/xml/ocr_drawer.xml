@@ -1,98 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="incoluz_invoice_ai_ocr.OcrBatchDrawer">
-        <div t-if="state.visible" class="o_ocr_batch_drawer_container">
+        <div class="o_ocr_batch_drawer_container" t-att-style="widget.visible ? '' : 'display: none;'">
             <!-- Modo Minimizado: Pastilla Flotante -->
-            <div t-if="state.minimized" class="o_ocr_batch_pill" t-on-click="toggleMinimize" title="Haz clic para expandir">
-                <span t-if="!isComplete" class="fa fa-spinner fa-spin o_ocr_pill_spinner"/>
-                <span t-else="" class="fa fa-check-circle text-success"/>
-                <span>
-                    <t t-if="isComplete">
-                        Facturas procesadas (<t t-esc="doneCount"/>/<t t-esc="totalCount"/>)
-                    </t>
-                    <t t-else="">
-                        Digitalizando con IA (<t t-esc="doneCount"/>/<t t-esc="totalCount"/>) · <t t-esc="progressPercent"/>%
-                    </t>
-                </span>
-                <i class="fa fa-window-maximize ml-1" style="font-size: 11px; opacity: 0.8;"/>
-                <button type="button" class="close ml-2 text-white" style="font-size: 14px;" t-on-click.stop="close" title="Cerrar">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
+            <t t-if="widget.minimized">
+                <div class="o_ocr_batch_pill" title="Haz clic para expandir">
+                    <span t-if="!widget.isComplete" class="fa fa-spinner fa-spin o_ocr_pill_spinner"/>
+                    <span t-else="" class="fa fa-check-circle text-success"/>
+                    <span>
+                        <t t-if="widget.isComplete">
+                            Facturas procesadas (<t t-esc="widget.doneCount"/>/<t t-esc="widget.totalCount"/>)
+                        </t>
+                        <t t-else="">
+                            Digitalizando con IA (<t t-esc="widget.doneCount"/>/<t t-esc="widget.totalCount"/>) · <t t-esc="widget.progressPercent"/>%
+                        </t>
+                    </span>
+                    <i class="fa fa-window-maximize ml-1" style="font-size: 11px; opacity: 0.8;"/>
+                    <button type="button" class="close ml-2 text-white btn-close-pill" style="font-size: 14px;" title="Cerrar">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            </t>
 
             <!-- Modo Expandido: Ventana Estilo Google Drive -->
-            <div t-else="" class="o_ocr_batch_card">
-                <div class="o_ocr_header">
-                    <div class="o_ocr_title">
-                        <i t-if="!isComplete" class="fa fa-cogs text-primary mr-2"/>
-                        <i t-else="" class="fa fa-check-circle text-success mr-2"/>
-                        <span t-if="!isComplete">Digitalizando facturas con IA</span>
-                        <span t-else="">Digitalización completada</span>
-                        <span class="badge badge-secondary ml-1" style="font-size: 11px;">
-                            <t t-esc="doneCount"/>/<t t-esc="totalCount"/>
-                        </span>
+            <t t-else="">
+                <div class="o_ocr_batch_card">
+                    <div class="o_ocr_header">
+                        <div class="o_ocr_title">
+                            <i t-if="!widget.isComplete" class="fa fa-cogs text-primary mr-2"/>
+                            <i t-else="" class="fa fa-check-circle text-success mr-2"/>
+                            <span t-if="!widget.isComplete">Digitalizando facturas con IA</span>
+                            <span t-else="">Digitalización completada</span>
+                            <span class="badge badge-secondary ml-1" style="font-size: 11px;">
+                                <t t-esc="widget.doneCount"/>/<t t-esc="widget.totalCount"/>
+                            </span>
+                        </div>
+                        <div class="o_ocr_header_actions">
+                            <button type="button" class="btn-icon btn-minimize" title="Minimizar">
+                                <i class="fa fa-minus"/>
+                            </button>
+                            <button type="button" class="btn-icon btn-close-card" title="Cerrar">
+                                <i class="fa fa-times"/>
+                            </button>
+                        </div>
                     </div>
-                    <div class="o_ocr_header_actions">
-                        <button type="button" class="btn-icon" t-on-click="toggleMinimize" title="Minimizar">
-                            <i class="fa fa-minus"/>
-                        </button>
-                        <button type="button" class="btn-icon" t-on-click="close" title="Cerrar">
-                            <i class="fa fa-times"/>
-                        </button>
+
+                    <div class="o_ocr_progress_container">
+                        <div t-attf-class="o_ocr_progress_bar #{widget.isComplete ? 'is-complete' : ''}"
+                             t-attf-style="width: #{widget.progressPercent}%;"/>
                     </div>
-                </div>
 
-                <div class="o_ocr_progress_container">
-                    <div class="o_ocr_progress_bar"
-                         t-att-class="{ 'is-complete': isComplete }"
-                         t-att-style="'width: ' + progressPercent + '%;'"/>
-                </div>
+                    <div class="o_ocr_list">
+                        <t t-foreach="widget.items" t-as="item">
+                            <div class="o_ocr_item is-clickable" t-att-data-id="item.id" title="Haz clic para abrir la factura">
+                                <div class="o_ocr_item_left">
+                                    <span t-if="item.status === 'done'" class="fa fa-check-circle text-success" style="font-size: 15px;"/>
+                                    <span t-elif="item.status === 'mismatch'" class="fa fa-building text-warning" style="font-size: 15px;"/>
+                                    <span t-elif="item.status === 'processing'" class="fa fa-circle-o-notch fa-spin text-primary" style="font-size: 15px;"/>
+                                    <span t-elif="item.status === 'pending'" class="fa fa-clock-o text-muted" style="font-size: 15px;"/>
+                                    <span t-elif="item.status === 'failed'" class="fa fa-exclamation-triangle text-danger" style="font-size: 15px;"/>
 
-                <div class="o_ocr_list">
-                    <t t-foreach="state.items" t-as="item" t-key="item.id">
-                        <div class="o_ocr_item is-clickable" t-on-click="() => this.openInvoice(item.id)" title="Haz clic para abrir la factura">
-                            <div class="o_ocr_item_left">
-                                <span t-if="item.status === 'done'" class="fa fa-check-circle text-success" style="font-size: 15px;"/>
-                                <span t-elif="item.status === 'mismatch'" class="fa fa-building text-warning" style="font-size: 15px;"/>
-                                <span t-elif="item.status === 'processing'" class="fa fa-circle-o-notch fa-spin text-primary" style="font-size: 15px;"/>
-                                <span t-elif="item.status === 'pending'" class="fa fa-clock-o text-muted" style="font-size: 15px;"/>
-                                <span t-elif="item.status === 'failed'" class="fa fa-exclamation-triangle text-danger" style="font-size: 15px;"/>
+                                    <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                        <span class="o_ocr_item_name">
+                                            <t t-if="item.partner"><t t-esc="item.partner"/></t>
+                                            <t t-else=""><t t-esc="item.filename"/></t>
+                                            <span t-if="item.status === 'done' and item.move_type_label" class="badge badge-info ml-1" style="font-size: 10px;"><t t-esc="item.move_type_label"/></span>
+                                            <span t-if="item.status === 'mismatch'" class="badge badge-warning ml-1" style="font-size: 10px;">Discrepancia de empresa</span>
+                                            <span t-if="item.is_duplicate" class="badge badge-danger ml-1" style="font-size: 10px;">Posible Duplicada</span>
+                                            <span t-if="item.iban_status === 'mismatch'" class="badge badge-danger ml-1" style="font-size: 10px;">Alerta IBAN</span>
+                                        </span>
+                                        <span class="o_ocr_item_sub">
+                                            <t t-if="item.status === 'done'">
+                                                <span class="badge badge-primary mr-1" t-if="item.name and item.name !== '/'"><t t-esc="item.name"/></span>
+                                                <t t-esc="item.filename"/>
+                                                <t t-if="item.ref"> · Nº <t t-esc="item.ref"/></t>
+                                            </t>
+                                            <t t-elif="item.status === 'mismatch'">
+                                                <span class="text-warning font-weight-bold"><t t-esc="item.mismatch_details || 'Pertenece a otra empresa'"/></span>
+                                            </t>
+                                            <t t-elif="item.status === 'processing'">Procesando con IA...</t>
+                                            <t t-elif="item.status === 'pending'">En cola en el servidor...</t>
+                                            <t t-elif="item.status === 'failed'">
+                                                <span class="text-danger"><t t-esc="item.error || 'Requiere revisión manual'"/></span>
+                                            </t>
+                                        </span>
+                                    </div>
+                                </div>
 
-                                <div style="display: flex; flex-direction: column; overflow: hidden;">
-                                    <span class="o_ocr_item_name">
-                                        <t t-if="item.partner"><t t-esc="item.partner"/></t>
-                                        <t t-else=""><t t-esc="item.filename"/></t>
-                                        <span t-if="item.status === 'mismatch'" class="badge badge-warning ml-1" style="font-size: 10px;">Discrepancia de empresa</span>
-                                        <span t-if="item.is_duplicate" class="badge badge-danger ml-1" style="font-size: 10px;">Posible Duplicada</span>
+                                <div class="o_ocr_item_right">
+                                    <span t-if="item.status === 'done' and item.amount_total" class="o_ocr_item_total">
+                                        <t t-esc="widget.formatCurrency(item.amount_total)"/>
                                     </span>
-                                    <span class="o_ocr_item_sub">
-                                        <t t-if="item.status === 'done'">
-                                            <span class="badge badge-primary mr-1" t-if="item.name and item.name !== '/'"><t t-esc="item.name"/></span>
-                                            <t t-esc="item.filename"/>
-                                            <t t-if="item.ref"> · Nº <t t-esc="item.ref"/></t>
-                                        </t>
-                                        <t t-elif="item.status === 'mismatch'">
-                                            <span class="text-warning font-weight-bold"><t t-esc="item.mismatch_details || 'Pertenece a otra empresa'"/></span>
-                                        </t>
-                                        <t t-elif="item.status === 'processing'">Procesando con IA...</t>
-                                        <t t-elif="item.status === 'pending'">En cola en el servidor...</t>
-                                        <t t-elif="item.status === 'failed'">
-                                            <span class="text-danger"><t t-esc="item.error || 'Requiere revisión manual'"/></span>
-                                        </t>
+                                    <i class="fa fa-external-link text-muted ml-1" style="font-size: 11px; opacity: 0.6;"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Pie de página: Añadir más facturas -->
+                    <div class="o_ocr_footer">
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-add-more w-100">
+                            <i class="fa fa-plus mr-1"/> Añadir más facturas
+                        </button>
+                        <input type="file" multiple="true" accept=".pdf,image/*" class="d-none o_ocr_drawer_file_input"/>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="incoluz_invoice_ai_ocr.OcrUploadWizardDialog">
+        <div class="o_ocr_wizard_container">
+            <!-- Selector de Tipo de Documento y Contador -->
+            <div class="o_ocr_wizard_intro mb-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <label class="text-muted mr-2 mb-0" style="font-size: 13px;">Tipo de documento:</label>
+                    <select class="form-control form-control-sm o_ocr_move_type_select" style="width: auto; font-size: 12.5px;">
+                        <option value="auto" t-att-selected="widget.selectedMoveType === 'auto' ? 'selected' : undefined">Auto-detectar con IA (Recomendado)</option>
+                        <option value="in_invoice" t-att-selected="widget.selectedMoveType === 'in_invoice' ? 'selected' : undefined">Factura de proveedor</option>
+                        <option value="in_refund" t-att-selected="widget.selectedMoveType === 'in_refund' ? 'selected' : undefined">Abono de proveedor</option>
+                        <option value="out_invoice" t-att-selected="widget.selectedMoveType === 'out_invoice' ? 'selected' : undefined">Factura de cliente</option>
+                        <option value="out_refund" t-att-selected="widget.selectedMoveType === 'out_refund' ? 'selected' : undefined">Abono de cliente</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="badge badge-primary px-2 py-1" style="font-size: 12px;">
+                        <t t-esc="widget.files ? widget.files.length : 0"/> archivo(s)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Lista de Archivos Seleccionados -->
+            <t t-if="widget.files and widget.files.length">
+                <div class="o_ocr_wizard_file_list mb-3">
+                    <t t-foreach="widget.files" t-as="file">
+                        <div class="o_ocr_wizard_file_item">
+                            <div class="o_ocr_wizard_file_info">
+                                <i t-if="file.mimetype and file.mimetype.indexOf('pdf') !== -1" class="fa fa-file-pdf-o text-danger o_ocr_file_icon"/>
+                                <i t-else="" class="fa fa-file-image-o text-primary o_ocr_file_icon"/>
+                                <div class="o_ocr_wizard_file_text">
+                                    <span class="o_ocr_wizard_file_name" t-att-title="file.name">
+                                        <t t-esc="file.name"/>
+                                    </span>
+                                    <span class="o_ocr_wizard_file_size text-muted">
+                                        <t t-esc="widget.formatFileSize(file.size)"/>
                                     </span>
                                 </div>
                             </div>
-
-                            <div class="o_ocr_item_right">
-                                <span t-if="item.status === 'done' and item.amount_total" class="o_ocr_item_total">
-                                    <t t-esc="formatCurrency(item.amount_total)"/>
-                                </span>
-                                <i class="fa fa-external-link text-muted ml-1" style="font-size: 11px; opacity: 0.6;"/>
-                            </div>
+                            <button type="button" class="btn btn-sm btn-link text-danger o_ocr_remove_btn" t-att-data-index="file_index" title="Eliminar archivo">
+                                <i class="fa fa-times"/>
+                            </button>
                         </div>
                     </t>
                 </div>
+            </t>
+            <t t-else="">
+                <!-- Estado Vacío -->
+                <div class="o_ocr_wizard_empty text-center p-4 border rounded bg-light mb-3">
+                    <i class="fa fa-files-o fa-2x text-muted mb-2"/>
+                    <p class="text-muted mb-0">No hay archivos en la lista. Pulsa <strong>Subir más archivos</strong> o arrastra aquí tus facturas.</p>
+                </div>
+            </t>
+
+            <!-- Zona de Arrastre -->
+            <div class="o_ocr_drop_area p-3 mb-2 text-center border" title="Haz clic o arrastra archivos aquí">
+                <i class="fa fa-cloud-upload text-primary mb-1" style="font-size: 24px;"/>
+                <div class="text-muted small">
+                    Arrastra y suelta más facturas aquí o haz clic para seleccionarlas (PDF o imagen)
+                </div>
             </div>
+
+            <input type="file" multiple="multiple" accept=".pdf,image/*" class="d-none o_ocr_wizard_file_input"/>
         </div>
     </t>
 </templates>

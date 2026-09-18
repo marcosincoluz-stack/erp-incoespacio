@@ -6,6 +6,7 @@ services:
     container_name: incoespacio_nginx
     depends_on:
       - web
+      - websocket
     ports:
       - "80:80"
       - "443:443"
@@ -31,6 +32,23 @@ services:
       - ./config:/etc/odoo
       - ./addons:/mnt/extra-addons
       - ./addons-incoespacio:/mnt/incoespacio-addons
+    restart: always
+
+  websocket:
+    image: incoespacio-odoo:17.0
+    container_name: incoespacio_websocket
+    depends_on:
+      - db
+    environment:
+      - HOST=db
+      - USER=${POSTGRES_USER:-odoo}
+      - PASSWORD=${POSTGRES_PASSWORD:-odoo}
+    volumes:
+      - incoespacio_web_data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      - ./addons-incoespacio:/mnt/incoespacio-addons
+    command: odoo gevent
     restart: always
 
   db:

@@ -38,7 +38,7 @@ class AccountMove(models.Model):
         string="Posible Duplicada",
         default=False,
         copy=False,
-        help="Marcado si la IA o el sistema detecta otra factura con mismo CIF, número o importe."
+        help="Marcado si existe otra factura del mismo proveedor con el mismo número."
     )
     duplicate_move_id = fields.Many2one(
         'account.move',
@@ -50,7 +50,7 @@ class AccountMove(models.Model):
     ocr_extracted_iban = fields.Char(string="IBAN Extraído por IA", copy=False, readonly=True)
     ocr_iban_status = fields.Selection([
         ('verified', 'Coincide con proveedor'),
-        ('new', 'Nueva cuenta dada de alta'),
+        ('new', 'IBAN nuevo (sin dar de alta)'),
         ('mismatch', '¡Alerta! No coincide con cuentas conocidas'),
         ('none', 'No detectado en factura'),
     ], string="Estado IBAN", default='none', copy=False, readonly=True)
@@ -77,20 +77,28 @@ class AccountMove(models.Model):
             })
             return False
 
+    def _ocr_attachments(self):
+        self.ensure_one()
+        atts = self.env['ir.attachment'].search([
+            ('res_model', '=', 'account.move'),
+            ('res_id', '=', self.id),
+        ])
+        if not atts and self.message_main_attachment_id:
+            atts = self.message_main_attachment_id
+        if not atts:
+            msg_atts = self.message_ids.mapped('attachment_ids')
+            if msg_atts:
+                atts = msg_atts
+        partes = atts.filtered(lambda a: a.name and '_parte_' in a.name.lower())
+        return partes or atts
+
     def action_scan_with_ai(self):
         self.ensure_one()
-        attachments = self.attachment_ids.filtered(
+        attachments = self._ocr_attachments().filtered(
             lambda a: a.mimetype in ('application/pdf', 'image/jpeg', 'image/png', 'image/webp')
                       or (a.name and a.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png', '.webp')))
         )
         if not attachments:
-            msg = self.message_ids.filtered(lambda m: m.attachment_ids)
-            if msg:
-                attachments = msg.mapped('attachment_ids').filtered(
-                    lambda a: a.mimetype in ('application/pdf', 'image/jpeg', 'image/png', 'image/webp')
-                              or (a.name and a.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png', '.webp')))
-                )
-
             raise UserError(
                 _("No se encontró ningún archivo PDF o imagen adjunto en esta factura.\n"
                   "Por favor, adjunta el documento antes de pulsar 'Escanear con IA'.")
@@ -162,8 +170,13 @@ class AccountMove(models.Model):
         first_pages = sub_docs[0].get('paginas', [])
         if first_pages and file_bytes.startswith(b"%PDF-"):
             part_bytes = AiOcrService.split_pdf_pages(file_bytes, first_pages)
-            if self.attachment_ids:
-                self.attachment_ids[0].write({'datas': base64.b64encode(part_bytes).decode('utf-8')})
+            self.env['ir.attachment'].create({
+                'name': f"{filename or 'factura'}_parte_1.pdf",
+                'datas': base64.b64encode(part_bytes).decode('utf-8'),
+                'mimetype': 'application/pdf',
+                'res_model': 'account.move',
+                'res_id': self.id,
+            })
 
         created_invoices = self
         for idx, sub_doc in enumerate(sub_docs[1:], start=2):
@@ -364,29 +377,37 @@ class AccountMove(models.Model):
             if curr:
                 self.currency_id = curr.id
 
-        if lineas_data:
-            self.invoice_line_ids = [(5, 0, 0)]
+        keep_lines = bool(
+            self.invoice_line_ids.filtered(lambda l: l.display_type == "product")
+        )
+        if lineas_data and not keep_lines:
+            header_irpf = float(factura_data.get('retencion_irpf_porcentaje') or 0.0)
+            if header_irpf and len(lineas_data) > 1:
+                self.message_post(
+                    body=Markup(
+                        "<div class='alert alert-warning'><b>OCR IA:</b> "
+                        "IRPF de cabecera no aplicado: hay varias líneas. "
+                        "Revísalo a mano.</div>"
+                    ),
+                    subtype_xmlid='mail.mt_note',
+                )
+                header_irpf = 0.0
             new_lines = []
-
             for line in lineas_data:
                 desc = (line.get('descripcion') or 'Servicio / Mercancía').strip()
                 qty = float(line.get('cantidad') or 1.0)
                 price = float(line.get('precio_unitario') or 0.0)
                 pct_iva = float(line.get('porcentaje_iva') or 0.0)
-                pct_irpf = float(factura_data.get('retencion_irpf_porcentaje') or 0.0)
-
                 if is_customer:
                     taxes = self._find_matching_sale_taxes(pct_iva)
                 else:
-                    taxes = self._find_matching_purchase_taxes(pct_iva, pct_irpf)
-
+                    taxes = self._find_matching_purchase_taxes(pct_iva, header_irpf)
                 new_lines.append((0, 0, {
                     'name': desc,
                     'quantity': qty,
                     'price_unit': price,
                     'tax_ids': [(6, 0, taxes.ids)],
                 }))
-
             self.invoice_line_ids = new_lines
 
         # Verificación IBAN
@@ -515,15 +536,7 @@ class AccountMove(models.Model):
         except Exception:
             iban_valid = False
         if iban_valid:
-            try:
-                self.env['res.partner.bank'].create({
-                    'acc_number': clean_iban,
-                    'partner_id': partner.id,
-                    'company_id': self.company_id.id if self.company_id else False,
-                })
-                self.ocr_iban_status = 'new'
-            except Exception:
-                self.ocr_iban_status = 'none'
+            self.ocr_iban_status = 'new'
         else:
             self.ocr_iban_status = 'none'
 

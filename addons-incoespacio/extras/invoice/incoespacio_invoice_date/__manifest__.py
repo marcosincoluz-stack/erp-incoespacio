@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Incoespacio: Fecha contable onchange fecha factura",
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
     'author': 'Incoespacio',
     'category': 'Incoespacio',
     'website': 'https://incoespacio.com',

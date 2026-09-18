@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_inherit_ocr_obra_purchase" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.ocr.obra.purchase</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
+                <field name="construction_line_id"
+                       string="Partida"
+                       optional="show"
+                       context="{'short_construction_line': True}"
+                       options="{'no_create': True, 'no_quick_create': True}"
+                       domain="[('display_type', '=', False), ('order_id.project_id', '=', parent.project_id)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

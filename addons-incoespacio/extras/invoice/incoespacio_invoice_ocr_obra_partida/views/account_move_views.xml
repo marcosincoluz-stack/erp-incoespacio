@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_ocr_obra_partida" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.ocr.obra.partida</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_obra.view_move_form_inherit_ocr_obra"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='construction_section_id']" position="attributes">
+                <attribute name="context">{'short_construction_line': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='construction_section_id']" position="after">
+                <field name="construction_line_id"
+                       string="Partida"
+                       optional="show"
+                       context="{'short_construction_line': True}"
+                       options="{'no_create': True, 'no_quick_create': True}"
+                       domain="[('display_type', '=', False), ('order_id.project_id', '=', parent.project_id), ('bc3_section_id', '=?', construction_section_id)]"
+                       column_invisible="parent.move_type not in ('in_invoice', 'in_refund')"/>
+                <button name="action_split_partida" type="object" icon="fa-scissors"
+                        title="Repartir entre partidas"
+                        column_invisible="parent.state != 'draft' or parent.move_type not in ('in_invoice', 'in_refund')"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm_obra'][last()]" position="after">
+                <field name="has_unassigned_partida" invisible="1"/>
+                <button name="action_assign_partida" type="object" string="Imputar a partidas"
+                        class="btn-secondary"
+                        invisible="state != 'posted' or move_type not in ('in_invoice', 'in_refund') or not project_id or not has_unassigned_partida"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm_obra'][last()]" position="attributes">
+                <attribute name="string">Rellenar capítulos y partidas</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_ocr_obra_partida" model="ir.ui.view">
+        <field name="name">account.move.search.inherit.ocr.obra.partida</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_obra.view_account_invoice_filter_ocr_obra"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='gastos_sin_obra']" position="after">
+                <filter string="Gastos sin partida" name="gastos_sin_partida"
+                        domain="[('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '=', 'posted'), ('project_id', '!=', False), ('has_unassigned_partida', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gastos_sin_partida" model="ir.actions.act_window">
+        <field name="name">Gastos sin partida</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '=', 'posted'), ('project_id', '!=', False), ('has_unassigned_partida', '=', True)]</field>
+        <field name="context">{'search_default_gastos_sin_partida': 1}</field>
+    </record>
+</odoo>

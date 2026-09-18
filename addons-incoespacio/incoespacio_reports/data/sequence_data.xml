@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <!-- Prefijo de Presupuestos y Pedidos de Venta: 'P%(y)s' con padding 4 (ej: P260001, P260920) estándar Incoluz -->
         <record id="sale.seq_sale_order" model="ir.sequence">
             <field name="prefix">P%(y)s</field>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_certification_line_lens_form" model="ir.ui.view">
+        <field name="name">certification.line.lens.form</field>
+        <field name="model">certification.line.lens</field>
+        <field name="arch" type="xml">
+            <form string="Partida">
+                <field name="line_id" invisible="1"/>
+                <field name="sol_id" invisible="1"/>
+                <field name="order_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="cost_alert" invisible="1"/>
+                <field name="verdict_level" invisible="1"/>
+                <div class="alert alert-danger mb-2" role="alert"
+                     invisible="verdict_level != 'danger'">
+                    <field name="verdict" nolabel="1"/>
+                    <field name="cost_alert" widget="badge" nolabel="1"
+                           decoration-danger="cost_alert == 'over_sale'"/>
+                </div>
+                <div class="alert alert-warning mb-2" role="alert"
+                     invisible="verdict_level != 'warning'">
+                    <field name="verdict" nolabel="1"/>
+                    <field name="cost_alert" widget="badge" nolabel="1"
+                           decoration-warning="cost_alert == 'certified'"/>
+                </div>
+                <div class="alert alert-success mb-2" role="alert"
+                     invisible="verdict_level != 'success'">
+                    <field name="verdict" nolabel="1"/>
+                </div>
+                <div class="o_construction_margins_kpis">
+                    <div class="o_margin_kpi">
+                        <div class="o_margin_kpi_title">Venta restante</div>
+                        <field name="amount_remaining" widget="monetary" nolabel="1"/>
+                        <div class="o_margin_kpi_sub text-muted">
+                            <field name="qty_remaining" nolabel="1"/>
+                            <field name="product_uom_id" nolabel="1" options="{'no_open': True}"/>
+                            a <field name="price_unit" nolabel="1"/>
+                        </div>
+                    </div>
+                    <div class="o_margin_kpi">
+                        <div class="o_margin_kpi_title">Objetivo restante</div>
+                        <field name="amount_planned_remaining" widget="monetary" nolabel="1"/>
+                        <div class="o_margin_kpi_sub text-muted">
+                            Margen obj. <field name="planned_percent" nolabel="1"/> %
+                        </div>
+                    </div>
+                    <div class="o_margin_kpi">
+                        <div class="o_margin_kpi_title">Coste factura</div>
+                        <field name="pending_cost_amount" widget="monetary" nolabel="1"/>
+                        <div class="o_margin_kpi_sub text-muted">
+                            <field name="pending_bill_names" nolabel="1"/>
+                        </div>
+                    </div>
+                    <div class="o_margin_kpi">
+                        <div class="o_margin_kpi_title">Margen si aceptas</div>
+                        <field name="margin_new" widget="monetary" nolabel="1"
+                               decoration-danger="margin_new &lt; 0"/>
+                        <div class="o_margin_kpi_sub text-danger" invisible="margin_new &gt;= 0">
+                            <field name="margin_percent_new" nolabel="1"/> %
+                        </div>
+                        <div class="o_margin_kpi_sub text-muted" invisible="margin_new &lt; 0">
+                            <field name="margin_percent_new" nolabel="1"/> %
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-sm o_lens_table">
+                    <thead>
+                        <tr>
+                            <th/>
+                            <th>Presupuesto</th>
+                            <th>Objetivo</th>
+                            <th>Factura</th>
+                            <th class="o_lens_cert">Certificar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Cantidad</th>
+                            <td><field name="qty_remaining" nolabel="1"/></td>
+                            <td><field name="qty_remaining" nolabel="1"/></td>
+                            <td><field name="pending_cost_qty" nolabel="1"/></td>
+                            <td class="o_lens_cert">
+                                <field name="qty_period" nolabel="1"/>
+                                <div class="o_lens_shortcuts">
+                                    <button name="action_use_suggested" type="object"
+                                            class="btn-link p-0" string="sugerida"/>
+                                    (<field name="qty_suggested" nolabel="1"/>)
+                                    ·
+                                    <button name="action_fill_remaining" type="object"
+                                            class="btn-link p-0" string="restante"/>
+                                    (<field name="qty_remaining" nolabel="1"/>)
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>P.U.</th>
+                            <td><field name="price_unit" nolabel="1"/></td>
+                            <td><field name="price_planned" nolabel="1"/></td>
+                            <td><field name="price_unit_cost" nolabel="1"/></td>
+                            <td class="o_lens_cert"><field name="price_unit" nolabel="1"/></td>
+                        </tr>
+                        <tr>
+                            <th>Importe</th>
+                            <td><field name="amount_remaining" widget="monetary" nolabel="1"/></td>
+                            <td><field name="amount_planned_remaining" widget="monetary" nolabel="1"/></td>
+                            <td><field name="pending_cost_amount" widget="monetary" nolabel="1"/></td>
+                            <td class="o_lens_cert">
+                                <field name="amount_period_new" widget="monetary" nolabel="1"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-muted mb-2">
+                    Med. anterior <field name="qty_previous" nolabel="1"/>
+                    · sugerida <field name="qty_suggested" nolabel="1"/>
+                    · a origen tras aceptar
+                    <field name="percent_origin_new" nolabel="1"/> %
+                </div>
+                <separator string="Facturas imputadas" invisible="not bill_line_ids"/>
+                <field name="bill_line_ids" nolabel="1" invisible="not bill_line_ids">
+                    <tree editable="bottom" create="0" delete="0" no_open="1">
+                        <field name="move_line_id" column_invisible="True"/>
+                        <field name="order_id" column_invisible="True"/>
+                        <field name="construction_section_id" column_invisible="True"/>
+                        <field name="currency_id" column_invisible="True"/>
+                        <field name="move_id" readonly="1" string="Factura"/>
+                        <field name="name" readonly="1" string="Concepto"/>
+                        <field name="quantity" readonly="1" string="Cantidad"/>
+                        <field name="price_subtotal" widget="monetary" readonly="1" string="Importe"/>
+                        <field name="construction_line_id"
+                               string="Partida"
+                               context="{'short_construction_line': True}"
+                               options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"/>
+                        <button name="action_split_partida" type="object" icon="fa-scissors"
+                                title="Repartir entre partidas"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_accept" type="object" string="Aceptar" class="btn-primary"/>
+                    <button name="action_create_modification" type="object" string="Crear modificado"
+                            class="btn-warning" invisible="cost_alert != 'over_sale'"/>
+                    <button special="cancel" string="Cancelar" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

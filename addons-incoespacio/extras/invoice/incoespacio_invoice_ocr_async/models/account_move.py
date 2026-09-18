@@ -197,17 +197,22 @@ class AccountMove(models.Model):
                 'mismatch': getattr(self, 'ocr_company_mismatch', False),
                 'mismatch_details': getattr(self, 'ocr_mismatch_details', '') or '',
             }
-            # Enviar notificación a ambos canales para compatibilidad total
             target = self.env.user.partner_id
             self.env['bus.bus']._sendone(target, 'ocr_batch_status', payload)
-            self.env['bus.bus']._sendone(target, 'incoespacio_ocr_batch_event', payload)
         except Exception as e:
             _logger.debug("No se pudo enviar notificación bus: %s", e)
 
     @api.model
     def _cron_process_pending_ocr(self):
+        stale = self.search([
+            ('ocr_status', '=', 'processing'),
+            ('write_date', '<', fields.Datetime.now() - datetime.timedelta(minutes=15)),
+            ('move_type', 'in', ('in_invoice', 'in_receipt', 'in_refund', 'out_invoice', 'out_refund', 'out_receipt')),
+        ])
+        if stale:
+            stale.write({'ocr_status': 'pending'})
         pending_moves = self.search([
-            ('ocr_status', 'in', ('pending', 'processing')),
+            ('ocr_status', '=', 'pending'),
             ('move_type', 'in', ('in_invoice', 'in_receipt', 'in_refund', 'out_invoice', 'out_refund', 'out_receipt')),
         ], limit=10)
         if pending_moves:

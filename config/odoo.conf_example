@@ -13,10 +13,12 @@ addons_path =
     /mnt/extra-addons/account-reconcile,
     /mnt/extra-addons/bank-statement-import,
     /mnt/extra-addons/account-payment,
+    /mnt/extra-addons/vertical-construction,
     /mnt/incoespacio-addons,
     /mnt/incoespacio-addons/extras/invoice,
     /mnt/incoespacio-addons/extras/partner,
-    /mnt/incoespacio-addons/extras/purchases
+    /mnt/incoespacio-addons/extras/purchases,
+    /mnt/incoespacio-addons/extras/sales
 data_dir = /var/lib/odoo
 db_host = db
 db_port = 5432
@@ -36,7 +38,8 @@ limit_time_real_cron = -1
 limit_request = 8192
 limit_memory_hard = 2684354560
 limit_memory_soft = 2147483648
-workers = 2
+; Estándar Incoluz: 4 mostradores HTTP (+ 2 de cron)
+workers = 4
 max_cron_threads = 2
 db_maxconn = 64
 

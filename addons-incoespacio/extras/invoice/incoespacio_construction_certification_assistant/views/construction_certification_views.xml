@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_construction_certification_form_assistant" model="ir.ui.view">
+        <field name="name">construction.certification.form.assistant</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_construction_certification_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='retention_rate']" position="after">
+                <field name="suggest_by" widget="radio" options="{'horizontal': true}"
+                       readonly="state != 'draft'" invisible="state != 'draft'"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree" position="attributes">
+                <attribute name="decoration-danger">needs_measure or cost_alert</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='qty_period']" position="after">
+                <field name="needs_measure" column_invisible="True"/>
+                <field name="qty_suggested" string="Med. sug."/>
+                <field name="suggest_basis" widget="badge" optional="hide"
+                       decoration-info="suggest_basis == 'qty'"
+                       decoration-warning="suggest_basis == 'sale'"/>
+                <button name="action_apply_suggested" type="object" icon="fa-magic"
+                        title="Aplicar medición facturada"
+                        invisible="not needs_measure or not qty_suggested"
+                        column_invisible="parent.state != 'draft'"/>
+                <field name="pending_cost_amount" widget="monetary" optional="show" string="Coste pend."/>
+                <field name="pending_bill_names" optional="hide" string="Facturas"/>
+                <field name="cost_alert" widget="badge" optional="show"
+                       decoration-danger="cost_alert == 'over_sale'"
+                       decoration-warning="cost_alert == 'certified'"/>
+                <button name="action_create_modification" type="object" icon="fa-plus-square"
+                        title="Crear modificado"
+                        invisible="cost_alert != 'over_sale'"
+                        column_invisible="parent.state != 'draft'"/>
+            </xpath>
+            <xpath expr="//page[@name='notes']" position="before">
+                <page string="Facturas pendientes" name="pending_bills"
+                      invisible="state != 'draft' or not pending_bill_count">
+                    <field name="pending_bill_count" invisible="1"/>
+                    <field name="pending_bill_late_count" invisible="1"/>
+                    <separator string="Del periodo"/>
+                    <field name="pending_bill_period_ids" nolabel="1" context="{'certification_id': id}">
+                        <tree create="0" delete="0">
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="invoice_date"/>
+                            <field name="amount_untaxed" widget="monetary" sum="Total"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="has_unassigned_partida" string="Sin partida"/>
+                            <button name="action_cert_reviewed" type="object" string="Revisada"/>
+                            <button name="action_assign_partida" type="object" string="Imputar"
+                                    invisible="not has_unassigned_partida"/>
+                        </tree>
+                    </field>
+                    <separator string="De periodos anteriores" invisible="not pending_bill_late_count"/>
+                    <field name="pending_bill_late_ids" nolabel="1"
+                           invisible="not pending_bill_late_count"
+                           context="{'certification_id': id}">
+                        <tree create="0" delete="0" decoration-muted="True">
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="invoice_date"/>
+                            <field name="amount_untaxed" widget="monetary" sum="Total"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="has_unassigned_partida" string="Sin partida"/>
+                            <button name="action_cert_reviewed" type="object" string="Revisada"/>
+                            <button name="action_assign_partida" type="object" string="Imputar"
+                                    invisible="not has_unassigned_partida"/>
+                        </tree>
+                    </field>
+                    <separator string="Líneas a revisar"/>
+                    <field name="pending_review_line_ids" nolabel="1"
+                           context="{'certification_id': id}">
+                        <tree editable="bottom" create="0" delete="0">
+                            <field name="move_id" readonly="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="quantity" readonly="1"/>
+                            <field name="price_subtotal" widget="monetary" readonly="1"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="review_reason" readonly="1" string="Motivo"/>
+                            <field name="construction_section_id" readonly="1" string="Capítulo"/>
+                            <field name="construction_line_id"
+                                   string="Partida"
+                                   context="{'short_construction_line': True}"
+                                   options="{'no_create': True, 'no_quick_create': True}"
+                                   domain="[('order_id', '=', parent.order_id), ('display_type', '=', False), ('bc3_section_id', '=?', construction_section_id)]"/>
+                            <field name="construction_line_suggested_id" readonly="1"
+                                   string="Sugerida"
+                                   options="{'no_open': True}"/>
+                            <button name="action_use_suggested_partida" type="object" string="Usar"
+                                    invisible="not construction_line_suggested_id"/>
+                            <button name="action_split_partida" type="object" icon="fa-scissors"
+                                    title="Repartir entre partidas"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_construction_certification_form_assistant_banner" model="ir.ui.view">
+        <field name="name">construction.certification.form.assistant.banner</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification_pending_bills.view_construction_certification_form_pending_bills"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_pending_bills']" position="before">
+                <field name="assistant_line_count" invisible="1"/>
+                <field name="pending_bill_late_count" invisible="1"/>
+                <field name="assistant_pending_cost" invisible="1"/>
+                <field name="assistant_suggested_amount" invisible="1"/>
+                <field name="assistant_suggested_percent" invisible="1"/>
+                <span invisible="not assistant_line_count">
+                    · <field name="assistant_line_count" class="oe_inline"/> partidas con coste y sin medición.
+                    Coste pendiente <field name="assistant_pending_cost" widget="monetary" class="oe_inline"/>
+                    · aplicando sugerencias certificas
+                    <field name="assistant_suggested_amount" widget="monetary" class="oe_inline"/>
+                    (<field name="assistant_suggested_percent" class="oe_inline"/> %).
+                </span>
+                <span invisible="not pending_bill_late_count">
+                    · <field name="pending_bill_late_count" class="oe_inline"/> de periodos anteriores
+                </span>
+            </xpath>
+        </field>
+    </record>
+</odoo>

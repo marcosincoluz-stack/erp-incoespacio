@@ -1,0 +1,29 @@
+.o_certification_line_search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    padding-bottom: 1.5rem;
+
+    input {
+        flex: 1;
+        max-width: 28rem;
+        min-height: 2rem;
+        padding: 0.25rem 0.5rem;
+        line-height: 1.5;
+        box-sizing: border-box;
+        appearance: none;
+    }
+}
+
+.o_form_view .o_notebook > .tab-content > .tab-pane > :first-child:not(.o_group) .o_field_x2many.o_field_x2many_list .o_certification_line_search + .o_list_renderer {
+    margin-top: 0;
+}
+
+tr.o_certification_line_match > td {
+    background-color: #fff3cd;
+}
+tr.o_certification_line_match_current > td {
+    background-color: #cfe2ff;
+}

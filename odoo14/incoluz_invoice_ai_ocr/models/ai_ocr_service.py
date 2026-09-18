@@ -16,20 +16,22 @@ GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{
 
 INVOICE_PROMPT_SYSTEM = """
 Eres un asistente contable experto en fiscalidad española y procesamiento de facturas para ERP Odoo.
-Analiza minuciosamente el documento adjunto (factura de compra/proveedor) y extrae todos los datos fiscales.
+Analiza minuciosamente el documento adjunto (factura, factura rectificativa o ticket) y extrae todos los datos fiscales.
+El documento puede ser de compra (proveedor) o de venta (cliente): identifica con precisión emisor y receptor y NUNCA los intercambies.
 
 REGLAS DE FISCALIDAD Y EXTRACCIÓN (ESPAÑA):
-1. EMISOR (PROVEEDOR):
-   - Es la empresa o profesional que emite la factura (el vendedor). NUNCA confundir con el receptor/cliente.
+1. EMISOR:
+   - Es quien emite el documento (el vendedor). En una factura de compra es el proveedor; en una de venta es tu empresa. NUNCA lo intercambies con el receptor.
    - Extrae con precisión: CIF / NIF / NIE, Razón Social o Nombre fiscal, Dirección (calle y número), Código Postal, Ciudad, País, Teléfono y Email si aparecen.
-2. RECEPTOR (CLIENTE / COMPAÑÍA):
-   - Es quien recibe la factura. Extrae CIF y Nombre fiscal.
+2. RECEPTOR:
+   - Es quien recibe el documento (el comprador). En una factura de compra es tu empresa; en una de venta es el cliente.
+   - Extrae CIF y Nombre fiscal. Si es un ticket simplificado y no figuran, déjalos vacíos.
 3. NÚMERO Y FECHAS:
    - Número de factura: código o serie completo del emisor (ej: '2024/0145', 'B-1289').
    - Fecha de emisión: Formato obligatorio 'YYYY-MM-DD'.
    - Fecha de vencimiento: Formato 'YYYY-MM-DD' si está indicada; si no, null.
 4. LÍNEAS DE FACTURA:
-   - Extrae cada concepto desglosado con: descripción, cantidad (float), precio_unitario (float), porcentaje_iva (float, ej: 21.0, 10.0, 4.0, 0.0) e importe de línea (subtotal sin impuestos).
+   - Extrae cada concepto desglosado con: descripcion, codigo (referencia / SKU / default_code si aparece; si no, ""), cantidad (float), precio_unitario (float), porcentaje_iva (float, ej: 21.0, 10.0, 4.0, 0.0) e importe de línea (subtotal sin impuestos).
    - Si no hay líneas claras pero hay una base imponible general, crea una única línea con la descripción general o concepto.
 5. IMPUESTOS (IVA E IRPF):
    - Desglosa las bases imponibles y cuotas por cada tipo de IVA.
@@ -47,6 +49,11 @@ REGLAS DE FISCALIDAD Y EXTRACCIÓN (ESPAÑA):
      * Marca "es_multifactura": false y deja "documentos_particionados": []
 9. VALIDACIÓN:
    - Si el documento no es una factura válida o es completamente ilegible, marca "es_factura_valida": false y explica el "motivo".
+10. TIPO DE DOCUMENTO:
+   - Identifica en "factura.tipo_documento" uno de los siguientes valores exactos:
+     * "factura_rectificativa" (si indica factura rectificativa, abono, nota de crédito o importes negativos)
+     * "ticket_simplificado" (si es ticket de caja, combustible, parking o comercio menor sin datos identificativos del cliente)
+     * "factura" (para cualquier factura comercial estándar completa)
 
 Debes responder ÚNICAMENTE un objeto JSON válido con la siguiente estructura exacta:
 {
@@ -68,6 +75,7 @@ Debes responder ÚNICAMENTE un objeto JSON válido con la siguiente estructura e
     "nombre": "Nombre del Cliente o Empresa Receptora"
   },
   "factura": {
+    "tipo_documento": "factura",
     "numero": "FAC-2024-001",
     "fecha_emision": "2024-05-15",
     "fecha_vencimiento": "2024-06-15",
@@ -81,6 +89,7 @@ Debes responder ÚNICAMENTE un objeto JSON válido con la siguiente estructura e
   "lineas": [
     {
       "descripcion": "Descripción del producto o servicio",
+      "codigo": "",
       "cantidad": 1.0,
       "precio_unitario": 100.0,
       "porcentaje_iva": 21.0,
@@ -104,13 +113,18 @@ class AiOcrService:
     def get_session(cls):
         if cls._session is None:
             session = requests.Session()
-            session.mount("https://", HTTPAdapter(max_retries=Retry(
-                total=3,
-                backoff_factor=2,
-                status_forcelist=(429, 500, 502, 503, 504),
-                allowed_methods=["POST"],
-                raise_on_status=False,
-            )))
+            retry_kwargs = {
+                'total': 3,
+                'backoff_factor': 2,
+                'status_forcelist': (429, 500, 502, 503, 504),
+                'raise_on_status': False,
+            }
+            try:
+                Retry(allowed_methods=["POST"])
+                retry_kwargs['allowed_methods'] = ["POST"]
+            except TypeError:
+                retry_kwargs['method_whitelist'] = ["POST"]
+            session.mount("https://", HTTPAdapter(max_retries=Retry(**retry_kwargs)))
             cls._session = session
         return cls._session
 
@@ -181,7 +195,7 @@ class AiOcrService:
             "contents": [{
                 "parts": [
                     {"inline_data": {"mime_type": mimetype, "data": b64_data}},
-                    {"text": "Analiza minuciosamente el documento adjunto y extrae todos los datos fiscales en JSON."},
+                    {"text": "Analiza el documento (compra o venta) y extrae emisor, receptor y datos fiscales en JSON."},
                 ]
             }],
             "generationConfig": gen_config,

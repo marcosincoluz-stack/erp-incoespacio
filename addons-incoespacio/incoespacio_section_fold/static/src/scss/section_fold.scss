@@ -1,0 +1,41 @@
+tr.o_is_line_section {
+    cursor: pointer;
+
+    td[name="name"] .o_field_widget {
+        display: inline-flex;
+        align-items: center;
+        width: auto;
+        max-width: 100%;
+        vertical-align: middle;
+    }
+
+    td[name="name"] .o_field_widget::before {
+        font-family: FontAwesome;
+        content: "\f0d7";
+        flex: 0 0 auto;
+        margin-right: 0.4rem;
+        width: 0.8rem;
+        line-height: 1;
+    }
+
+    &.o_section_folded td[name="name"] .o_field_widget::before {
+        content: "\f0da";
+    }
+
+    .o_section_fold_total {
+        font-weight: 700;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+}
+
+tr.o_section_folded_hidden {
+    display: none;
+}
+
+@for $i from 1 through 6 {
+    tr.o_bc3_level_#{$i} > td[name="bc3_code"],
+    tr.o_bc3_level_#{$i} > td[name="name"] {
+        padding-left: #{1.75rem * $i};
+    }
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="incoespacio_construction_certification_search.X2ManyField" t-inherit="web.X2ManyField" t-inherit-mode="primary">
+        <xpath expr="//ListRenderer" position="before">
+            <div class="o_certification_line_search">
+                <i class="fa fa-search" title="Buscar partida"/>
+                <input type="search"
+                       class="o_input"
+                       t-ref="search"
+                       t-on-input="onSearchInput"
+                       t-on-keydown="onSearchKeydown"
+                       placeholder="Buscar partida, código o precio…"/>
+                <span t-if="state.query" class="text-muted">
+                    <t t-esc="state.current"/> / <t t-esc="state.total"/>
+                </span>
+            </div>
+        </xpath>
+    </t>
+</templates>
