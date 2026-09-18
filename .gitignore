@@ -19,3 +19,7 @@ __pycache__/
 .cursor/
 scratch/
 .agents/
+GEMINI.md
+AGENTS.md
+opencode.json
+docs/ponytail-audit-*.md
