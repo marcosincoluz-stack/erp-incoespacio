@@ -124,7 +124,12 @@ class TestConstruction(TransactionCase):
             }
         )
         self.assertEqual(bill.construction_order_id, self.order)
+        self.assertEqual(self.order.vendor_bill_count, 0)
         bill.action_post()
+        self.order.invalidate_recordset(["vendor_bill_count"])
+        self.assertEqual(self.order.vendor_bill_count, 1)
+        action = self.order.action_view_vendor_bills()
+        self.assertIn(bill, self.env["account.move"].search(action["domain"]))
         self.order.invalidate_recordset(
             ["amount_job_cost", "amount_job_margin", "amount_certified_origin"]
         )

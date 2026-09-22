@@ -19,6 +19,10 @@ class SaleOrder(models.Model):
         string="Nº Certificaciones",
         compute="_compute_certification_count",
     )
+    vendor_bill_count = fields.Integer(
+        string="Gastos",
+        compute="_compute_vendor_bill_count",
+    )
     retention_return_invoice_id = fields.Many2one(
         "account.move",
         string="Factura devolución retención",
@@ -72,6 +76,37 @@ class SaleOrder(models.Model):
     def _compute_certification_count(self):
         for order in self:
             order.certification_count = len(order.certification_ids)
+
+    @api.depends("project_id")
+    def _compute_vendor_bill_count(self):
+        grouped = self.env["account.move"].read_group(
+            [
+                ("construction_order_id", "in", self.ids),
+                ("move_type", "in", ("in_invoice", "in_refund")),
+                ("state", "=", "posted"),
+            ],
+            ["construction_order_id"],
+            ["construction_order_id"],
+        )
+        counts = {
+            g["construction_order_id"][0]: g["construction_order_id_count"]
+            for g in grouped
+        }
+        for order in self:
+            order.vendor_bill_count = counts.get(order.id, 0)
+
+    def action_view_vendor_bills(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "account.action_move_in_invoice_type"
+        )
+        action["domain"] = [
+            ("construction_order_id", "=", self.id),
+            ("move_type", "in", ("in_invoice", "in_refund")),
+            ("state", "=", "posted"),
+        ]
+        action["context"] = {"default_move_type": "in_invoice", "create": False}
+        return action
 
     @api.depends(
         "certification_ids.state",

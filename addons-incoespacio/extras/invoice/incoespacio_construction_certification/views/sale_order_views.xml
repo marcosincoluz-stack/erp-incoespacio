@@ -23,6 +23,15 @@
                         invisible="state not in ('sale', 'done')"/>
             </xpath>
 
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <button name="action_view_vendor_bills"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-eur">
+                    <field name="vendor_bill_count" widget="statinfo" string="Gastos"/>
+                </button>
+            </xpath>
+
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_certifications"
                         type="object"
