@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from markupsafe import Markup
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -41,7 +43,7 @@ class Ticket(models.Model):
         for vals in vals_list:
             if vals.get('name', _('Nuevo')) == _('Nuevo'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('seq.ticket.id') or _('Nuevo')
-        tickets = super(Ticket, self).create(vals_list)
+        tickets = super(Ticket, self.with_context(mail_create_nolog=True)).create(vals_list)
 
         for ticket in tickets:
             # Notificar al administrador de soporte si existe el grupo
@@ -49,7 +51,7 @@ class Ticket(models.Model):
             if group and group.users:
                 partners = [u.partner_id.id for u in group.users if u.partner_id]
                 ticket.message_post(
-                    body=_("Se ha creado el ticket: <b>[%s] %s</b>") % (ticket.name, ticket.title),
+                    body=Markup(_("Se ha creado el ticket: <b>[%s] %s</b>")) % (ticket.name, ticket.title),
                     partner_ids=partners,
                     subtype_xmlid='mail.mt_comment',
                 )
@@ -57,7 +59,7 @@ class Ticket(models.Model):
             # Notificar al técnico asignado
             if ticket.assigned_user_id and ticket.assigned_user_id != self.env.user:
                 ticket.message_post(
-                    body=_("Ticket <b>[%s] %s</b> asignado a %s") % (ticket.name, ticket.title, ticket.assigned_user_id.name),
+                    body=Markup(_("Ticket <b>[%s] %s</b> asignado a %s")) % (ticket.name, ticket.title, ticket.assigned_user_id.name),
                     partner_ids=[ticket.assigned_user_id.partner_id.id],
                     subtype_xmlid='mail.mt_comment',
                 )
@@ -72,7 +74,7 @@ class Ticket(models.Model):
             for rec in self:
                 if rec.assigned_user_id != new_user:
                     rec.message_post(
-                        body=_("Ticket reasignado a: <b>%s</b>") % new_user.name,
+                        body=Markup(_("Ticket reasignado a: <b>%s</b>")) % new_user.name,
                         partner_ids=[new_user.partner_id.id],
                         subtype_xmlid='mail.mt_comment',
                     )
@@ -109,17 +111,45 @@ class Ticket(models.Model):
             )
 
     def button_working(self):
-        self._transition('working', lambda r: _("El ticket <b>[%s]</b> ha pasado a estado: <b>En revisión</b>") % r.name)
+        self._transition('working', lambda r: Markup(_("El ticket <b>[%s]</b> ha pasado a estado: <b>En revisión</b>")) % r.name)
 
     def button_soon(self):
-        self._transition('soon', lambda r: _("El ticket <b>[%s]</b> ha sido marcado como: <b>Resuelto</b>") % r.name)
+        self._transition('soon', lambda r: Markup(_("El ticket <b>[%s]</b> ha sido marcado como: <b>Resuelto</b>")) % r.name)
 
     def button_done(self):
         self._transition(
             'done',
-            lambda r: _("El ticket <b>[%s]</b> ha sido <b>Cerrado</b>.<br/><b>Resolución:</b> %s") % (r.name, r.resolution),
+            lambda r: Markup(_("El ticket <b>[%s]</b> ha sido <b>Cerrado</b>.<br/><b>Resolución:</b> %s")) % (r.name, r.resolution or ''),
             require_resolution=True,
         )
+
+    @api.model
+    def _fix_seed_mojibake(self):
+        """noupdate freeze: a Windows install stored accents as '?'."""
+        seeds = (
+            ('incoespacio_support.ticket_cat_it', 'Informática / Conectividad'),
+            ('incoespacio_support.ticket_cat_erp', 'ERP & Facturación'),
+            ('incoespacio_support.ticket_type_error', 'Error crítico'),
+        )
+        for xid, name in seeds:
+            rec = self.env.ref(xid, raise_if_not_found=False)
+            if rec is None or rec.name == name:
+                continue
+            broken = name.encode('ascii', 'replace').decode()
+            if rec.name in (broken, broken.replace('?', '\ufffd')):
+                rec.name = name
+        self.env.cr.execute(
+            """
+            UPDATE mail_message
+               SET body = replace(replace(replace(body, '&lt;b&gt;', '<b>'),
+                                          '&lt;/b&gt;', '</b>'),
+                                  '&lt;br/&gt;', '<br/>')
+             WHERE model = %s AND body LIKE %s
+            """,
+            (self._name, '%&lt;b&gt;%'),
+        )
+        if self.env.cr.rowcount:
+            self.env['mail.message'].invalidate_model(['body'])
 
     def button_reset(self):
         user = self.env.user

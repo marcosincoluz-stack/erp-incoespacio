@@ -38,3 +38,44 @@ class TestTicketWrite(TransactionCase):
         except (AccessError, UserError):
             return
         self.fail("expected AccessError or UserError on foreign ticket")
+
+    def test_transition_chatter_renders_html(self):
+        ticket = self.env["incoespacio_support.ticket"].create(
+            {
+                "title": "Prueba",
+                "type_id": self.env.ref("incoespacio_support.ticket_type_question").id,
+            }
+        )
+        ticket.button_working()
+        bodies = "".join(ticket.message_ids.mapped("body"))
+        self.assertIn("<b>", bodies)
+        self.assertNotIn("&lt;b&gt;", bodies)
+
+    def test_fix_seed_mojibake(self):
+        cat = self.env.ref("incoespacio_support.ticket_cat_it")
+        erp = self.env.ref("incoespacio_support.ticket_cat_erp")
+        err = self.env.ref("incoespacio_support.ticket_type_error")
+        cat.name = "Inform?tica / Conectividad"
+        erp.name = "ERP & Facturaci?n"
+        err.name = "Error cr?tico"
+        self.env["incoespacio_support.ticket"]._fix_seed_mojibake()
+        self.assertEqual(cat.name, "Informática / Conectividad")
+        self.assertEqual(erp.name, "ERP & Facturación")
+        self.assertEqual(err.name, "Error crítico")
+
+    def test_fix_escaped_chatter(self):
+        ticket = self.env["incoespacio_support.ticket"].create(
+            {
+                "title": "Prueba",
+                "type_id": self.env.ref("incoespacio_support.ticket_type_question").id,
+            }
+        )
+        msg = ticket.message_post(body="n")
+        self.env.cr.execute(
+            "UPDATE mail_message SET body = %s WHERE id = %s",
+            ("<p>El ticket &lt;b&gt;X&lt;/b&gt;</p>", msg.id),
+        )
+        msg.invalidate_recordset()
+        self.env["incoespacio_support.ticket"]._fix_seed_mojibake()
+        self.assertIn("<b>", msg.body)
+        self.assertNotIn("&lt;b&gt;", msg.body)

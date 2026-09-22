@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Incoespacio: Soporte e Incidencias",
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
     'author': 'Incoespacio',
     'category': 'Services/Helpdesk',
     'website': 'https://incoespacio.com',
