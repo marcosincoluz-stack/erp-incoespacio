@@ -53,6 +53,13 @@
                 </group>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']//create[@name='add_product_control']" position="attributes">
+                <attribute name="string">Añadir partida</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//create[@name='add_section_control']" position="attributes">
+                <attribute name="string">Añadir capítulo</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
                 <field name="is_modification" optional="hide"/>
                 <field name="modification_ref" optional="show"/>
