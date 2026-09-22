@@ -111,6 +111,8 @@ class TestConstructionMargins(TransactionCase):
         self.assertAlmostEqual(self.order.amount_untaxed, 1000.0)
         self.assertAlmostEqual(self.order.amount_certified_origin, 400.0)
         self.assertAlmostEqual(self.order.amount_cost_partida, 300.0)
+        self.assertAlmostEqual(self.line.amount_margin_planned, 200.0)
+        self.assertAlmostEqual(self.line.margin_percent_planned, 20.0)
         self.assertAlmostEqual(self.order.amount_margin_planned, 200.0)
         self.assertAlmostEqual(self.order.margin_percent_planned, 20.0)
         self.assertAlmostEqual(self.order.progress_percent, 40.0)

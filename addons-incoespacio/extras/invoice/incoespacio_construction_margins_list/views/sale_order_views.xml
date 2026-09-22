@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- sale_order_tree es la base de pedidos y de presupuestos: una herencia cubre las dos listas.
+         La de obras es la de presupuestos (la que abre Ventas). -->
+    <record id="sale_order_tree_inherit_obras" model="ir.ui.view">
+        <field name="name">sale.order.tree.inherit.obras</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+                <attribute name="optional"/>
+            </xpath>
+            <!-- Sin optional: el navegador guarda las columnas opcionales y no enseña las nuevas -->
+            <field name="amount_untaxed" position="replace">
+                <field name="amount_untaxed" string="Importe previsto" sum="Importe previsto" widget="monetary"/>
+            </field>
+            <field name="amount_total" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="amount_untaxed" position="after">
+                <field name="planned_percent" column_invisible="1"/>
+                <field name="amount_certified_origin" string="Certificado" widget="monetary" sum="Certificado"/>
+                <field name="amount_job_cost" string="Coste real" widget="monetary" sum="Coste real"/>
+                <!-- Sin margen objetivo (planned_percent = 0) el previsto sería el 100 % de la venta: se oculta la celda -->
+                <field name="amount_margin_planned" string="Margen previsto" widget="monetary"
+                       invisible="planned_percent == 0"/>
+                <field name="margin_percent_planned" string="% prev."
+                       invisible="planned_percent == 0"/>
+                <field name="amount_job_margin" string="Margen real" widget="monetary" sum="Margen real"
+                       decoration-danger="amount_job_margin &lt; 0"/>
+                <field name="margin_percent_job" string="% real"
+                       decoration-danger="amount_certified_origin and (margin_percent_job &lt; 0 or (planned_percent and margin_percent_job &lt; margin_percent_planned))"/>
+            </field>
+        </field>
+    </record>
+</odoo>

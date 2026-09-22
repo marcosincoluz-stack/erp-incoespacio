@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { sectionColumnSums } from "@incoespacio_construction_margins/js/margin_lines";
+import { sectionColumnSums, sectionFigure } from "@incoespacio_construction_margins/js/margin_lines";
 
 QUnit.module("construction margin lines");
 
@@ -23,4 +23,24 @@ QUnit.test("sectionColumnSums adds partidas, skips nested sections", (assert) =>
     assert.strictEqual(c01.amount_vendor_cost, 9);
     const c02 = sectionColumnSums(records, 4, ["price_subtotal"]);
     assert.strictEqual(c02.price_subtotal, 3);
+});
+
+QUnit.test("chapter percent is money over money, not the sum of percents", (assert) => {
+    const records = [
+        { id: 1, data: { display_type: "line_section" } },
+        {
+            id: 2,
+            data: {
+                price_subtotal: 1000,
+                amount_margin_planned: 200,
+                amount_cert_origin: 400,
+                amount_margin: 100,
+            },
+        },
+        { id: 3, data: { price_subtotal: 0, amount_margin_planned: 0, amount_cert_origin: 0, amount_margin: 0 } },
+    ];
+    assert.strictEqual(sectionFigure(records, 0, "price_subtotal"), 1000);
+    assert.strictEqual(sectionFigure(records, 0, "margin_percent_planned"), 20);
+    assert.strictEqual(sectionFigure(records, 0, "progress_percent"), 40);
+    assert.strictEqual(sectionFigure(records, 0, "margin_percent"), 25);
 });

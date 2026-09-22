@@ -95,6 +95,8 @@
                             <field name="display_type" column_invisible="1"/>
                             <field name="currency_id" column_invisible="1"/>
                             <field name="bc3_level" column_invisible="1"/>
+                            <field name="bc3_text" column_invisible="1"/>
+                            <field name="bc3_measures" column_invisible="1"/>
                             <field name="qty_cert_origin" column_invisible="1"/>
                             <field name="bc3_code" string="Cód." optional="show"/>
                             <field name="name" widget="section_and_note_text" string="Partida"/>

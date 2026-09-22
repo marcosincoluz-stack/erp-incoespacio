@@ -121,6 +121,16 @@ class SaleOrderLine(models.Model):
         compute="_compute_line_margin",
         currency_field="currency_id",
     )
+    amount_margin_planned = fields.Monetary(
+        string="Margen previsto",
+        compute="_compute_line_margin",
+        currency_field="currency_id",
+    )
+    margin_percent_planned = fields.Float(
+        string="% margen previsto",
+        compute="_compute_line_margin",
+        digits=(16, 1),
+    )
     amount_margin = fields.Monetary(
         string="Margen",
         compute="_compute_line_margin",
@@ -151,7 +161,9 @@ class SaleOrderLine(models.Model):
         "display_type",
         "price_unit",
         "product_uom_qty",
+        "price_subtotal",
         "price_planned",
+        "amount_planned",
         "amount_vendor_cost",
         "order_id.certification_ids.state",
         "order_id.certification_ids.number",
@@ -175,6 +187,8 @@ class SaleOrderLine(models.Model):
                 line.amount_cert_origin = 0.0
                 line.amount_planned_done = 0.0
                 line.amount_cost_deviation = 0.0
+                line.amount_margin_planned = 0.0
+                line.margin_percent_planned = 0.0
                 line.amount_margin = 0.0
                 line.margin_percent = 0.0
                 line.price_unit_real = 0.0
@@ -189,6 +203,10 @@ class SaleOrderLine(models.Model):
             line.amount_cert_origin = cert_amt
             line.amount_planned_done = planned_done
             line.amount_cost_deviation = (cost - planned_done) if qty_cert else 0.0
+            sale = line.price_subtotal or 0.0
+            target = line.amount_planned or 0.0
+            line.amount_margin_planned = sale - target
+            line.margin_percent_planned = (sale - target) / sale * 100.0 if sale else 0.0
             line.amount_margin = cert_amt - cost
             line.margin_percent = (
                 (cert_amt - cost) / cert_amt * 100.0 if cert_amt else 0.0

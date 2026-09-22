@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { formatMonetary } from "@web/views/fields/formatters";
+import { formatFloat, formatMonetary } from "@web/views/fields/formatters";
 import {
     SectionAndNoteFieldOne2Many,
     SectionAndNoteListRenderer,
@@ -22,6 +22,34 @@ export function sectionColumnSums(records, sectionIndex, fieldNames) {
         }
     }
     return sums;
+}
+
+// % de capítulo: importe contra importe. Sumar los % de cada partida mezcla unidades.
+export const SECTION_RATIOS = {
+    margin_percent_planned: ["amount_margin_planned", "price_subtotal"],
+    progress_percent: ["amount_cert_origin", "price_subtotal"],
+    margin_percent: ["amount_margin", "amount_cert_origin"],
+    margin_percent_forecast: ["amount_margin_forecast", "price_subtotal"],
+};
+
+const BAD_OVER = new Set(["amount_cost_deviation"]);
+const BAD_UNDER = new Set([
+    "amount_margin",
+    "margin_percent",
+    "amount_margin_planned",
+    "margin_percent_planned",
+    "amount_margin_forecast",
+    "margin_percent_forecast",
+]);
+
+export function sectionFigure(records, sectionIndex, columnName) {
+    const ratio = SECTION_RATIOS[columnName];
+    const sums = sectionColumnSums(records, sectionIndex, ratio || [columnName]);
+    if (!ratio) {
+        return sums[columnName];
+    }
+    const den = sums[ratio[1]];
+    return den ? (sums[ratio[0]] / den) * 100 : 0;
 }
 
 export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
@@ -46,10 +74,16 @@ export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
         return super.getRowClass(record);
     }
 
-    _sumColumnNames() {
-        return this.props.archInfo.columns
-            .filter((col) => col.sum)
-            .map((col) => col.name);
+    _isChapterFigure(column) {
+        return Boolean((column.attrs && column.attrs.sum) || SECTION_RATIOS[column.name]);
+    }
+
+    // widget="monetary" no usa getFormattedValue y pintaría el 0 de la fila de capítulo.
+    canUseFormatter(column, record) {
+        if (record.data.display_type === "line_section") {
+            return true;
+        }
+        return super.canUseFormatter(column, record);
     }
 
     getColumns(record) {
@@ -62,13 +96,19 @@ export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
     }
 
     getCellClass(column, record) {
-        if (
-            record.data.display_type === "line_section" &&
-            this._sumColumnNames().includes(column.name)
-        ) {
-            return `${super.getCellClass(column, record)} o_section_fold_total text-end`;
+        if (record.data.display_type !== "line_section") {
+            return super.getCellClass(column, record);
         }
-        return super.getCellClass(column, record);
+        // El renderer de secciones pone o_hidden en todo lo que no es el título y la fila se descuadra.
+        let cls = super.getCellClass(column, record).replace(/\bo_hidden\b/g, "");
+        if (!this._isChapterFigure(column)) {
+            return cls;
+        }
+        cls += " o_section_fold_total text-end";
+        const records = this.props.list.records;
+        const val = sectionFigure(records, records.indexOf(record), column.name);
+        const bad = BAD_OVER.has(column.name) ? val > 0 : BAD_UNDER.has(column.name) && val < 0;
+        return bad ? `${cls} text-danger` : cls;
     }
 
     getFormattedValue(column, record) {
@@ -78,13 +118,14 @@ export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
         if (column.name === this.titleField || column.name === "bc3_code") {
             return super.getFormattedValue(column, record);
         }
-        if (!this._sumColumnNames().includes(column.name)) {
+        if (!this._isChapterFigure(column)) {
             return "";
         }
         const records = this.props.list.records;
-        const val = sectionColumnSums(records, records.indexOf(record), [column.name])[
-            column.name
-        ];
+        const val = sectionFigure(records, records.indexOf(record), column.name);
+        if (SECTION_RATIOS[column.name]) {
+            return formatFloat(val, { digits: [16, 1] });
+        }
         const currency = record.data.currency_id;
         const currencyId = Array.isArray(currency) ? currency[0] : currency;
         return formatMonetary(val, { currencyId });
