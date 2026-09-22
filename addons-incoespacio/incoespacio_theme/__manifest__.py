@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "INCOESPACIO: Tema de Odoo",
-    'version': '17.0.1.0.1',
+    'version': '17.0.1.0.2',
     'author': 'Incoespacio',
     'category': 'Themes/Backend',
     'website': 'https://incoespacio.com',
@@ -21,6 +21,7 @@
         'web.assets_backend': [
             'incoespacio_theme/static/src/scss/backend_theme.scss',
             'incoespacio_theme/static/src/js/web_title_widget.js',
+            'incoespacio_theme/static/src/js/list_column_fit.js',
             'incoespacio_theme/static/src/js/app_sidebar.js',
             'incoespacio_theme/static/src/xml/app_sidebar.xml',
         ],
