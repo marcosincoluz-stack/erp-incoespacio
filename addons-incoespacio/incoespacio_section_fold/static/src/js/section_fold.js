@@ -130,6 +130,13 @@ patch(SectionAndNoteListRenderer.prototype, {
                 name: "display_type",
             });
     },
+    // Fake total has no field descriptor; Field() would throw in fieldVisualFeedback.
+    canUseFormatter(column, record) {
+        if (column.id === "section_total") {
+            return true;
+        }
+        return super.canUseFormatter(column, record);
+    },
     getCellClass(column, record) {
         if (column.id === "section_total") {
             return "o_data_cell o_section_fold_total text-end";
@@ -147,6 +154,7 @@ patch(SectionAndNoteListRenderer.prototype, {
     onCellClicked(record, column, ev) {
         if (
             record.data.display_type === "line_section" &&
+            !record.isInEdition &&
             column.widget !== "handle" &&
             !ev.target.closest(".o_row_handle")
         ) {
