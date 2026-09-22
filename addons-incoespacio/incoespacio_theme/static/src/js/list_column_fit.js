@@ -48,6 +48,9 @@ patch(ListRenderer.prototype, {
             return;
         }
         const table = this.tableRef.el;
+        for (const th of table.querySelectorAll("thead th.o_handle_cell")) {
+            th.style.width = "33px";
+        }
         const total = [...table.querySelectorAll("thead th")].reduce(
             (sum, th) => sum + th.getBoundingClientRect().width,
             0

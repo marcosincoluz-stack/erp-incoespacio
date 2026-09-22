@@ -87,7 +87,9 @@
                     </group>
                     <field name="order_line" widget="construction_margin_lines" readonly="1"
                            nolabel="1" string="Partida" class="o_construction_margin_lines">
-                        <tree create="0" delete="0"
+                        <!-- Segundo order_line del form: Odoo funde su config con la lista
+                             principal; sin esto pisa el orden por asa (arrastre) y el limite. -->
+                        <tree create="0" delete="0" default_order="sequence, id" limit="1000"
                               decoration-danger="amount_cost_deviation &gt; 0 and qty_cert_origin &gt; 0 and not display_type"
                               decoration-muted="qty_cert_origin == 0 and amount_vendor_cost == 0 and not display_type">
                             <field name="display_type" column_invisible="1"/>
@@ -103,13 +105,15 @@
                             <field name="qty_planned" string="Med. obj" optional="hide"/>
                             <field name="price_planned" string="P.U. obj"/>
                             <field name="amount_planned" widget="monetary" string="Objetivo" sum="Objetivo"/>
+                            <field name="amount_margin_planned" widget="monetary" string="Margen prev." sum="Margen prev."/>
+                            <field name="margin_percent_planned" string="% prev."/>
                             <field name="progress_percent" string="Avance %"/>
                             <field name="amount_planned_done" widget="monetary" string="Obj. ejecutado" sum="Obj. ejecutado"/>
-                            <field name="amount_cert_origin" widget="monetary" string="Cert. a origen" optional="hide"/>
+                            <field name="amount_cert_origin" widget="monetary" string="Certificado" sum="Certificado"/>
                             <field name="amount_vendor_cost" widget="monetary" string="Coste" sum="Coste"/>
                             <field name="amount_cost_deviation" widget="monetary" string="Desv." sum="Desv."/>
-                            <field name="amount_margin" widget="monetary" string="Margen" optional="hide" sum="Margen"/>
-                            <field name="margin_percent" string="Margen %"/>
+                            <field name="amount_margin" widget="monetary" string="Margen real" sum="Margen real"/>
+                            <field name="margin_percent" string="% real"/>
                         </tree>
                         <form create="0" edit="0" class="o_margin_partida_form">
                             <sheet>

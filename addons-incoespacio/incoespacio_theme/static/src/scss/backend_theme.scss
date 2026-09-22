@@ -482,6 +482,16 @@ html .o_web_client > .o_action_manager {
 .o_form_view .o_field_x2many .o_list_table {
     width: max-content;
 
+    // Odoo deja el asa a 1px y el icono se pinta encima de la celda de al lado.
+    // !important gana al width inline. Sin position/z-index: con border-collapse
+    // el clic deja de caer en la celda y el arrastre no arranca.
+    th.o_handle_cell,
+    td.o_handle_cell {
+        width: 2rem !important;
+        min-width: 2rem !important;
+        max-width: 2rem !important;
+    }
+
     thead th .text-truncate {
         white-space: normal; // gana a .text-truncate (nowrap) por especificidad
         line-height: 1.2;
@@ -500,7 +510,7 @@ html .o_web_client > .o_action_manager {
         white-space: normal;
     }
 
-    .o_data_row:not(.o_selected_row) {
+    .o_data_row:not(.o_selected_row):not(.o_is_line_section) {
         .o_list_text,
         .o_list_char,
         .o_list_many2one {
@@ -515,6 +525,19 @@ html .o_web_client > .o_action_manager {
                 white-space: normal;
                 text-overflow: ellipsis;
             }
+        }
+    }
+
+    // El ::before de plegar es un flex item: la caja vertical lo sube encima del título.
+    tr.o_is_line_section td[name="name"] {
+        max-width: none;
+
+        .o_field_widget {
+            display: inline-flex;
+            -webkit-box-orient: horizontal;
+            -webkit-line-clamp: unset;
+            overflow: visible;
+            white-space: nowrap;
         }
     }
 

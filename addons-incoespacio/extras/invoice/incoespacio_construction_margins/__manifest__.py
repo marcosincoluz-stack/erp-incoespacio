@@ -1,7 +1,7 @@
 {
     "name": "Incoespacio: Márgenes de obra",
     "summary": "Comparativa venta / objetivo ejecutado / coste real por partida",
-    "version": "17.0.1.2.1",
+    "version": "17.0.1.2.2",
     "category": "Sales",
     "author": "Incoespacio",
     "license": "LGPL-3",
