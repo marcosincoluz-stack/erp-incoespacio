@@ -148,6 +148,35 @@ class TestConstruction(TransactionCase):
         cert = self.env["construction.certification"].browse(action["res_id"])
         self.assertEqual(cert.project_id, self.order.project_id)
 
+    def test_cert_keeps_subchapter_level(self):
+        self.order.write(
+            {
+                "order_line": [
+                    (0, 0, {"display_type": "line_section", "name": "C01", "bc3_level": 0}),
+                    (0, 0, {"display_type": "line_section", "name": "C01A", "bc3_level": 1}),
+                    (
+                        0,
+                        0,
+                        {
+                            "product_id": self.product.id,
+                            "name": "Bajo subcapítulo",
+                            "product_uom_qty": 1,
+                            "price_unit": 10,
+                            "bc3_level": 2,
+                            "tax_id": [(6, 0, [])],
+                        },
+                    ),
+                ]
+            }
+        )
+        self.order.action_confirm()
+        action = self.order.action_create_certification()
+        cert = self.env["construction.certification"].browse(action["res_id"])
+        sub = cert.line_ids.filtered(lambda l: l.name == "C01A")
+        partida = cert.line_ids.filtered(lambda l: l.name == "Bajo subcapítulo")
+        self.assertEqual(sub.bc3_level, 1)
+        self.assertEqual(partida.bc3_level, 2)
+
     def test_report_hides_zero_origin_lines(self):
         self.order.write(
             {

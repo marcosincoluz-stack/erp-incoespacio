@@ -2,6 +2,7 @@
 
 import { patch } from "@web/core/utils/patch";
 import { useState } from "@odoo/owl";
+import { evaluateExpr } from "@web/core/py_js/py";
 import { formatMonetary } from "@web/views/fields/formatters";
 import { SectionAndNoteListRenderer } from "@account/components/section_and_note_fields_backend/section_and_note_fields_backend";
 
@@ -55,6 +56,37 @@ export function sectionTotal(records, sectionIndex) {
     );
 }
 
+// The list passes the arch context as a Python string. Spreading that string
+// drops default_display_type and the subchapter is created as a partida.
+export function createContext(raw) {
+    if (!raw) {
+        return {};
+    }
+    if (typeof raw === "string") {
+        return evaluateExpr(raw);
+    }
+    return { ...raw };
+}
+
+// Partida under the open section (chapter 0 -> 1, subchapter 1 -> 2).
+// A section button keeps its own level. null = leave the field default.
+export function addedLineLevel(records, context) {
+    const ctx = context || {};
+    if (ctx.default_display_type === "line_section") {
+        return ctx.default_bc3_level ? Number(ctx.default_bc3_level) : 0;
+    }
+    if (ctx.default_display_type) {
+        return null;
+    }
+    for (let i = records.length - 1; i >= 0; i--) {
+        const data = records[i].data || records[i];
+        if (data.display_type === "line_section") {
+            return sectionLevel(data) + 1;
+        }
+    }
+    return null;
+}
+
 export function foldedHiddenIds(records, folded, searchActive) {
     if (searchActive) {
         return new Set();
@@ -98,6 +130,33 @@ patch(SectionAndNoteListRenderer.prototype, {
     },
     _toggleSection(record) {
         this.sectionFold.folded[record.id] = !this.sectionFold.folded[record.id];
+    },
+    add(params) {
+        const context = createContext(params && params.context);
+        const level = addedLineLevel(this.props.list.records, context);
+        if (!context.default_display_type && level) {
+            context.default_bc3_level = level;
+        }
+        return super.add({ ...params, context });
+    },
+    async sortDrop(dataRowId, params) {
+        await super.sortDrop(dataRowId, params);
+        const records = this.props.list.records;
+        const rec = records.find((r) => r.id === dataRowId);
+        if (!rec || rec.data.display_type || !("bc3_level" in rec.data)) {
+            return;
+        }
+        const idx = records.indexOf(rec);
+        let level = null;
+        for (let i = idx - 1; i >= 0; i--) {
+            if (records[i].data.display_type === "line_section") {
+                level = sectionLevel(records[i].data) + 1;
+                break;
+            }
+        }
+        if (level && (Number(rec.data.bc3_level) || 0) !== level) {
+            await rec.update({ bc3_level: level });
+        }
     },
     getRowClass(record) {
         let cls = super.getRowClass(record);

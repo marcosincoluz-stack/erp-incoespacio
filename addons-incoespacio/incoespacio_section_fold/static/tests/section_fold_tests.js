@@ -1,6 +1,8 @@
 /** @odoo-module **/
 
 import {
+    addedLineLevel,
+    createContext,
     foldedHiddenIds,
     lineAmount,
     sectionTotal,
@@ -48,4 +50,26 @@ QUnit.test("nested C01A folds inside C01; sibling partida stays", (assert) => {
     const hideSub = foldedHiddenIds(records, { 2: true }, false);
     assert.ok(hideSub.has(3));
     assert.notOk(hideSub.has(4) || hideSub.has(2) || hideSub.has(5));
+});
+
+QUnit.test("new partida nests under the open section", (assert) => {
+    const chapter = [{ data: { display_type: "line_section", bc3_level: 0 } }];
+    assert.strictEqual(addedLineLevel(chapter, {}), 1);
+    const sub = chapter.concat([{ data: { display_type: "line_section", bc3_level: 1 } }]);
+    assert.strictEqual(addedLineLevel(sub, {}), 2);
+    assert.strictEqual(addedLineLevel([], {}), null);
+    assert.strictEqual(
+        addedLineLevel(chapter, { default_display_type: "line_section", default_bc3_level: 1 }),
+        1
+    );
+    assert.strictEqual(addedLineLevel(chapter, { default_display_type: "line_note" }), null);
+});
+
+QUnit.test("subchapter button context stays a section", (assert) => {
+    const ctx = createContext(
+        "{'default_display_type': 'line_section', 'default_bc3_level': 1}"
+    );
+    assert.strictEqual(ctx.default_display_type, "line_section");
+    assert.strictEqual(ctx.default_bc3_level, 1);
+    assert.strictEqual(addedLineLevel([], ctx), 1);
 });

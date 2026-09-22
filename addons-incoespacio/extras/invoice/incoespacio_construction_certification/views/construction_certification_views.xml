@@ -54,6 +54,7 @@
                                 <tree editable="bottom" create="parent.lines_editable" delete="parent.lines_editable" decoration-info="display_type == 'line_section'" decoration-muted="display_type == 'line_note'" decoration-warning="is_modification">
                                     <field name="sequence" widget="handle" readonly="not parent.lines_editable"/>
                                     <field name="display_type" column_invisible="True"/>
+                                    <field name="bc3_level" column_invisible="True"/>
                                     <field name="currency_id" column_invisible="True"/>
                                     <field name="tax_ids" column_invisible="True"/>
                                     <field name="is_modification" column_invisible="True"/>

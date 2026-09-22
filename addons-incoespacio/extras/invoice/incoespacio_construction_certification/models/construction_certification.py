@@ -386,6 +386,7 @@ class ConstructionCertificationLine(models.Model):
         ondelete="set null",
     )
     sequence = fields.Integer(string="Secuencia", default=10)
+    bc3_level = fields.Integer(string="Nivel", default=0)
     display_type = fields.Selection(
         [
             ("line_section", "Capítulo / Sección"),

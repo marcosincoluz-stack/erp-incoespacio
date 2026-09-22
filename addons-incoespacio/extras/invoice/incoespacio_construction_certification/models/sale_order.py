@@ -246,6 +246,7 @@ class SaleOrder(models.Model):
                             "display_type": line.display_type,
                             "sequence": line.sequence,
                             "name": line.name,
+                            "bc3_level": line.bc3_level,
                         },
                     )
                 )
@@ -264,6 +265,7 @@ class SaleOrder(models.Model):
                         {
                             "sale_order_line_id": line.id,
                             "sequence": line.sequence,
+                            "bc3_level": line.bc3_level,
                             "code": code_val,
                             "name": name,
                             "is_modification": line.is_modification,
