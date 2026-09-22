@@ -42,32 +42,32 @@ msgstr "Pedidos BC3"
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_cubic_meter_product_template
 msgid "BC3 Product (Cubic meter)"
-msgstr "Producto BC3 (metro cúbico)"
+msgstr "m³"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_l_product_template
 msgid "BC3 Product (L)"
-msgstr "Producto BC3 (L)"
+msgstr "L"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_meter_product_template
 msgid "BC3 Product (Meter)"
-msgstr "Producto BC3 (Metro)"
+msgstr "Metro lineal"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_square_meter_product_template
 msgid "BC3 Product (Square meter)"
-msgstr "BC3 Producto (metro cuadrado)"
+msgstr "m²"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_units_product_template
 msgid "BC3 Product (Units)"
-msgstr "BC3 Producto (Unidades)"
+msgstr "Unidades"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_g_product_template
 msgid "BC3 Product (g)"
-msgstr "BC3 Producto (g)"
+msgstr "g"
 
 #. module: bc3_importer
 #: model:ir.actions.act_window,name:bc3_importer.action_quotations_bc3
@@ -78,32 +78,32 @@ msgstr "Presupuestos BC3"
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_template_cubic_meter
 msgid "BC3 Template Product (Cubic meter)"
-msgstr "Plantilla BC3 Producto (metro cúbico)"
+msgstr "m³"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_template_l
 msgid "BC3 Template Product (L)"
-msgstr "Plantilla BC3 Producto (L)"
+msgstr "L"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_template_meter
 msgid "BC3 Template Product (Meter)"
-msgstr "Plantilla BC3 Producto (Metro)"
+msgstr "Metro lineal"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_template_square_meter
 msgid "BC3 Template Product (Square meter)"
-msgstr "Plantilla BC3 Producto (metro cuadrado)"
+msgstr "m²"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_template_units
 msgid "BC3 Template Product (Units)"
-msgstr "Cuenta de gastos en plantilla producto"
+msgstr "Unidades"
 
 #. module: bc3_importer
 #: model:product.template,name:bc3_importer.product_product_product_template_g
 msgid "BC3 Template Product (g)"
-msgstr "Plantilla BC3 Producto (g)"
+msgstr "g"
 
 #. module: bc3_importer
 #: model:ir.actions.act_window,name:bc3_importer.bc3_version_action

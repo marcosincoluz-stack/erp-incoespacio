@@ -7,8 +7,8 @@ import chardet
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-# V/C/D/T are the only registers this wizard parses.
-_BC3_RECORD = re.compile(r"~([VCDT])\|")
+# V/C/D/T/M. ~T is the long text, ~M the measurement lines.
+_BC3_RECORD = re.compile(r"~([VCDTM])\|")
 _BC3_NEXT = re.compile(r"~[A-Za-z]\|")
 _CHAPTER_TYPES = frozenset({"CA", "OB"})
 _UOM_PRODUCT_XMLIDS = (
@@ -70,8 +70,8 @@ class BC3ImportWizard(models.TransientModel):
         if self.project_id and "project_id" in self.env["sale.order"]._fields:
             so_vals["project_id"] = self.project_id.id
         self.sale_id = self.env["sale.order"].create(so_vals).id
-        concepts, tree = self._collect_tree()
-        self._emit_from_tree(concepts, tree)
+        concepts, tree, detail = self._collect_tree()
+        self._emit_from_tree(concepts, tree, detail)
         return {
             "name": _("Show Sale Order"),
             "type": "ir.actions.act_window",
@@ -87,6 +87,7 @@ class BC3ImportWizard(models.TransientModel):
     def _collect_tree(self):
         concepts = {}
         tree = {}
+        detail = {"texts": {}, "measures": {}}
         for register in self._iter_bc3_registers(
             self._decode_bc3(base64.decodebytes(self.bc3_file))
         ):
@@ -100,7 +101,11 @@ class BC3ImportWizard(models.TransientModel):
                 self._collect_concept(register, concepts)
             elif kind == "D":
                 self._collect_decomp(register, tree)
-        return concepts, tree
+            elif kind == "T":
+                self._collect_text(register, detail["texts"])
+            elif kind == "M":
+                self._collect_measure(register, detail["measures"])
+        return concepts, tree, detail
 
     def _raw_code(self, code):
         return (code or "").split("\\")[0].strip()
@@ -160,6 +165,86 @@ class BC3ImportWizard(models.TransientModel):
             )
         return children
 
+    def _collect_text(self, register, texts):
+        body = register.split("|", 2)
+        if len(body) < 3:
+            return
+        key = self._code_key(body[1])
+        if not key:
+            return
+        text = body[2][:-1] if body[2].endswith("|") else body[2]
+        text = text.strip()
+        if text:
+            texts[key] = text
+
+    def _measure_num(self, raw):
+        text = (raw or "").strip().replace(",", ".")
+        if not text:
+            return None
+        try:
+            return float(text)
+        except ValueError:
+            return None
+
+    def _parse_measure_lines(self, payload):
+        parts = (payload or "").split("\\")
+        rows = []
+        for i in range(0, len(parts) - 5, 6):
+            tipo, comment, units, length, width, height = parts[i : i + 6]
+            # ponytail: tipo 1/2/3 are subtotal/formula, not a quantity line
+            if (tipo or "").strip() in ("1", "2", "3"):
+                continue
+            nums = [self._measure_num(raw) for raw in (units, length, width, height)]
+            comment = (comment or "").replace("\r", "").strip()
+            if not comment and all(num is None for num in nums):
+                continue
+            present = [num for num in nums if num is not None]
+            partial = 1.0
+            for num in present:
+                partial *= num
+            rows.append(
+                {
+                    "comment": comment,
+                    "units": nums[0],
+                    "length": nums[1],
+                    "width": nums[2],
+                    "height": nums[3],
+                    "partial": partial if present else 0.0,
+                }
+            )
+        return rows
+
+    def _collect_measure(self, register, measures):
+        parts = register.split("|")
+        ident = parts[1] if len(parts) > 1 else ""
+        segs = [self._code_key(seg) for seg in ident.split("\\") if seg.strip()]
+        if not segs:
+            return
+        child = segs[-1]
+        parent = segs[-2] if len(segs) > 1 else ""
+        payload = parts[4] if len(parts) > 4 else ""
+        rows = self._parse_measure_lines(payload)
+        if not rows:
+            rows = max(
+                (self._parse_measure_lines(field) for field in parts[2:]),
+                key=len,
+                default=[],
+            )
+        if rows:
+            measures.setdefault((parent, child), []).extend(rows)
+
+    def _measures_for(self, measures, parent, child):
+        parent = self._code_key(parent)
+        child = self._code_key(child)
+        if (parent, child) in measures:
+            return measures[(parent, child)]
+        if ("", child) in measures:
+            return measures[("", child)]
+        found = [rows for (par, code), rows in measures.items() if code == child]
+        if len(found) == 1:
+            return found[0]
+        return []
+
     def _collect_decomp(self, register, tree):
         parts = register.split("|")
         parent = self._code_key(parts[1] if len(parts) > 1 else "")
@@ -178,21 +263,34 @@ class BC3ImportWizard(models.TransientModel):
         # no UoM + has children = capítulo (Presto tipo 0 is also used on partidas)
         return not concept.get("unit") and bool(tree.get(code))
 
-    def _emit_from_tree(self, concepts, tree):
+    def _emit_from_tree(self, concepts, tree, detail=None):
         roots = [code for code, concept in concepts.items() if concept.get("root")]
         if not roots:
             child_codes = {child for nodes in tree.values() for child, _, _ in nodes}
             roots = [parent for parent in tree if parent not in child_codes]
         prices = {}
+        detail = detail or {}
         for root in roots:
-            self._emit_node(root, 1.0, 1.0, concepts, tree, prices, 0)
+            self._emit_node(root, 1.0, 1.0, concepts, tree, prices, 0, "", detail)
 
-    def _emit_node(self, code, factor, rendimiento, concepts, tree, prices, level=0):
+    def _emit_node(
+        self,
+        code,
+        factor,
+        rendimiento,
+        concepts,
+        tree,
+        prices,
+        level=0,
+        parent="",
+        detail=None,
+    ):
         concept = concepts.get(code) or {}
+        detail = detail or {}
         if self._is_root(code, concept):
             for child, child_factor, child_rend in tree.get(code, []):
                 self._emit_node(
-                    child, child_factor, child_rend, concepts, tree, prices, 0
+                    child, child_factor, child_rend, concepts, tree, prices, 0, "", detail
                 )
             return
         if self._is_chapter(code, concept, tree):
@@ -206,10 +304,20 @@ class BC3ImportWizard(models.TransientModel):
                     tree,
                     prices,
                     level + 1,
+                    code,
+                    detail,
                 )
             return
         self._create_partida(
-            code, concept, factor * rendimiento, concepts, tree, prices, level
+            code,
+            concept,
+            factor * rendimiento,
+            concepts,
+            tree,
+            prices,
+            level,
+            parent,
+            detail,
         )
 
     def _create_section(self, code, concept, level=0):
@@ -254,15 +362,30 @@ class BC3ImportWizard(models.TransientModel):
         prices[code] = sum(amt for _, amt in lines)
         return prices[code]
 
-    def _create_partida(self, code, concept, qty, concepts, tree, prices, level=0):
+    def _create_partida(
+        self,
+        code,
+        concept,
+        qty,
+        concepts,
+        tree,
+        prices,
+        level=0,
+        parent="",
+        detail=None,
+    ):
         line_code = self._line_code(code)
         summary = concept.get("summary") or line_code
         product, uom_id = self._product_for_line(line_code, concept)
+        detail = detail or {}
+        measures = self._measures_for(detail.get("measures") or {}, parent, line_code)
         self.env["sale.order.line"].create(
             {
                 "order_id": self.sale_id.id,
                 "bc3_code": line_code,
                 "bc3_level": level,
+                "bc3_text": (detail.get("texts") or {}).get(line_code) or False,
+                "bc3_measures": measures or False,
                 "name": "[%s] %s" % (line_code, summary),
                 "product_id": product.id,
                 "product_uom": uom_id,

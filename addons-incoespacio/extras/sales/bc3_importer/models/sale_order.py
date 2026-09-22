@@ -22,3 +22,5 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
     bc3_code = fields.Char("Code")
     bc3_level = fields.Integer("Tree level", default=0)
+    bc3_text = fields.Text("BC3 description")
+    bc3_measures = fields.Json("BC3 measurements")

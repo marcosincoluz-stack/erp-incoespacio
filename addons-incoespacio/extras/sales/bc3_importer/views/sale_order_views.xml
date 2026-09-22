@@ -71,6 +71,8 @@
             >
                 <field name="bc3_code" />
                 <field name="bc3_level" column_invisible="True" />
+                <field name="bc3_text" column_invisible="True" />
+                <field name="bc3_measures" column_invisible="True" />
             </xpath>
         </field>
     </record>

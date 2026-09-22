@@ -1,0 +1,50 @@
+tr.o_bc3_has_detail > td[name="name"] .o_field_widget {
+    position: relative;
+    display: block;
+    padding-left: 1.15rem;
+}
+
+tr.o_bc3_has_detail > td[name="name"] .o_field_widget::before {
+    position: absolute;
+    left: 0;
+    top: 0.15rem;
+    font-family: FontAwesome;
+    content: "\f0da";
+    width: 0.8rem;
+    line-height: 1;
+}
+
+tr.o_bc3_detail_open > td[name="name"] .o_field_widget::before {
+    content: "\f0d7";
+}
+
+tr.o_section_folded_hidden + tr.o_bc3_detail {
+    display: none;
+}
+
+tr.o_bc3_detail > td {
+    background: #f8f9fa;
+}
+
+.o_bc3_text {
+    white-space: pre-wrap;
+    max-height: 8rem;
+    overflow: auto;
+    margin-bottom: 0.5rem;
+}
+
+.o_bc3_measures {
+    width: auto;
+    margin: 0;
+}
+
+.o_bc3_measures th,
+.o_bc3_measures td {
+    padding: 0.15rem 0.75rem;
+    white-space: nowrap;
+}
+
+.o_bc3_measures th:first-child,
+.o_bc3_measures td:first-child {
+    white-space: normal;
+}

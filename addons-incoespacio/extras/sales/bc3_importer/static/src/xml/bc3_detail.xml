@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="extension">
+        <xpath expr="//tr" position="after">
+            <tr t-if="bc3DetailOpen(record)" class="o_bc3_detail">
+                <td t-att-colspan="nbCols">
+                    <div t-if="record.data.bc3_text" class="o_bc3_text" t-esc="record.data.bc3_text"/>
+                    <table t-if="bc3Measures(record).length" class="table table-sm o_bc3_measures">
+                        <thead>
+                            <tr>
+                                <th>Comentario</th>
+                                <th>N</th>
+                                <th>Largo</th>
+                                <th>Ancho</th>
+                                <th>Alto</th>
+                                <th>Parcial</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="bc3Measures(record)" t-as="measure" t-key="measure_index">
+                                <tr>
+                                    <td t-esc="measure.comment"/>
+                                    <td t-esc="bc3MeasureLabel(measure.units)"/>
+                                    <td t-esc="bc3MeasureLabel(measure.length)"/>
+                                    <td t-esc="bc3MeasureLabel(measure.width)"/>
+                                    <td t-esc="bc3MeasureLabel(measure.height)"/>
+                                    <td t-esc="bc3MeasureLabel(measure.partial)"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </xpath>
+    </t>
+</templates>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo noupdate="1">
     <record id="product_product_product_template_units" model="product.template">
-        <field name="name">BC3 Template Product (Units)</field>
+        <field name="name">Unidades</field>
         <field name="uom_id" ref="uom.product_uom_unit" />
         <field name="uom_po_id" ref="uom.product_uom_unit" />
         <field
@@ -9,7 +9,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_template_meter" model="product.template">
-        <field name="name">BC3 Template Product (Meter)</field>
+        <field name="name">Metro lineal</field>
         <field name="uom_id" ref="uom.product_uom_meter" />
         <field name="uom_po_id" ref="uom.product_uom_meter" />
         <field
@@ -17,7 +17,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_template_square_meter" model="product.template">
-        <field name="name">BC3 Template Product (Square meter)</field>
+        <field name="name">m²</field>
         <field name="uom_id" ref="bc3_importer.product_uom_square_meter" />
         <field name="uom_po_id" ref="bc3_importer.product_uom_square_meter" />
         <field
@@ -25,7 +25,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_template_cubic_meter" model="product.template">
-        <field name="name">BC3 Template Product (Cubic meter)</field>
+        <field name="name">m³</field>
         <field name="uom_id" ref="uom.product_uom_cubic_meter" />
         <field name="uom_po_id" ref="uom.product_uom_cubic_meter" />
         <field
@@ -33,7 +33,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_template_g" model="product.template">
-        <field name="name">BC3 Template Product (g)</field>
+        <field name="name">g</field>
         <field name="uom_id" ref="uom.product_uom_gram" />
         <field name="uom_po_id" ref="uom.product_uom_gram" />
         <field
@@ -41,7 +41,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_template_l" model="product.template">
-        <field name="name">BC3 Template Product (L)</field>
+        <field name="name">L</field>
         <field name="uom_id" ref="uom.product_uom_litre" />
         <field name="uom_po_id" ref="uom.product_uom_litre" />
         <field
@@ -49,7 +49,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_units" model="product.product">
-        <field name="name">BC3 Product (Units)</field>
+        <field name="name">Unidades</field>
         <field name="uom_id" ref="uom.product_uom_unit" />
         <field name="uom_po_id" ref="uom.product_uom_unit" />
         <field
@@ -57,7 +57,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_meter" model="product.product">
-        <field name="name">BC3 Product (Meter)</field>
+        <field name="name">Metro lineal</field>
         <field name="uom_id" ref="uom.product_uom_meter" />
         <field name="uom_po_id" ref="uom.product_uom_meter" />
         <field
@@ -65,7 +65,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_square_meter" model="product.product">
-        <field name="name">BC3 Product (Square meter)</field>
+        <field name="name">m²</field>
         <field name="uom_id" ref="bc3_importer.product_uom_square_meter" />
         <field name="uom_po_id" ref="bc3_importer.product_uom_square_meter" />
         <field
@@ -73,7 +73,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_cubic_meter" model="product.product">
-        <field name="name">BC3 Product (Cubic meter)</field>
+        <field name="name">m³</field>
         <field name="uom_id" ref="uom.product_uom_cubic_meter" />
         <field name="uom_po_id" ref="uom.product_uom_cubic_meter" />
         <field
@@ -81,7 +81,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_g" model="product.product">
-        <field name="name">BC3 Product (g)</field>
+        <field name="name">g</field>
         <field name="uom_id" ref="uom.product_uom_gram" />
         <field name="uom_po_id" ref="uom.product_uom_gram" />
         <field
@@ -89,7 +89,7 @@
         >BC3 product that will be used if imported product does not exist.</field>
     </record>
     <record id="product_product_product_l" model="product.product">
-        <field name="name">BC3 Product (L)</field>
+        <field name="name">L</field>
         <field name="uom_id" ref="uom.product_uom_litre" />
         <field name="uom_po_id" ref="uom.product_uom_litre" />
         <field

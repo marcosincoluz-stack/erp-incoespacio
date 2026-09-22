@@ -185,3 +185,39 @@ class TestBC3ImportWizard(TransactionCase):
         codes = wizard.sale_id.order_line.mapped("bc3_code")
         self.assertNotIn("PEONORD", codes)
         self.assertNotIn("U18AD041", codes)
+
+    def test_text_and_measures_do_not_change_qty(self):
+        raw = (
+            b"~V|Fixture|FIEBDC-3/2024|bc3-skill||ANSI|\n"
+            b"~C|T01##||Presupuesto|953.40||OB|\n"
+            b"~D|T01##|C01#\\1\\1\\|\n"
+            b"~C|C01#||Movimiento de tierras|953.40|||\n"
+            b"~D|C01#|UO01\\1\\10\\|\n"
+            b"~M|C01#\\UO01|001\\|10|\\Zona A\\10\\\\\\\\|\n"
+            b"~C|UO01|m3|Excavacion en zanja|90.80||EU|\n"
+            b"~T|UO01|Excavacion de zanja en terreno compacto,\n"
+            b"Criterio de medicion: m3 de volumen teorico excavado.|\n"
+            b"~D|UO01|MO01\\1\\2\\|\n"
+            b"~C|MO01|h|Peon|20||1|\n"
+        )
+        wizard = self.env["bc3.import.wizard"].create(
+            {
+                "bc3_file": base64.b64encode(raw),
+                "bc3_file_name": "medicion.bc3",
+                "version_id": self.env.ref("bc3_importer.bc3_version_2020_v2").id,
+                "partner_id": self.partner.id,
+                "create_products": False,
+            }
+        )
+        wizard.do_action()
+        line = wizard.sale_id.order_line.filtered(lambda l: l.bc3_code == "UO01")
+        self.assertEqual(len(line), 1)
+        self.assertAlmostEqual(line.product_uom_qty, 10.0)
+        self.assertIn("volumen teorico", line.bc3_text)
+        self.assertIn("\n", line.bc3_text)
+        self.assertEqual(len(line.bc3_measures), 1)
+        measure = line.bc3_measures[0]
+        self.assertEqual(measure["comment"], "Zona A")
+        self.assertAlmostEqual(measure["partial"], 10.0)
+        self.assertIsNone(measure["length"])
+        self.assertNotIn("MO01", wizard.sale_id.order_line.mapped("bc3_code"))
