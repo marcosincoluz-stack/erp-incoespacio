@@ -18,11 +18,12 @@ class PurchaseOrder(models.Model):
             "incoespacio_purchase_bot_alert.purchase_bot_alert_group_user",
             raise_if_not_found=False,
         )
-        if not group or not group.users:
+        bot = self.env.ref("base.user_root", raise_if_not_found=False)
+        if not group or not group.users or not bot:
             return purchase_orders
 
         for order in purchase_orders:
-            if order.create_uid.id != 1:
+            if order.create_uid != bot:
                 continue
             partner_ids = [user.partner_id.id for user in group.users if user.partner_id]
             supplier_name = order.partner_id.name if order.partner_id else "Sin asignar"

@@ -84,6 +84,18 @@ class TestConstruction(TransactionCase):
         with self.assertRaises(UserError):
             self.order.action_return_retention()
 
+    def test_retention_account_wrong_type(self):
+        self.env["account.account"].create({
+            "code": "430800",
+            "name": "Retención mal tipada",
+            "account_type": "income",
+            "company_id": self.env.company.id,
+        })
+        with self.assertRaises(UserError):
+            self.env["construction.certification"]._get_or_create_retention_account(
+                self.env.company
+            )
+
     def test_confirm_creates_project_once(self):
         self.order.action_confirm()
         project = self.order.project_id
@@ -312,6 +324,9 @@ class TestConstruction(TransactionCase):
         cert.action_confirm_and_invoice()
         self.assertEqual(cert.state, "invoiced")
         self.assertTrue(cert.invoice_id)
+        with self.assertRaises(UserError):
+            cert.action_draft()
+        self.assertEqual(cert.state, "invoiced")
 
     def test_confirm_and_invoice_no_period_stays_confirmed(self):
         # El botón confirma y luego factura. Si no hay periodo, UserError de la

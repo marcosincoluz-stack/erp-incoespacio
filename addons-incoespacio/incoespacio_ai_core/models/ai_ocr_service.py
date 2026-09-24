@@ -12,7 +12,7 @@ from odoo.tools.mimetypes import guess_mimetype
 
 _logger = logging.getLogger(__name__)
 
-GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 INVOICE_PROMPT_SYSTEM = """
 Eres un asistente contable experto en fiscalidad española y procesamiento de facturas para ERP Odoo.
@@ -98,21 +98,18 @@ Debes responder ÚNICAMENTE un objeto JSON válido con la siguiente estructura e
 
 class AiOcrService:
     """Servicio para interactuar con la API de Google Gemini para extracción de facturas."""
-    _session = None
 
-    @classmethod
-    def get_session(cls):
-        if cls._session is None:
-            session = requests.Session()
-            session.mount("https://", HTTPAdapter(max_retries=Retry(
-                total=3,
-                backoff_factor=2,
-                status_forcelist=(429, 500, 502, 503, 504),
-                allowed_methods=["POST"],
-                raise_on_status=False,
-            )))
-            cls._session = session
-        return cls._session
+    @staticmethod
+    def _new_session():
+        session = requests.Session()
+        session.mount("https://", HTTPAdapter(max_retries=Retry(
+            total=3,
+            backoff_factor=2,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=["POST"],
+            raise_on_status=False,
+        )))
+        return session
 
     @staticmethod
     def is_pdf_encrypted(file_bytes):
@@ -185,9 +182,10 @@ class AiOcrService:
         mimetype = guess_mimetype(file_bytes, default="application/pdf")
         b64_data = base64.b64encode(file_bytes).decode('utf-8')
 
-        url = GEMINI_API_BASE_URL.format(model=model, api_key=api_key)
+        url = GEMINI_API_BASE_URL.format(model=model)
         headers = {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-goog-api-key": api_key,
         }
 
         # Optimizaciones de velocidad:
@@ -224,7 +222,7 @@ class AiOcrService:
 
         try:
             _logger.info("Enviando documento %s (%s) a Gemini Flash (%s)...", filename, mimetype, model)
-            response = cls.get_session().post(url, json=payload, headers=headers, timeout=45)
+            response = cls._new_session().post(url, json=payload, headers=headers, timeout=45)
         except requests.exceptions.RequestException as e:
             _logger.exception("Error de conexión con Gemini API tras reintentos: %s", e)
             raise UserError(f"Error de conexión con la IA de Google tras reintentos: {str(e)}")
@@ -270,7 +268,7 @@ class AiOcrService:
             icp.get_param("incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash").strip()
             or "gemini-2.5-flash"
         )
-        url = GEMINI_API_BASE_URL.format(model=model, api_key=api_key)
+        url = GEMINI_API_BASE_URL.format(model=model)
         gen_config = {"temperature": 0.1, "response_mime_type": "application/json"}
         if "gemini-2.5" in model:
             gen_config["thinkingConfig"] = {"thinkingBudget": 0}
@@ -280,7 +278,12 @@ class AiOcrService:
             "generationConfig": gen_config,
         }
         try:
-            response = cls.get_session().post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=20)
+            response = cls._new_session().post(
+                url,
+                json=payload,
+                headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
+                timeout=20,
+            )
             if response.status_code != 200:
                 _logger.warning("complete_json Gemini %s: %s", response.status_code, response.text[:200])
                 return {}

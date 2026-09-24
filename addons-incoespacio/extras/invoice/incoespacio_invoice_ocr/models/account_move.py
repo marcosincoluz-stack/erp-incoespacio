@@ -6,6 +6,7 @@ import re
 from markupsafe import Markup
 
 from odoo import api, fields, models, _
+from odoo.tools import formatLang
 from odoo.exceptions import UserError
 from schwifty import IBAN
 
@@ -546,9 +547,9 @@ class AccountMove(models.Model):
         rec = data.get('receptor', {})
         is_customer = self.move_type in ('out_invoice', 'out_refund', 'out_receipt')
 
-        total_eur = f"{float(fac.get('total') or 0.0):,.2f} €".replace(',', 'X').replace('.', ',').replace('X', '.')
-        base_eur = f"{float(fac.get('base_imponible_total') or 0.0):,.2f} €".replace(',', 'X').replace('.', ',').replace('X', '.')
-        iva_eur = f"{float(fac.get('iva_total') or 0.0):,.2f} €".replace(',', 'X').replace('.', ',').replace('X', '.')
+        total_eur = formatLang(self.env, float(fac.get('total') or 0.0), currency_obj=self.currency_id)
+        base_eur = formatLang(self.env, float(fac.get('base_imponible_total') or 0.0), currency_obj=self.currency_id)
+        iva_eur = formatLang(self.env, float(fac.get('iva_total') or 0.0), currency_obj=self.currency_id)
 
         dup_badge = "<div class='alert alert-danger p-2 mb-2'><b>Posible factura duplicada</b></div>" if self.is_duplicate_detected else ""
         iban_badge = "<div class='alert alert-danger p-2 mb-2'><b>Discrepancia de IBAN con el proveedor</b></div>" if self.ocr_iban_status == 'mismatch' else ""

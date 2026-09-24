@@ -132,7 +132,6 @@ class AccountMove(models.Model):
 
     @classmethod
     def _run_background_ocr(cls, db_name, user_id, move_ids):
-        import concurrent.futures
         registry = odoo.registry(db_name)
 
         def _process_single_move(mid):
@@ -166,16 +165,8 @@ class AccountMove(models.Model):
                     except Exception:
                         pass
 
-        # Si es solo 1 factura, procesar secuencialmente en el hilo
-        if len(move_ids) <= 1:
-            for mid in move_ids:
-                _process_single_move(mid)
-        else:
-            # Procesar concurrentemente en paralelo con un pool de 3 hilos simultáneos
-            max_workers = min(3, len(move_ids))
-            _logger.info("Iniciando procesamiento paralelo de %d facturas con %d workers", len(move_ids), max_workers)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                list(executor.map(_process_single_move, move_ids))
+        for mid in move_ids:
+            _process_single_move(mid)
 
     def _notify_bus_status(self, status):
         try:

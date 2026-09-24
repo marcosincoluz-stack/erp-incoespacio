@@ -174,8 +174,9 @@ class ConstructionCertification(models.Model):
             total_origin = sum(content_lines.mapped("amount_origin"))
             period_untaxed = sum(content_lines.mapped("amount_period"))
 
-            retention = period_untaxed * (cert.retention_rate / 100.0)
-            net_period = period_untaxed - retention
+            rnd = cert.currency_id.round if cert.currency_id else lambda amount: amount
+            retention = rnd(period_untaxed * (cert.retention_rate / 100.0))
+            net_period = rnd(period_untaxed - retention)
 
             period_tax = 0.0
             for line in content_lines:
@@ -195,7 +196,7 @@ class ConstructionCertification(models.Model):
             cert.amount_retention = retention
             cert.amount_net_period = net_period
             cert.amount_period_tax = period_tax
-            cert.amount_period_total = net_period + period_tax
+            cert.amount_period_total = rnd(net_period + period_tax)
             cert.progress_origin = (
                 (total_origin / total_budget * 100.0) if total_budget else 0.0
             )
@@ -228,6 +229,8 @@ class ConstructionCertification(models.Model):
         return self.action_create_invoice()
 
     def action_draft(self):
+        if any(c.invoice_id and c.invoice_id.state != "cancel" for c in self):
+            raise UserError(_("No puede volver a borrador una certificación cuya factura no haya sido cancelada."))
         self.write({"state": "draft"})
 
     def action_cancel(self):
@@ -238,18 +241,21 @@ class ConstructionCertification(models.Model):
     def _get_or_create_retention_account(self, company):
         Account = self.env["account.account"]
         account = Account.search(
-            [("code", "=like", "4308%"), ("company_id", "=", company.id)],
+            [("code", "=", "430800"), ("company_id", "=", company.id)],
             limit=1,
         )
         if not account:
-            account = Account.create({
+            return Account.create({
                 "code": "430800",
                 "name": "Clientes, retenciones por garantía de obra",
                 "account_type": "asset_current",
                 "company_id": company.id,
             })
-        elif account.account_type != "asset_current":
-            account.write({"account_type": "asset_current"})
+        if account.account_type != "asset_current":
+            raise UserError(_(
+                "La cuenta 430800 existe pero no es de activo corriente. "
+                "Corrija el tipo en el plan contable antes de facturar la retención."
+            ))
         return account
 
     def action_create_invoice(self):
@@ -480,10 +486,11 @@ class ConstructionCertificationLine(models.Model):
                 line.amount_origin = 0.0
                 line.amount_period = 0.0
             else:
+                rnd = line.currency_id.round if line.currency_id else lambda amount: amount
                 line.percentage_origin = (
                     (line.qty_origin / line.qty_budget * 100.0) if line.qty_budget else 0.0
                 )
-                line.amount_budget = line.qty_budget * line.price_unit
-                line.amount_previous = line.qty_previous * line.price_unit
-                line.amount_origin = line.qty_origin * line.price_unit
-                line.amount_period = line.qty_period * line.price_unit
+                line.amount_budget = rnd(line.qty_budget * line.price_unit)
+                line.amount_previous = rnd(line.qty_previous * line.price_unit)
+                line.amount_origin = rnd(line.qty_origin * line.price_unit)
+                line.amount_period = rnd(line.qty_period * line.price_unit)
