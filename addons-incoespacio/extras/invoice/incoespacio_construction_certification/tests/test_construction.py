@@ -85,12 +85,18 @@ class TestConstruction(TransactionCase):
             self.order.action_return_retention()
 
     def test_retention_account_wrong_type(self):
-        self.env["account.account"].create({
-            "code": "430800",
-            "name": "Retención mal tipada",
-            "account_type": "income",
-            "company_id": self.env.company.id,
-        })
+        account = self.env["account.account"].search([
+            ("code", "=", "430800"),
+            ("company_id", "=", self.env.company.id),
+        ], limit=1)
+        if not account:
+            account = self.env["account.account"].create({
+                "code": "430800",
+                "name": "Retención mal tipada",
+                "account_type": "asset_current",
+                "company_id": self.env.company.id,
+            })
+        account.account_type = "income"
         with self.assertRaises(UserError):
             self.env["construction.certification"]._get_or_create_retention_account(
                 self.env.company
@@ -327,6 +333,9 @@ class TestConstruction(TransactionCase):
         with self.assertRaises(UserError):
             cert.action_draft()
         self.assertEqual(cert.state, "invoiced")
+        with self.assertRaises(UserError):
+            cert.action_create_invoice()
+        self.assertEqual(len(cert.invoice_id), 1)
 
     def test_confirm_and_invoice_no_period_stays_confirmed(self):
         # El botón confirma y luego factura. Si no hay periodo, UserError de la

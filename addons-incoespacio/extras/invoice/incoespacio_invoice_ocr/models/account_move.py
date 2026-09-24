@@ -48,6 +48,10 @@ class AccountMove(models.Model):
         readonly=True
     )
 
+    ocr_partner_pending = fields.Boolean(
+        related="partner_id.ocr_pending_review",
+        string="Contacto OCR pendiente",
+    )
     ocr_extracted_iban = fields.Char(string="IBAN Extraído por IA", copy=False, readonly=True)
     ocr_iban_status = fields.Selection([
         ('verified', 'Coincide con proveedor'),
@@ -459,7 +463,21 @@ class AccountMove(models.Model):
                 country = self.env['res.country'].search([('name', '=ilike', country_name)], limit=1)
                 if country:
                     vals['country_id'] = country.id
+        vals["ocr_pending_review"] = True
         return partner_obj.create(vals), True
+
+    def action_confirm_ocr_partner(self):
+        partners = self.partner_id.filtered("ocr_pending_review")
+        partners.ocr_pending_review = False
+
+    def action_post(self):
+        pending = self.filtered(lambda m: m.partner_id.ocr_pending_review)
+        if pending:
+            raise UserError(_(
+                "El contacto de esta factura lo creó el OCR y aún no está revisado. "
+                "Pulsa «Contacto revisado» antes de publicar."
+            ))
+        return super().action_post()
 
     def _find_matching_purchase_taxes(self, pct_iva, pct_irpf=0.0):
         Tax = self.env['account.tax']

@@ -219,8 +219,17 @@ class ConstructionCertification(models.Model):
             raise UserError(_("La certificación debe tener al menos una partida de obra."))
         self.write({"state": "confirmed"})
 
+    def _lock_certification(self):
+        self.ensure_one()
+        self.env.cr.execute(
+            "SELECT id FROM construction_certification WHERE id = %s FOR UPDATE",
+            [self.id],
+        )
+        self.invalidate_recordset()
+
     def action_confirm_and_invoice(self):
         self.ensure_one()
+        self._lock_certification()
         if self.state == "draft":
             self.action_confirm()
             # ponytail: un RPC; sin commit el UserError de la factura deshace el aprobar
@@ -260,6 +269,7 @@ class ConstructionCertification(models.Model):
 
     def action_create_invoice(self):
         self.ensure_one()
+        self._lock_certification()
         if self.invoice_id:
             raise UserError(_("Esta certificación ya tiene una factura asignada: %s") % self.invoice_id.name)
         if self.state != "confirmed":

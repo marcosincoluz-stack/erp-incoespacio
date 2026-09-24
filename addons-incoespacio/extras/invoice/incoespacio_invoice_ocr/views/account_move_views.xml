@@ -20,6 +20,7 @@
                 <field name="duplicate_move_id" invisible="1"/>
                 <field name="ocr_extracted_iban" invisible="1"/>
                 <field name="ocr_iban_status" invisible="1"/>
+                <field name="ocr_partner_pending" invisible="1"/>
                 <field name="ocr_company_mismatch" invisible="1"/>
                 <field name="ocr_mismatch_details" invisible="1"/>
 
@@ -58,6 +59,18 @@
                         <strong>ALERTA DE SEGURIDAD ANTIFRAUDE (IBAN):</strong><br/>
                         El IBAN de la factura (<strong><field name="ocr_extracted_iban" readonly="1"/></strong>) <u>no coincide</u> con las cuentas bancarias autorizadas del proveedor.
                     </div>
+                </div>
+
+                <div class="alert alert-warning d-flex align-items-center justify-content-between mb-2"
+                     role="alert"
+                     invisible="not ocr_partner_pending">
+                    <div>
+                        <strong>Contacto creado por el OCR, pendiente de revisar.</strong>
+                    </div>
+                    <button name="action_confirm_ocr_partner"
+                            type="object"
+                            string="Contacto revisado"
+                            class="btn btn-sm btn-primary ms-3"/>
                 </div>
 
                 <div class="alert alert-warning mb-2"

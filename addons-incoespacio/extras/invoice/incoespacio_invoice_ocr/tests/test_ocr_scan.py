@@ -175,3 +175,33 @@ class TestOcrScan(TransactionCase):
         )
         atts = move._ocr_attachments()
         self.assertEqual(atts.ids, part.ids)
+
+    def test_new_partner_blocks_post_until_reviewed(self):
+        move = self._bill()
+        partner, created = move._find_or_create_partner(
+            {"cif": "B99999999", "nombre": "Proveedor sin ficha"},
+            is_supplier=True,
+        )
+        self.assertTrue(created)
+        self.assertTrue(partner.ocr_pending_review)
+        known, created_known = move._find_or_create_partner(
+            {"cif": "B12345678", "nombre": "Proveedor OCR"},
+            is_supplier=True,
+        )
+        self.assertFalse(created_known)
+        self.assertFalse(known.ocr_pending_review)
+        move.partner_id = partner
+        with self.assertRaises(UserError):
+            move.action_post()
+        move.action_confirm_ocr_partner()
+        self.assertFalse(partner.ocr_pending_review)
+        move.invoice_line_ids = [(
+            0, 0, {
+                "name": "Linea",
+                "quantity": 1,
+                "price_unit": 10,
+                "tax_ids": [(6, 0, [])],
+            },
+        )]
+        move.action_post()
+        self.assertEqual(move.state, "posted")
