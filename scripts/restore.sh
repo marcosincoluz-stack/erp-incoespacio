@@ -9,11 +9,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(dirname "$SCRIPT_DIR")"
 
-if [ -f "$BASE_DIR/.env" ]; then
-    export $(grep -v '^#' "$BASE_DIR/.env" | xargs)
-fi
-
-DB_NAME="${POSTGRES_DB:-incoespacio}"
+# POSTGRES_DB del .env es la BD de arranque de Postgres, no la de Odoo.
+DB_NAME="${ODOO_DB:-incoespacio}"
 DB_USER="${POSTGRES_USER:-odoo}"
 DB_CONTAINER="${DB_CONTAINER:-incoespacio_db}"
 WEB_CONTAINER="${WEB_CONTAINER:-incoespacio_web}"
