@@ -2,33 +2,86 @@
 <templates xml:space="preserve">
     <t t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="extension">
         <xpath expr="//tr" position="after">
-            <tr t-if="bc3DetailOpen(record)" class="o_bc3_detail">
+            <tr t-if="bc3DetailOpen(record)" class="o_bc3_detail" t-on-click.stop="">
                 <td t-att-colspan="nbCols">
-                    <div t-if="record.data.bc3_text" class="o_bc3_text" t-esc="record.data.bc3_text"/>
-                    <table t-if="bc3Measures(record).length" class="table table-sm o_bc3_measures">
-                        <thead>
-                            <tr>
-                                <th>Comentario</th>
-                                <th>N</th>
-                                <th>Largo</th>
-                                <th>Ancho</th>
-                                <th>Alto</th>
-                                <th>Parcial</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="bc3Measures(record)" t-as="measure" t-key="measure_index">
+                    <t t-if="props.editable">
+                        <textarea class="o_bc3_text_input" placeholder="Descripción"
+                            t-att-value="record.data.bc3_text || ''"
+                            t-on-change="(ev) => this.bc3SetText(record, ev)"/>
+                        <table class="table table-sm o_bc3_measures">
+                            <thead>
                                 <tr>
-                                    <td t-esc="measure.comment"/>
-                                    <td t-esc="bc3MeasureLabel(measure.units)"/>
-                                    <td t-esc="bc3MeasureLabel(measure.length)"/>
-                                    <td t-esc="bc3MeasureLabel(measure.width)"/>
-                                    <td t-esc="bc3MeasureLabel(measure.height)"/>
-                                    <td t-esc="bc3MeasureLabel(measure.partial)"/>
+                                    <th>Comentario</th>
+                                    <th>N</th>
+                                    <th>Largo</th>
+                                    <th>Ancho</th>
+                                    <th>Alto</th>
+                                    <th>Parcial</th>
+                                    <th/>
                                 </tr>
-                            </t>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="bc3EditorRows(record)" t-as="measure" t-key="measure_index">
+                                    <tr>
+                                        <td>
+                                            <input class="o_input" t-att-value="measure.comment || ''"
+                                                t-on-change="(ev) => this.bc3SetMeasure(record, measure_index, 'comment', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="bc3MeasureLabel(measure.units)"
+                                                t-on-change="(ev) => this.bc3SetMeasure(record, measure_index, 'units', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="bc3MeasureLabel(measure.length)"
+                                                t-on-change="(ev) => this.bc3SetMeasure(record, measure_index, 'length', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="bc3MeasureLabel(measure.width)"
+                                                t-on-change="(ev) => this.bc3SetMeasure(record, measure_index, 'width', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="bc3MeasureLabel(measure.height)"
+                                                t-on-change="(ev) => this.bc3SetMeasure(record, measure_index, 'height', ev)"/>
+                                        </td>
+                                        <td t-esc="bc3MeasureLabel(measure.partial)"/>
+                                        <td>
+                                            <button t-if="bc3EditorRows(record).length &gt; 1" type="button"
+                                                class="btn btn-link fa fa-trash-o p-0"
+                                                t-on-click="() => this.bc3RemoveMeasure(record, measure_index)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <a href="#" role="button" t-on-click.prevent="() => this.bc3AddMeasure(record)">Añadir mediciones parciales</a>
+                    </t>
+                    <t t-else="">
+                        <div t-if="record.data.bc3_text" class="o_bc3_text" t-esc="record.data.bc3_text"/>
+                        <table t-if="bc3Measures(record).length" class="table table-sm o_bc3_measures">
+                            <thead>
+                                <tr>
+                                    <th>Comentario</th>
+                                    <th>N</th>
+                                    <th>Largo</th>
+                                    <th>Ancho</th>
+                                    <th>Alto</th>
+                                    <th>Parcial</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="bc3Measures(record)" t-as="measure" t-key="measure_index">
+                                    <tr>
+                                        <td t-esc="measure.comment"/>
+                                        <td t-esc="bc3MeasureLabel(measure.units)"/>
+                                        <td t-esc="bc3MeasureLabel(measure.length)"/>
+                                        <td t-esc="bc3MeasureLabel(measure.width)"/>
+                                        <td t-esc="bc3MeasureLabel(measure.height)"/>
+                                        <td t-esc="bc3MeasureLabel(measure.partial)"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
                 </td>
             </tr>
         </xpath>

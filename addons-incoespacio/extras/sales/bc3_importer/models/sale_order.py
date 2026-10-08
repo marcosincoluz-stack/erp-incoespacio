@@ -24,3 +24,33 @@ class SaleOrderLine(models.Model):
     bc3_level = fields.Integer("Tree level", default=0)
     bc3_text = fields.Text("BC3 description")
     bc3_measures = fields.Json("BC3 measurements")
+
+    def write(self, vals):
+        vals = dict(vals)
+        if (
+            len(self) == 1
+            and "product_uom_qty" in vals
+            and "bc3_measures" not in vals
+        ):
+            rows = self.bc3_measures or []
+            plain = len(rows) <= 1 and not (
+                rows and any(rows[0].get(key) for key in ("length", "width", "height"))
+            )
+            if plain:
+                qty = vals["product_uom_qty"] or 0
+                comment = (rows[0].get("comment") if rows else "") or ""
+                vals["bc3_measures"] = (
+                    [
+                        {
+                            "comment": comment,
+                            "units": qty,
+                            "length": None,
+                            "width": None,
+                            "height": None,
+                            "partial": qty,
+                        }
+                    ]
+                    if qty
+                    else False
+                )
+        return super().write(vals)

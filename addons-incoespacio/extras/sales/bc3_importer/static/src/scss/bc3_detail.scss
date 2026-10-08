@@ -18,6 +18,10 @@ tr.o_bc3_detail_open > td[name="name"] .o_field_widget::before {
     content: "\f0d7";
 }
 
+tr.o_bc3_detail_empty:not(.o_bc3_detail_open) > td[name="name"] .o_field_widget::before {
+    opacity: 0.35;
+}
+
 tr.o_section_folded_hidden + tr.o_bc3_detail {
     display: none;
 }
@@ -26,11 +30,18 @@ tr.o_bc3_detail > td {
     background: #f8f9fa;
 }
 
-.o_bc3_text {
+.o_bc3_text,
+.o_bc3_text_input {
     white-space: pre-wrap;
     max-height: 8rem;
     overflow: auto;
     margin-bottom: 0.5rem;
+}
+
+.o_bc3_text_input {
+    display: block;
+    width: 100%;
+    min-height: 4rem;
 }
 
 .o_bc3_measures {

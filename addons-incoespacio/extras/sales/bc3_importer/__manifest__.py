@@ -26,5 +26,8 @@
             "bc3_importer/static/src/js/bc3_detail.js",
             "bc3_importer/static/src/xml/bc3_detail.xml",
         ],
+        "web.qunit_suite_tests": [
+            "bc3_importer/static/tests/bc3_detail_tests.js",
+        ],
     },
 }
