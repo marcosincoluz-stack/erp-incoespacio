@@ -13,7 +13,7 @@
             </xpath>
             <!-- Sin optional: el navegador guarda las columnas opcionales y no enseña las nuevas -->
             <field name="amount_untaxed" position="replace">
-                <field name="amount_untaxed" string="Importe previsto" sum="Importe previsto" widget="monetary"/>
+                <field name="amount_untaxed" string="Venta prevista" sum="Venta prevista" widget="monetary"/>
             </field>
             <field name="amount_total" position="attributes">
                 <attribute name="optional">hide</attribute>

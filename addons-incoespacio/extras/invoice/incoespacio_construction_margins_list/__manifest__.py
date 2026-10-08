@@ -1,7 +1,7 @@
 {
     "name": "Incoespacio: Lista de obras",
     "summary": "Columnas de control económico en la lista de pedidos / obras",
-    "version": "17.0.1.0.0",
+    "version": "17.0.1.0.1",
     "category": "Sales",
     "author": "Incoespacio",
     "license": "LGPL-3",
