@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_module_module_list_select_inherit" model="ir.ui.view">
+        <field name="name">ir.module.module.list.select.inherit.app_search_filter</field>
+        <field name="model">ir.module.module</field>
+        <field name="inherit_id" ref="base.view_module_filter"/>
+        <field name="arch" type="xml">
+            <filter name="installed" position="before">
+                <filter name="incoespacio" string="Incoespacio" domain="[('author', 'ilike', 'Incoespacio')]"/>
+                <filter name="oca" string="OCA" domain="[('author', 'ilike', 'Odoo Community Association (OCA)')]"/>
+                <separator/>
+            </filter>
+        </field>
+    </record>
+</odoo>
