@@ -1,0 +1,26 @@
+[project]
+name = "odoo-addons-oca-bank-statement-import"
+version = "17.0.20260416.0"
+dependencies = [
+    "odoo-addon-account_statement_import_base>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_camt54>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_camt>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_file>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_file_reconcile_oca>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_move_line>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_ofx>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_ofx_by_acctid>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_online>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_online_gocardless>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_online_paypal>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_online_plaid>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_online_ponto>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_online_stripe>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_paypal>=17.0dev,<17.1dev",
+    "odoo-addon-account_statement_import_sheet_file>=17.0dev,<17.1dev",
+]
+classifiers=[
+    "Programming Language :: Python",
+    "Framework :: Odoo",
+    "Framework :: Odoo :: 17.0",
+]

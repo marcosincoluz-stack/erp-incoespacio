@@ -1,0 +1,10 @@
+# generated from manifests external_dependencies
+chardet
+deepdiff<8
+pycountry
+pycryptodome
+requests
+suds-py3
+unidecode
+xmlsig
+zeep

@@ -1,0 +1,9 @@
+.o_field_product_label_section_and_note_field {
+    textarea {
+        resize: none;
+    }
+}
+.o_field_product_label_section_and_note_field_o2m ~ .row.o_group {
+    clear: both;
+    justify-content: space-between;
+}

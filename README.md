@@ -11,7 +11,7 @@
 
 ## Introducción
 
-Este repositorio contiene la configuración de Docker y el código fuente para el despliegue de **Odoo 17 Community Edition** junto con los módulos custom de **Incoespacio** y las dependencias de la comunidad (OCA).
+Este repositorio contiene la configuración de Docker, los módulos propios de **Incoespacio** y los módulos **OCA 17.0 fijados** en `addons/` (no hace falta clonar OCA a parte). Con `git clone` + `.env` + `config/odoo.conf` + `docker compose up` el ERP arranca.
 
 ---
 
@@ -31,7 +31,7 @@ Este repositorio contiene la configuración de Docker y el código fuente para e
 - **Base de datos PostgreSQL**: `incoespacio_db_data -> /var/lib/postgresql/data/pgdata`
 - **Configuración Odoo**: `./config -> /etc/odoo`
 - **Módulos propios de Incoespacio**: `./addons-incoespacio -> /mnt/incoespacio-addons`
-- **Módulos externos y OCA**: `./addons -> /mnt/extra-addons`
+- **Módulos externos y OCA**: `./addons -> /mnt/extra-addons` (van en este repo; ver `addons/README.md`)
 - **Proxy y certificados SSL**: `./nginx -> /etc/nginx/...`
 
 ---
