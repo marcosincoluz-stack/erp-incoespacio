@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="it_group_user" model="res.groups">
+        <field name="name">Gestión IT: Usuario</field>
+    </record>
+    <record id="it_group_admin" model="res.groups">
+        <field name="name">Gestión IT: Administrador</field>
+        <field name="implied_ids" eval="[(4, ref('it_group_user'))]"/>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('it_group_admin'))]"/>
+    </record>
+</odoo>

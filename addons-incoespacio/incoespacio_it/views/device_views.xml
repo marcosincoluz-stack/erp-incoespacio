@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="device_view_tree" model="ir.ui.view">
+        <field name="name">incoespacio.it.device.tree</field>
+        <field name="model">incoespacio_it.device</field>
+        <field name="arch" type="xml">
+            <tree string="Equipos" multi_edit="1">
+                <field name="hostname"/>
+                <field name="alias"/>
+                <field name="assigned_to" widget="many2one_avatar_user"/>
+                <field name="mac_address"/>
+                <field name="ip_address"/>
+                <field name="switch_port" optional="hide"/>
+                <field name="floor_port" optional="hide"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="dns_name" optional="hide"/>
+                <field name="update_server" optional="hide"/>
+                <field name="so"/>
+                <field name="wol"/>
+                <field name="serial_number" optional="hide"/>
+                <field name="manufacturer" optional="hide"/>
+                <field name="model"/>
+                <field name="purchase_date" optional="hide"/>
+                <field name="warranty_expiry_date" optional="hide"/>
+                <field name="location" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="device_view_form" model="ir.ui.view">
+        <field name="name">incoespacio.it.device.form</field>
+        <field name="model">incoespacio_it.device</field>
+        <field name="arch" type="xml">
+            <form string="Equipo">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="alias" placeholder="Alias"/></h1>
+                        <h2>
+                            <field name="name" invisible="not id" readonly="1"/>
+                            <field name="hostname" placeholder="Hostname"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mac_address"/>
+                            <field name="ip_address"/>
+                            <field name="switch_port"/>
+                            <field name="floor_port"/>
+                            <field name="dns_name"/>
+                            <field name="vlan"/>
+                            <field name="so"/>
+                            <field name="wol"/>
+                        </group>
+                        <group>
+                            <field name="assigned_to"/>
+                            <field name="location"/>
+                            <field name="manufacturer"/>
+                            <field name="model"/>
+                            <field name="serial_number"/>
+                            <field name="update_server"/>
+                            <field name="purchase_date"/>
+                            <field name="warranty_expiry_date"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notas"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="device_view_search" model="ir.ui.view">
+        <field name="name">incoespacio.it.device.search</field>
+        <field name="model">incoespacio_it.device</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="alias"/>
+                <field name="hostname"/>
+                <field name="assigned_to"/>
+                <field name="ip_address"/>
+                <field name="mac_address"/>
+                <field name="location"/>
+                <field name="tag_ids"/>
+                <filter string="Archivados" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Ubicación" name="location" context="{'group_by': 'location'}"/>
+                    <filter string="Asignado a" name="assigned_to" context="{'group_by': 'assigned_to'}"/>
+                    <filter string="Fabricante" name="manufacturer" context="{'group_by': 'manufacturer'}"/>
+                    <filter string="Sistema operativo" name="so" context="{'group_by': 'so'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="devices_action" model="ir.actions.act_window">
+        <field name="name">Equipos</field>
+        <field name="res_model">incoespacio_it.device</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="it_menu_root" name="Gestión IT" groups="incoespacio_security.it_group_user" sequence="499" web_icon="incoespacio_it,static/description/icon.png"/>
+    <menuitem id="devices_menu" name="Equipos" action="devices_action" parent="it_menu_root" sequence="10"/>
+</odoo>

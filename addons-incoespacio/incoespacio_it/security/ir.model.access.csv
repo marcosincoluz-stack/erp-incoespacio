@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_incoespacio_it_device_user,Usuario equipos IT,model_incoespacio_it_device,incoespacio_security.it_group_user,1,0,0,0
+access_incoespacio_it_device_admin,Admin equipos IT,model_incoespacio_it_device,incoespacio_security.it_group_admin,1,1,1,1
+access_incoespacio_it_device_tag_user,Usuario etiquetas IT,model_incoespacio_it_device_tag,incoespacio_security.it_group_user,1,0,0,0
+access_incoespacio_it_device_tag_admin,Admin etiquetas IT,model_incoespacio_it_device_tag,incoespacio_security.it_group_admin,1,1,1,1

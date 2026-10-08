@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_device_id" model="ir.sequence">
+        <field name="name">ID de equipo IT</field>
+        <field name="code">seq.device.id</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>
