@@ -40,7 +40,7 @@ class SaleOrder(models.Model):
         string="Desv. vs objetivo",
         compute="_compute_order_margins",
         currency_field="currency_id",
-        help="Positivo = el coste real supera el objetivo ejecutado.",
+        help="Positivo = el coste va por debajo del objetivo ejecutado.",
     )
     amount_margin_real = fields.Monetary(
         string="Margen real",
@@ -86,7 +86,7 @@ class SaleOrder(models.Model):
             )
             order.progress_percent = certified / sale * 100.0 if sale else 0.0
             order.amount_planned_done = planned_done
-            order.amount_cost_deviation = (cost - planned_done) if certified else 0.0
+            order.amount_cost_deviation = (planned_done - cost) if certified else 0.0
             order.amount_margin_real = certified - cost
             order.margin_percent_real = (
                 (certified - cost) / certified * 100.0 if certified else 0.0
@@ -202,7 +202,7 @@ class SaleOrderLine(models.Model):
             line.progress_percent = qty_cert / qty * 100.0 if qty else 0.0
             line.amount_cert_origin = cert_amt
             line.amount_planned_done = planned_done
-            line.amount_cost_deviation = (cost - planned_done) if qty_cert else 0.0
+            line.amount_cost_deviation = (planned_done - cost) if qty_cert else 0.0
             sale = line.price_subtotal or 0.0
             target = line.amount_planned or 0.0
             line.amount_margin_planned = sale - target

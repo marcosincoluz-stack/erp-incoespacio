@@ -1,6 +1,10 @@
 /** @odoo-module **/
 
-import { sectionColumnSums, sectionFigure } from "@incoespacio_construction_margins/js/margin_lines";
+import {
+    sectionColumnSums,
+    sectionFigure,
+    withExplicitPlus,
+} from "@incoespacio_construction_margins/js/margin_lines";
 
 QUnit.module("construction margin lines");
 
@@ -43,4 +47,11 @@ QUnit.test("chapter percent is money over money, not the sum of percents", (asse
     assert.strictEqual(sectionFigure(records, 0, "margin_percent_planned"), 20);
     assert.strictEqual(sectionFigure(records, 0, "progress_percent"), 40);
     assert.strictEqual(sectionFigure(records, 0, "margin_percent"), 25);
+});
+
+QUnit.test("a gain gets an explicit plus; a loss keeps its minus", (assert) => {
+    assert.strictEqual(withExplicitPlus(20, "20,00 €"), "+20,00 €");
+    assert.strictEqual(withExplicitPlus(-20, "-20,00 €"), "-20,00 €");
+    assert.strictEqual(withExplicitPlus(0, "0,00 €"), "0,00 €");
+    assert.strictEqual(withExplicitPlus(20, "+20,00 €"), "+20,00 €");
 });

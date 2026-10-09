@@ -2,6 +2,7 @@
 
 import { registry } from "@web/core/registry";
 import { formatFloat, formatMonetary } from "@web/views/fields/formatters";
+import { MonetaryField, monetaryField } from "@web/views/fields/monetary/monetary_field";
 import {
     SectionAndNoteFieldOne2Many,
     SectionAndNoteListRenderer,
@@ -32,7 +33,6 @@ export const SECTION_RATIOS = {
     margin_percent_forecast: ["amount_margin_forecast", "price_subtotal"],
 };
 
-const BAD_OVER = new Set(["amount_cost_deviation"]);
 const BAD_UNDER = new Set([
     "amount_margin",
     "margin_percent",
@@ -41,6 +41,17 @@ const BAD_UNDER = new Set([
     "amount_margin_forecast",
     "margin_percent_forecast",
 ]);
+
+export function withExplicitPlus(value, text) {
+    if (Number(value) > 0 && text && !String(text).trim().startsWith("+")) {
+        return `+${text}`;
+    }
+    return text;
+}
+
+export function formatSignedMonetary(value, options) {
+    return withExplicitPlus(value, formatMonetary(value, options));
+}
 
 export function sectionFigure(records, sectionIndex, columnName) {
     const ratio = SECTION_RATIOS[columnName];
@@ -107,8 +118,16 @@ export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
         cls += " o_section_fold_total text-end";
         const records = this.props.list.records;
         const val = sectionFigure(records, records.indexOf(record), column.name);
-        const bad = BAD_OVER.has(column.name) ? val > 0 : BAD_UNDER.has(column.name) && val < 0;
-        return bad ? `${cls} text-danger` : cls;
+        if (column.name === "amount_cost_deviation") {
+            if (val > 0) {
+                return `${cls} text-success`;
+            }
+            if (val < 0) {
+                return `${cls} text-danger`;
+            }
+            return cls;
+        }
+        return BAD_UNDER.has(column.name) && val < 0 ? `${cls} text-danger` : cls;
     }
 
     getFormattedValue(column, record) {
@@ -128,7 +147,11 @@ export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
         }
         const currency = record.data.currency_id;
         const currencyId = Array.isArray(currency) ? currency[0] : currency;
-        return formatMonetary(val, { currencyId });
+        const options = { currencyId };
+        if (column.name === "amount_cost_deviation") {
+            return formatSignedMonetary(val, options);
+        }
+        return formatMonetary(val, options);
     }
 }
 
@@ -142,3 +165,20 @@ registry.category("fields").add("construction_margin_lines", {
     ...sectionAndNoteFieldOne2Many,
     component: ConstructionMarginLinesField,
 });
+
+export class DeviationMonetaryField extends MonetaryField {
+    get formattedValue() {
+        const text = super.formattedValue;
+        if (this.props.inputType === "number" && !this.props.readonly && this.value) {
+            return text;
+        }
+        return withExplicitPlus(this.value, text);
+    }
+}
+
+registry.category("fields").add("deviation_monetary", {
+    ...monetaryField,
+    component: DeviationMonetaryField,
+});
+
+registry.category("formatters").add("deviation_monetary", formatSignedMonetary);
