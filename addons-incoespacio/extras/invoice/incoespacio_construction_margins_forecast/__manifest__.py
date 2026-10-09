@@ -1,7 +1,7 @@
 {
     "name": "Incoespacio: Previsión de márgenes de obra",
     "summary": "Coste comprometido, incurrido y previsión a fin de obra por partida",
-    "version": "17.0.1.0.0",
+    "version": "17.0.1.0.1",
     "category": "Sales",
     "author": "Incoespacio",
     "license": "LGPL-3",

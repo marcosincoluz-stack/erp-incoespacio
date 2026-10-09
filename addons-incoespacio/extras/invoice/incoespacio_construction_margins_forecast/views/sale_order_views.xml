@@ -32,7 +32,6 @@
                 </div>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='amount_vendor_cost']" position="after">
-                <field name="amount_po_cost" widget="monetary" string="Comprometido" optional="show" sum="Comprometido"/>
                 <field name="amount_cost_incurred" widget="monetary" string="Incurrido" optional="show" sum="Incurrido"/>
                 <field name="amount_cost_forecast" widget="monetary" string="Coste prev." optional="show" sum="Coste prev."
                        decoration-danger="margin_percent_forecast &lt; parent.margin_percent_planned and not display_type"/>
