@@ -2,16 +2,16 @@
 <odoo>
     <data>
 
-        <!-- Cabecera Corporativa Estilo Incoluz (Banda Roja 10px, Logo y Numeracion) -->
+        <!-- Cabecera de alto fijo (20mm). El logo se escala a 12mm: otro fichero no empuja la franja. -->
         <template id="incoespacio_header_layout">
-            <div class="header" style="border-bottom: 10px solid #e72228; padding-bottom: 6px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+            <div class="header" style="height: 20mm; overflow: hidden; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
                 <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td style="width: 48%; vertical-align: middle; padding: 0;">
-                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 42px; width: auto; max-width: 220px; vertical-align: middle;" alt="Logo Empresa"/>
-                            <img t-else="" src="/incoespacio_reports/static/src/img/logo_fallback.png" style="max-height: 42px; width: auto; max-width: 220px; vertical-align: middle;" alt="Logo Incoespacio"/>
+                    <tr style="height: 16mm;">
+                        <td style="width: 48%; height: 16mm; vertical-align: middle; padding: 0; overflow: hidden;">
+                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" height="45" style="height: 12mm; width: auto;" alt="Logo Empresa"/>
+                            <img t-else="" src="/incoespacio_reports/static/src/img/logo_fallback.png" height="45" style="height: 12mm; width: auto;" alt="Logo Incoespacio"/>
                         </td>
-                        <td style="width: 52%; text-align: right; vertical-align: middle; padding: 0;">
+                        <td style="width: 52%; height: 16mm; text-align: right; vertical-align: middle; padding: 0;">
                             <div style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px; line-height: 1.2;">
                                 <t t-if="o and o._name == 'account.move'">
                                     <t t-if="o.move_type in ('out_refund','in_refund')">ABONO</t>
@@ -56,6 +56,9 @@
                                 </span>
                             </div>
                         </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height: 3mm; background-color: #e72228; font-size: 0; line-height: 0; padding: 0;">&#160;</td>
                     </tr>
                 </table>
             </div>
@@ -113,7 +116,7 @@
             </t>
 
             <t t-call="incoespacio_reports.incoespacio_header_layout"/>
-            <div class="article o_report_layout_standard" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id">
+            <div class="article o_report_layout_standard" style="padding-top: 4mm;" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id">
                 <div>
                     <t t-out="0"/>
                 </div>

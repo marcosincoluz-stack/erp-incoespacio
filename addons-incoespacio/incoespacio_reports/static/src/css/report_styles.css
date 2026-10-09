@@ -155,9 +155,6 @@
     outline: none;
     box-shadow: none;
 }
-.header {
-    border-bottom: 10px solid #e72228;
-}
 .footer {
     border-top: 2px solid #e72228;
 }
