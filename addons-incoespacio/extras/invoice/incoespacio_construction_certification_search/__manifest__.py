@@ -1,7 +1,7 @@
 {
     "name": "Incoespacio - Buscar partidas en certificación",
     "summary": "Lupa para saltar a una partida por código, nombre o precio",
-    "version": "17.0.1.1.0",
+    "version": "17.0.1.1.1",
     "category": "Accounting/Sales",
     "author": "Incoespacio",
     "license": "LGPL-3",
