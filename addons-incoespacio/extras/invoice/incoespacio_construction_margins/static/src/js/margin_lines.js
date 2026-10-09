@@ -8,7 +8,7 @@ import {
     SectionAndNoteListRenderer,
     sectionAndNoteFieldOne2Many,
 } from "@account/components/section_and_note_fields_backend/section_and_note_fields_backend";
-import { sectionChildRecords } from "@incoespacio_section_fold/js/section_fold";
+import { isSectionFoldColumn, sectionChildRecords } from "@incoespacio_section_fold/js/section_fold";
 
 export function sectionColumnSums(records, sectionIndex, fieldNames) {
     const children = sectionChildRecords(records, sectionIndex);
@@ -97,13 +97,17 @@ export class ConstructionMarginListRenderer extends SectionAndNoteListRenderer {
         return super.canUseFormatter(column, record);
     }
 
+    getActiveColumns(list) {
+        return super.getActiveColumns(list).filter((col) => col.id !== "sale_share");
+    }
+
     getColumns(record) {
         if (record.data.display_type === "line_section") {
             const product = this.props.list.records.find((r) => !r.data.display_type);
             const source = product || record;
-            return super.getColumns(source).filter((col) => col.id !== "section_total");
+            return super.getColumns(source).filter((col) => !isSectionFoldColumn(col));
         }
-        return super.getColumns(record).filter((col) => col.id !== "section_total");
+        return super.getColumns(record).filter((col) => !isSectionFoldColumn(col));
     }
 
     getCellClass(column, record) {

@@ -73,6 +73,16 @@
                         context="{'default_display_type': 'line_section', 'default_bc3_level': 1}"/>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']//tree//field[@name='qty_delivered']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//label[@for='qty_delivered']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//div[@name='delivered_qty']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
                 <field name="is_modification" optional="hide"/>
                 <field name="modification_ref" optional="show"/>

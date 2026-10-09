@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { patch } from "@web/core/utils/patch";
-import { useState } from "@odoo/owl";
+import { onWillRender, useState } from "@odoo/owl";
 import { evaluateExpr } from "@web/core/py_js/py";
 import { formatMonetary } from "@web/views/fields/formatters";
 import { SectionAndNoteListRenderer } from "@account/components/section_and_note_fields_backend/section_and_note_fields_backend";
@@ -53,6 +53,134 @@ export function sectionTotal(records, sectionIndex) {
     return sectionChildRecords(records, sectionIndex).reduce(
         (sum, rec) => sum + lineAmount(rec.data || rec),
         0
+    );
+}
+
+const CHAPTER_SUMS = ["price_subtotal", "amount_cert_origin"];
+
+export function sectionFieldTotal(records, sectionIndex, field) {
+    if (!field || field === "price_subtotal") {
+        return sectionTotal(records, sectionIndex);
+    }
+    return sectionChildRecords(records, sectionIndex).reduce((sum, rec) => {
+        const data = rec.data || rec;
+        if (!data || data.display_type) {
+            return sum;
+        }
+        return sum + (Number(data[field]) || 0);
+    }, 0);
+}
+
+// Chapter row keeps the title colspan, then one cell per sum column so the
+// figures sit under Venta sin IVA / Total facturado. Columns after them stay
+// as empty pads so the row still matches the header.
+export function sectionDisplayColumns(active, titleField) {
+    const sums = CHAPTER_SUMS.filter((name) => active.some((col) => col.name === name));
+    const firstSum = active.findIndex((col) => sums.includes(col.name));
+    const titleIdx = active.findIndex((col) => col.type === "field" && col.name === titleField);
+    if (!sums.length || titleIdx < 0 || firstSum <= titleIdx) {
+        return null;
+    }
+    const out = [];
+    let consumed = 0;
+    for (let i = 0; i < firstSum; i++) {
+        if (active[i].widget === "handle") {
+            out.push(active[i]);
+            consumed++;
+        }
+    }
+    out.push({ ...active[titleIdx], colspan: firstSum - consumed });
+    for (let i = firstSum; i < active.length; i++) {
+        if (active[i].id === "sale_share") {
+            out.push(active[i]);
+            continue;
+        }
+        const name = active[i].name;
+        out.push(
+            sums.includes(name)
+                ? {
+                      id: "section_total_" + name,
+                      type: "field",
+                      name: "display_type",
+                      sumField: name,
+                  }
+                : { id: "section_pad_" + i, type: "field", name: "display_type" }
+        );
+    }
+    return out;
+}
+
+export function formatShare(pct) {
+    if (pct === undefined || pct === null || Number.isNaN(pct)) {
+        return "";
+    }
+    const rounded = Math.round(pct * 10) / 10;
+    const text =
+        Math.abs(rounded - Math.round(rounded)) < 0.05
+            ? String(Math.round(rounded))
+            : rounded.toFixed(1);
+    return `${text}%`;
+}
+
+function sharePct(run, total) {
+    if (!total) {
+        return 0;
+    }
+    if (Math.abs(run - total) <= 0.0001) {
+        return 100;
+    }
+    return (run / total) * 100;
+}
+
+// Partidas climb in the order on screen. Chapters use their summed sale and
+// climb on their own, because a chapter plus its partidas would pass 100%.
+// ponytail: uses the loaded page; raise the order-line limit if a budget is cut off.
+export function cumulativeSalePercent(records) {
+    const ordered = records.slice().sort((a, b) => {
+        const sa = Number((a.data || a).sequence) || 0;
+        const sb = Number((b.data || b).sequence) || 0;
+        return sa - sb;
+    });
+    let total = 0;
+    const chapterAmt = new Map();
+    for (let i = 0; i < ordered.length; i++) {
+        const data = ordered[i].data || ordered[i];
+        if (data.display_type === "line_section") {
+            chapterAmt.set(ordered[i].id, sectionFieldTotal(ordered, i, "price_subtotal"));
+        } else if (!data.display_type) {
+            total += Number(data.price_subtotal) || 0;
+        }
+    }
+    const out = new Map();
+    let run = 0;
+    let chapterRun = 0;
+    for (const rec of records) {
+        const data = rec.data || rec;
+        if (!data || data.display_type === "line_note") {
+            continue;
+        }
+        if (data.display_type === "line_section") {
+            const amt = chapterAmt.get(rec.id) || 0;
+            if (sectionLevel(data) === 0) {
+                chapterRun += amt;
+                out.set(rec.id, sharePct(chapterRun, total));
+            } else {
+                out.set(rec.id, sharePct(amt, total));
+            }
+            continue;
+        }
+        run += Number(data.price_subtotal) || 0;
+        out.set(rec.id, sharePct(run, total));
+    }
+    return out;
+}
+
+export function isSectionFoldColumn(column) {
+    const id = column && column.id;
+    return (
+        id === "section_total" ||
+        (typeof id === "string" &&
+            (id.startsWith("section_total_") || id.startsWith("section_pad_")))
     );
 }
 
@@ -108,6 +236,59 @@ patch(SectionAndNoteListRenderer.prototype, {
     setup() {
         super.setup();
         this.sectionFold = useState({ folded: {} });
+        onWillRender(() => {
+            const cols = this.getActiveColumns(this.props.list);
+            const cur = this.state.columns;
+            if (cols.length !== cur.length || cols.some((col, i) => col.id !== cur[i].id)) {
+                this.state.columns = cols;
+            }
+        });
+    },
+    _saleShareOn(list) {
+        list = list || this.props.list;
+        const order = list.orderBy || [];
+        if (!order.length || order[0].name !== "price_subtotal") {
+            return false;
+        }
+        if (list.resModel !== "sale.order.line") {
+            return false;
+        }
+        return (this.allColumns || []).some((col) => col.name === "amount_cert_origin");
+    },
+    getActiveColumns(list) {
+        const columns = super.getActiveColumns(list);
+        if (!this._saleShareOn(list) || columns.some((col) => col.id === "sale_share")) {
+            return columns;
+        }
+        const idx = columns.findIndex((col) => col.name === "amount_cert_origin");
+        if (idx < 0) {
+            return columns;
+        }
+        const share = {
+            id: "sale_share",
+            type: "field",
+            name: "display_type",
+            label: "Acum. %",
+            hasLabel: true,
+            attrs: {},
+            options: {},
+            invisible: "0",
+        };
+        const out = columns.slice();
+        out.splice(idx + 1, 0, share);
+        return out;
+    },
+    isSortable(column) {
+        if (column.id === "sale_share") {
+            return false;
+        }
+        return super.isSortable(column);
+    },
+    isNumericColumn(column) {
+        if (column.id === "sale_share") {
+            return true;
+        }
+        return super.isNumericColumn(column);
     },
     _foldSearchActive() {
         return Boolean(
@@ -123,10 +304,6 @@ patch(SectionAndNoteListRenderer.prototype, {
             this.sectionFold.folded,
             this._foldSearchActive()
         );
-    },
-    _sectionTotal(record) {
-        const records = this.props.list.records;
-        return sectionTotal(records, records.indexOf(record));
     },
     _toggleSection(record) {
         this.sectionFold.folded[record.id] = !this.sectionFold.folded[record.id];
@@ -173,10 +350,14 @@ patch(SectionAndNoteListRenderer.prototype, {
         return cls;
     },
     getColumns(record) {
-        const columns = super.getColumns(record);
         if (record.data.display_type !== "line_section") {
-            return columns;
+            return super.getColumns(record);
         }
+        const built = sectionDisplayColumns(this.state.columns, this.titleField);
+        if (built) {
+            return built;
+        }
+        const columns = super.getColumns(record);
         return columns
             .map((col) =>
                 col.name === this.titleField && col.colspan
@@ -191,22 +372,58 @@ patch(SectionAndNoteListRenderer.prototype, {
     },
     // Fake total has no field descriptor; Field() would throw in fieldVisualFeedback.
     canUseFormatter(column, record) {
-        if (column.id === "section_total") {
+        if (column.id === "sale_share" || this._foldCell(column)) {
             return true;
         }
         return super.canUseFormatter(column, record);
     },
+    _foldCell(column) {
+        const id = column && column.id;
+        if (id === "section_total" || (typeof id === "string" && id.startsWith("section_total_"))) {
+            return "total";
+        }
+        if (typeof id === "string" && id.startsWith("section_pad_")) {
+            return "pad";
+        }
+        return null;
+    },
     getCellClass(column, record) {
-        if (column.id === "section_total") {
+        if (column.id === "sale_share") {
+            return "o_data_cell text-end";
+        }
+        if (this._foldCell(column) === "total") {
             return "o_data_cell o_section_fold_total text-end";
+        }
+        if (this._foldCell(column) === "pad") {
+            return "o_data_cell";
         }
         return super.getCellClass(column, record);
     },
+    _saleShares() {
+        const records = this.props.list.records;
+        if (this._saleShareRecords !== records) {
+            this._saleShareRecords = records;
+            this._saleShareMap = cumulativeSalePercent(records);
+        }
+        return this._saleShareMap;
+    },
     getFormattedValue(column, record) {
-        if (column.id === "section_total") {
+        if (column.id === "sale_share") {
+            return formatShare(this._saleShares().get(record.id));
+        }
+        if (this._foldCell(column) === "pad") {
+            return "";
+        }
+        if (this._foldCell(column) === "total") {
             const currency = record.data.currency_id;
             const currencyId = Array.isArray(currency) ? currency[0] : currency;
-            return formatMonetary(this._sectionTotal(record), { currencyId });
+            const records = this.props.list.records;
+            const amount = sectionFieldTotal(
+                records,
+                records.indexOf(record),
+                column.sumField
+            );
+            return formatMonetary(amount, { currencyId });
         }
         return super.getFormattedValue(column, record);
     },

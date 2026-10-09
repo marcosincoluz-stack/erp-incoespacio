@@ -181,6 +181,12 @@
                     </field>
                 </page>
             </xpath>
+            <xpath expr="//page[@name='order_lines']//tree/field[@name='price_subtotal']" position="attributes">
+                <attribute name="string">Venta sin IVA</attribute>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']//tree/field[@name='price_subtotal']" position="after">
+                <field name="amount_cert_origin" string="Total facturado" widget="monetary" readonly="1" invisible="is_downpayment"/>
+            </xpath>
         </field>
     </record>
 </odoo>

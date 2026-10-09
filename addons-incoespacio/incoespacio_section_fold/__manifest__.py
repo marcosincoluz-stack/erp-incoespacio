@@ -2,7 +2,7 @@
 {
     "name": "Incoespacio - Capítulos plegables",
     "summary": "Plegar secciones de líneas y ver el total de cada capítulo",
-    "version": "17.0.1.0.7",
+    "version": "17.0.1.0.9",
     "category": "Web",
     "author": "Incoespacio",
     "license": "LGPL-3",
