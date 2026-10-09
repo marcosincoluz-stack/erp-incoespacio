@@ -413,6 +413,8 @@ class ConstructionCertificationLine(models.Model):
     )
     code = fields.Char(string="Código")
     name = fields.Text(string="Concepto / Partida", required=True)
+    bc3_text = fields.Text(string="Descripción")
+    bc3_measures = fields.Json(string="Mediciones")
     is_modification = fields.Boolean(string="Modificado")
     product_uom_id = fields.Many2one("uom.uom", string="Ud.")
     price_unit = fields.Float(string="Precio Unit.", digits="Product Price")
@@ -485,6 +487,118 @@ class ConstructionCertificationLine(models.Model):
     def _inverse_qty_period(self):
         for line in self:
             line.qty_origin = line.qty_previous + line.qty_period
+
+    @api.onchange("qty_period")
+    def _onchange_qty_period(self):
+        # El inverso solo se aplica al guardar; sin esto Med. Origen no se mueve hasta F5.
+        for line in self:
+            if line.display_type:
+                continue
+            line.qty_origin = (line.qty_previous or 0.0) + (line.qty_period or 0.0)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        cleaned = []
+        for vals in vals_list:
+            if vals.get("bc3_measures"):
+                vals = dict(vals)
+                vals["bc3_measures"] = self._normalize_measures(vals["bc3_measures"])
+            cleaned.append(vals)
+        return super().create(cleaned)
+
+    def write(self, vals):
+        if "bc3_measures" in vals:
+            vals = self._apply_measure_vals(vals)
+        return super().write(vals)
+
+    def _apply_measure_vals(self, vals):
+        vals = dict(vals)
+        rows = self._normalize_measures(vals.get("bc3_measures"))
+        vals["bc3_measures"] = rows
+        if len(self) != 1 or self.display_type or vals.get("display_type"):
+            return vals
+        period = self._measures_period_qty(rows)
+        # ponytail: filas a 0 no pisan Med. Periodo escrito en la partida
+        if period is None:
+            return vals
+        vals.pop("qty_period", None)
+        previous = vals["qty_previous"] if "qty_previous" in vals else (self.qty_previous or 0.0)
+        vals["qty_origin"] = previous + period
+        return vals
+
+    @api.onchange("bc3_measures")
+    def _onchange_bc3_measures(self):
+        for line in self:
+            if line.display_type:
+                continue
+            rows = line._normalize_measures(line.bc3_measures)
+            line.bc3_measures = rows
+            period = line._measures_period_qty(rows)
+            if period is not None:
+                line.qty_origin = (line.qty_previous or 0.0) + period
+
+    @api.model
+    def _measure_num(self, value):
+        if value in (None, False, ""):
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @api.model
+    def _measure_partial(self, row):
+        nums = [
+            num
+            for num in (self._measure_num((row or {}).get(key)) for key in ("units", "length", "width", "height"))
+            if num is not None
+        ]
+        if not nums:
+            return None
+        partial = 1.0
+        for num in nums:
+            partial *= num
+        return partial
+
+    @api.model
+    def _normalize_measures(self, rows):
+        if not rows:
+            return False
+        cleaned = []
+        seen_manual = False
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            if row.get("manual") and seen_manual:
+                continue
+            manual = bool(row.get("manual"))
+            seen_manual = seen_manual or manual
+            partial = self._measure_partial(row)
+            qty = partial if manual else (self._measure_num(row.get("qty_period")) or 0.0)
+            cleaned.append(
+                {
+                    "comment": row.get("comment") or "",
+                    "units": self._measure_num(row.get("units")),
+                    "length": self._measure_num(row.get("length")),
+                    "width": self._measure_num(row.get("width")),
+                    "height": self._measure_num(row.get("height")),
+                    "partial": 0 if partial is None else partial,
+                    "qty_period": qty or 0.0,
+                    "manual": manual,
+                }
+            )
+        return cleaned or False
+
+    @api.model
+    def _measures_period_qty(self, rows):
+        total = 0.0
+        any_qty = False
+        for row in rows or []:
+            qty = row.get("qty_period") or 0.0
+            if qty:
+                any_qty = True
+                total += qty
+        return total if any_qty else None
 
     @api.depends("qty_budget", "qty_previous", "qty_origin", "qty_period", "price_unit")
     def _compute_amounts(self):

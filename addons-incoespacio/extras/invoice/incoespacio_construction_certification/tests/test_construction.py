@@ -52,6 +52,130 @@ class TestConstruction(TransactionCase):
             }
         )
 
+    def test_period_onchange_sets_origin(self):
+        self.order.action_confirm()
+        action = self.order.action_create_certification()
+        cert = self.env["construction.certification"].browse(action["res_id"])
+        line = cert.line_ids.filtered(lambda l: not l.display_type)[:1]
+        result = line.onchange(
+            {"qty_previous": 2.0, "qty_period": 3.0, "qty_origin": 2.0, "price_unit": 100.0},
+            ["qty_period"],
+            {
+                "qty_previous": {},
+                "qty_period": {},
+                "qty_origin": {},
+                "amount_origin": {},
+                "amount_period": {},
+            },
+        )
+        self.assertAlmostEqual(result["value"]["qty_origin"], 5.0)
+        self.assertAlmostEqual(result["value"]["amount_origin"], 500.0)
+
+    def test_cert_measures_stay_on_certification(self):
+        measures = [
+            {
+                "comment": "Zona A",
+                "units": 2,
+                "length": 3,
+                "width": None,
+                "height": None,
+                "partial": 6,
+            }
+        ]
+        self.order.order_line.bc3_text = "volumen teorico"
+        self.order.order_line.bc3_measures = measures
+        self.order.action_confirm()
+        action = self.order.action_create_certification()
+        cert = self.env["construction.certification"].browse(action["res_id"])
+        line = cert.line_ids.filtered(lambda item: not item.display_type)[:1]
+        self.assertEqual(line.bc3_text, "volumen teorico")
+        result = line.onchange(
+            {
+                "bc3_measures": [
+                    {
+                        "comment": "Zona A",
+                        "units": 2,
+                        "length": 3,
+                        "qty_period": 4,
+                        "manual": False,
+                    }
+                ],
+                "qty_previous": 0.0,
+                "qty_origin": 0.0,
+                "price_unit": 100.0,
+            },
+            ["bc3_measures"],
+            {
+                "bc3_measures": {},
+                "qty_origin": {},
+                "qty_period": {},
+                "amount_period": {},
+            },
+        )
+        self.assertAlmostEqual(result["value"]["qty_origin"], 4.0)
+        self.assertAlmostEqual(result["value"]["amount_period"], 400.0)
+        self.assertEqual(len(line.bc3_measures), 1)
+        self.assertEqual(line.bc3_measures[0]["comment"], "Zona A")
+        self.assertAlmostEqual(line.bc3_measures[0]["partial"], 6.0)
+        self.assertAlmostEqual(line.bc3_measures[0]["qty_period"], 0.0)
+        self.assertFalse(line.bc3_measures[0]["manual"])
+
+        line.bc3_measures = [
+            {
+                "comment": "Zona A",
+                "units": 2,
+                "length": 3,
+                "width": None,
+                "height": None,
+                "partial": 6,
+                "qty_period": 4,
+                "manual": False,
+            },
+            {
+                "comment": "extra",
+                "units": 1,
+                "length": 2,
+                "width": None,
+                "height": None,
+                "manual": True,
+            },
+            {
+                "comment": "sobra",
+                "units": 9,
+                "manual": True,
+            },
+        ]
+        manuals = [row for row in line.bc3_measures if row["manual"]]
+        self.assertEqual(len(manuals), 1)
+        self.assertEqual(manuals[0]["comment"], "extra")
+        self.assertAlmostEqual(manuals[0]["qty_period"], 2.0)
+        self.assertAlmostEqual(line.qty_origin, 6.0)
+        self.assertAlmostEqual(line.qty_period, 6.0)
+        self.assertAlmostEqual(line.amount_period, 600.0)
+        sale_measures = self.order.order_line.bc3_measures
+        self.assertEqual(len(sale_measures), 1)
+        self.assertEqual(sale_measures[0]["comment"], "Zona A")
+        self.assertNotIn("qty_period", sale_measures[0])
+        self.assertNotIn("manual", sale_measures[0])
+
+        origin = line.qty_origin
+        line.bc3_measures = [
+            {
+                "comment": "Zona A",
+                "units": 2,
+                "length": 3,
+                "qty_period": 0,
+                "manual": False,
+            }
+        ]
+        self.assertAlmostEqual(line.qty_origin, origin)
+
+        action = self.order.action_create_certification()
+        cert2 = self.env["construction.certification"].browse(action["res_id"])
+        line2 = cert2.line_ids.filtered(lambda item: not item.display_type)[:1]
+        self.assertFalse(any(row.get("manual") for row in line2.bc3_measures))
+        self.assertAlmostEqual(line2.qty_previous, origin)
+
     def test_new_certification_retention_defaults_zero(self):
         self.order.action_confirm()
         action = self.order.action_create_certification()

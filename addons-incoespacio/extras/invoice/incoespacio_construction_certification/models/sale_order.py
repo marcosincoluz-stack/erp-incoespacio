@@ -303,6 +303,8 @@ class SaleOrder(models.Model):
                             "bc3_level": line.bc3_level,
                             "code": code_val,
                             "name": name,
+                            "bc3_text": line.bc3_text,
+                            "bc3_measures": line.bc3_measures,
                             "is_modification": line.is_modification,
                             "product_uom_id": line.product_uom.id
                             if line.product_uom

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="extension">
+        <xpath expr="//tr" position="after">
+            <tr t-if="certDetailOpen(record)" class="o_bc3_detail" t-on-click.stop="">
+                <td t-att-colspan="nbCols">
+                    <div t-if="record.data.bc3_text" class="o_bc3_text" t-esc="record.data.bc3_text"/>
+                    <table t-if="certRows(record).length" class="table table-sm o_bc3_measures">
+                        <thead>
+                            <tr>
+                                <th>Comentario</th>
+                                <th>N</th>
+                                <th>Largo</th>
+                                <th>Ancho</th>
+                                <th>Alto</th>
+                                <th>Parcial</th>
+                                <th>Med. periodo</th>
+                                <th t-if="props.editable"/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="certRows(record)" t-as="measure" t-key="measure_index">
+                                <tr>
+                                    <t t-if="measure.manual and props.editable">
+                                        <td>
+                                            <input class="o_input" t-att-value="measure.comment || ''"
+                                                t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'comment', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="certMeasureLabel(measure.units)"
+                                                t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'units', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="certMeasureLabel(measure.length)"
+                                                t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'length', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="certMeasureLabel(measure.width)"
+                                                t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'width', ev)"/>
+                                        </td>
+                                        <td>
+                                            <input class="o_input" t-att-value="certMeasureLabel(measure.height)"
+                                                t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'height', ev)"/>
+                                        </td>
+                                    </t>
+                                    <t t-else="">
+                                        <td t-esc="measure.comment"/>
+                                        <td t-esc="certMeasureLabel(measure.units)"/>
+                                        <td t-esc="certMeasureLabel(measure.length)"/>
+                                        <td t-esc="certMeasureLabel(measure.width)"/>
+                                        <td t-esc="certMeasureLabel(measure.height)"/>
+                                    </t>
+                                    <td t-esc="certMeasureLabel(measure.partial)"/>
+                                    <td>
+                                        <input t-if="props.editable and !measure.manual" class="o_input"
+                                            t-att-value="certPeriodLabel(measure.qty_period)"
+                                            t-on-change="(ev) => this.certSetPeriod(record, measure_index, ev)"/>
+                                        <t t-else="" t-esc="certPeriodLabel(measure.manual ? measure.partial : measure.qty_period)"/>
+                                    </td>
+                                    <td t-if="props.editable">
+                                        <button t-if="measure.manual" type="button"
+                                            class="btn btn-link fa fa-trash-o p-0"
+                                            t-on-click="() => this.certRemoveMeasure(record, measure_index)"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <a t-if="props.editable and !certHasManual(record)" href="#" role="button"
+                        t-on-click.prevent="() => this.certAddMeasure(record)">Añadir mediciones parciales</a>
+                </td>
+            </tr>
+        </xpath>
+    </t>
+</templates>
