@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "INCOESPACIO: Tema de Odoo",
-    'version': '17.0.1.0.7',
+    'version': '17.0.1.0.9',
     'author': 'Incoespacio',
     'category': 'Themes/Backend',
     'website': 'https://incoespacio.com',

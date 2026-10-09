@@ -482,6 +482,14 @@ html .o_web_client > .o_action_manager {
 .o_form_view .o_field_x2many .o_list_table {
     width: max-content;
 
+    // Odoo deja 8px arriba y abajo en cada celda. En partidas eso se ve como
+    // una franja vacia entre filas.
+    tbody > tr > td {
+        padding-top: 1px;
+        padding-bottom: 1px;
+        line-height: 1.2;
+    }
+
     // Odoo deja el asa a 1px y el icono se pinta encima de la celda de al lado.
     // !important gana al width inline. Sin position/z-index: con border-collapse
     // el clic deja de caer en la celda y el arrastre no arranca.
