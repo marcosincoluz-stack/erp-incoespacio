@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function model="ir.config_parameter" name="set_param">
+        <value eval="'auth_signup.invitation_scope'"/>
+        <value eval="'b2b'"/>
+    </function>
+    <function model="ir.config_parameter" name="set_param">
+        <value eval="'auth_signup.reset_password'"/>
+        <value eval="'False'"/>
+    </function>
+
+    <record id="res_users_view_form_no_public_auth" model="ir.ui.view">
+        <field name="name">res.users.form.no.public.auth</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="auth_signup.res_users_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_reset_password'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_reset_password'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_no_public_auth" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.no.public.auth</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="auth_signup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='login_documents']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//setting[@id='enable_password_reset']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="auth_signup.action_send_password_reset_instructions" model="ir.actions.server">
+        <field name="binding_model_id" eval="False"/>
+    </record>
+</odoo>
