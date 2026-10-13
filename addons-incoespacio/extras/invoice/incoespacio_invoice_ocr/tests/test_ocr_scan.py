@@ -176,6 +176,25 @@ class TestOcrScan(TransactionCase):
         atts = move._ocr_attachments()
         self.assertEqual(atts.ids, part.ids)
 
+    def test_chatter_escapes_invoice_number(self):
+        move = self._bill()
+        move._apply_ai_extracted_data(
+            {
+                "factura": {
+                    "numero": "<img src=x onerror=alert(1)>",
+                    "total": 10,
+                },
+                "emisor": {"cif": "B12345678", "nombre": "Proveedor OCR"},
+                "receptor": {},
+                "lineas": [],
+                "pago": {},
+            },
+            force=True,
+        )
+        body = str(move.message_ids[:1].body)
+        self.assertIn("&lt;img", body)
+        self.assertNotIn("<img", body)
+
     def test_new_partner_blocks_post_until_reviewed(self):
         move = self._bill()
         partner, created = move._find_or_create_partner(

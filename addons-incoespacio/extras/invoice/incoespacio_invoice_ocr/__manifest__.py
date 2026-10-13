@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Incoespacio: OCR de Facturas con IA (Core)",
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
     'summary': 'Extracción y conciliación contable inteligente de facturas mediante IA',
     'author': 'Incoespacio',
     'category': 'Accounting/Invoicing',

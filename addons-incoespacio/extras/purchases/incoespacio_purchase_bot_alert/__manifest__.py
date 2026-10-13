@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "INCOESPACIO: Alertas de Compra IncoBot",
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.1',
     'author': 'Incoespacio',
     'category': 'Incoespacio/Purchases',
     'website': 'https://incoespacio.com',

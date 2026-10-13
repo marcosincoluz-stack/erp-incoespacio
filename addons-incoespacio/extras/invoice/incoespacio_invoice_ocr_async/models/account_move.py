@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
-import threading
+
 from odoo import api, fields, models
-import odoo
+from odoo.tools import config
 
 _logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class AccountMove(models.Model):
             move_ids_to_process.append(move.id)
 
         if move_ids_to_process:
-            self._trigger_background_ocr_worker(move_ids_to_process)
+            self._trigger_ocr_cron()
 
         return created_moves
 
@@ -107,66 +107,36 @@ class AccountMove(models.Model):
         return result
 
     @api.model
-    def _trigger_background_ocr_worker(self, move_ids):
-        if not move_ids:
-            return
-        db_name = self.env.cr.dbname
-        user_id = self.env.uid
+    def _trigger_ocr_cron(self):
+        self.env.ref(
+            "incoespacio_invoice_ocr_async.ir_cron_process_pending_ocr"
+        )._trigger()
 
-        def _start_worker_thread():
-            thread = threading.Thread(
-                target=self._run_background_ocr,
-                args=(db_name, user_id, list(move_ids)),
-                daemon=True,
-                name=f"ocr_worker_{db_name}"
-            )
-            thread.start()
-            _logger.info("Worker OCR lanzado en hilo (post-commit) para facturas %s", move_ids)
+    def _ocr_commit(self):
+        if not config["test_enable"]:
+            self.env.cr.commit()
 
-        # Garantizar que el hilo arranque SOLO después de que la transacción HTTP haya hecho COMMIT
-        # Esto elimina al 100% los errores 'could not serialize access due to concurrent update'
-        if hasattr(self.env.cr, 'postcommit'):
-            self.env.cr.postcommit.add(_start_worker_thread)
-        else:
-            _start_worker_thread()
-
-    @classmethod
-    def _run_background_ocr(cls, db_name, user_id, move_ids):
-        registry = odoo.registry(db_name)
-
-        def _process_single_move(mid):
-            with registry.cursor() as worker_cr:
-                worker_env = api.Environment(worker_cr, user_id, {})
-                try:
-                    move = worker_env['account.move'].browse(mid)
-                    if not move.exists() or move.ocr_status == 'done':
-                        return
-                    move.ocr_status = 'processing'
-                    worker_cr.commit()
-
-                    move._notify_bus_status('processing')
-                    move.action_scan_with_ai()
-                    worker_cr.commit()
-
-                    # Notificar el estado resultante real (done o mismatch)
-                    move._notify_bus_status(move.ocr_status or 'done')
-                except Exception as e:
-                    worker_cr.rollback()
-                    _logger.exception("Error en worker OCR para factura ID %s: %s", mid, e)
-                    try:
-                        move = worker_env['account.move'].browse(mid)
-                        if move.exists():
-                            move.write({
-                                'ocr_status': 'error',
-                                'ocr_error_message': str(e),
-                            })
-                            worker_cr.commit()
-                            move._notify_bus_status('error')
-                    except Exception:
-                        pass
-
-        for mid in move_ids:
-            _process_single_move(mid)
+    def _process_one_ocr_move(self, move):
+        move.ocr_status = "processing"
+        self._ocr_commit()
+        move._notify_bus_status("processing")
+        try:
+            move.with_user(move.create_uid).with_company(move.company_id).action_scan_with_ai()
+            self._ocr_commit()
+            move._notify_bus_status(move.ocr_status or "done")
+        except Exception as e:
+            _logger.exception("Error en OCR para factura ID %s: %s", move.id, e)
+            if not config["test_enable"]:
+                self.env.cr.rollback()
+                self.env.clear()
+            move = self.browse(move.id)
+            if move.exists():
+                move.write({
+                    "ocr_status": "error",
+                    "ocr_error_message": str(e),
+                })
+                self._ocr_commit()
+                move._notify_bus_status("error")
 
     def _notify_bus_status(self, status):
         try:
@@ -188,7 +158,7 @@ class AccountMove(models.Model):
                 'mismatch': getattr(self, 'ocr_company_mismatch', False),
                 'mismatch_details': getattr(self, 'ocr_mismatch_details', '') or '',
             }
-            target = self.env.user.partner_id
+            target = self.create_uid.partner_id
             self.env['bus.bus']._sendone(target, 'ocr_batch_status', payload)
         except Exception as e:
             _logger.debug("No se pudo enviar notificación bus: %s", e)
@@ -206,5 +176,5 @@ class AccountMove(models.Model):
             ('ocr_status', '=', 'pending'),
             ('move_type', 'in', ('in_invoice', 'in_receipt', 'in_refund', 'out_invoice', 'out_refund', 'out_receipt')),
         ], limit=10)
-        if pending_moves:
-            self._trigger_background_ocr_worker(pending_moves.ids)
+        for move in pending_moves:
+            self._process_one_ocr_move(move)

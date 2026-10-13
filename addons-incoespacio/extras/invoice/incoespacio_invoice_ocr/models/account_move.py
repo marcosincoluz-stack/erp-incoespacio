@@ -139,7 +139,7 @@ class AccountMove(models.Model):
                 'ocr_error_message': motivo,
             })
             self.message_post(
-                body=Markup(f"<div class='alert alert-warning'><b>OCR IA:</b> {motivo}</div>"),
+                body=Markup("<div class='alert alert-warning'><b>OCR IA:</b> %s</div>") % motivo,
                 subtype_xmlid='mail.mt_note'
             )
             return False
@@ -337,12 +337,12 @@ class AccountMove(models.Model):
                 title = details.get('title', 'Discrepancia de Empresa')
                 msg = details.get('msg', '')
                 body = Markup(
-                    f"<div class='alert alert-warning'>"
-                    f"<b>{title}:</b> {msg}<br/>"
-                    f"<b>Cómo resolverlo:</b> Cambia de empresa en el selector superior de Odoo antes de registrar esta factura. "
-                    f"Si deseas procesarla en esta empresa de todos modos, pulsa el botón <b>\"Forzar procesado de todos modos\"</b>."
-                    f"</div>"
-                )
+                    "<div class='alert alert-warning'>"
+                    "<b>%s:</b> %s<br/>"
+                    "<b>Cómo resolverlo:</b> Cambia de empresa en el selector superior de Odoo antes de registrar esta factura. "
+                    "Si deseas procesarla en esta empresa de todos modos, pulsa el botón <b>\"Forzar procesado de todos modos\"</b>."
+                    "</div>"
+                ) % (title, msg)
                 self.message_post(body=body, subtype_xmlid='mail.mt_note')
                 return False
 
@@ -569,29 +569,50 @@ class AccountMove(models.Model):
         base_eur = formatLang(self.env, float(fac.get('base_imponible_total') or 0.0), currency_obj=self.currency_id)
         iva_eur = formatLang(self.env, float(fac.get('iva_total') or 0.0), currency_obj=self.currency_id)
 
-        dup_badge = "<div class='alert alert-danger p-2 mb-2'><b>Posible factura duplicada</b></div>" if self.is_duplicate_detected else ""
-        iban_badge = "<div class='alert alert-danger p-2 mb-2'><b>Discrepancia de IBAN con el proveedor</b></div>" if self.ocr_iban_status == 'mismatch' else ""
-        new_partner_badge = f"<div class='alert alert-info p-2 mb-2'><b>Nuevo contacto creado:</b> {partner.name}</div>" if was_created and partner else ""
+        dup_badge = (
+            Markup("<div class='alert alert-danger p-2 mb-2'><b>Posible factura duplicada</b></div>")
+            if self.is_duplicate_detected else ""
+        )
+        iban_badge = (
+            Markup("<div class='alert alert-danger p-2 mb-2'><b>Discrepancia de IBAN con el proveedor</b></div>")
+            if self.ocr_iban_status == 'mismatch' else ""
+        )
+        new_partner_badge = (
+            Markup("<div class='alert alert-info p-2 mb-2'><b>Nuevo contacto creado:</b> %s</div>") % partner.name
+            if was_created and partner else ""
+        )
 
         partner_label = "Cliente:" if is_customer else "Proveedor:"
         partner_name = (rec.get('nombre') if is_customer else emi.get('nombre')) or (partner and partner.name) or ''
         partner_vat = (rec.get('cif') if is_customer else emi.get('cif')) or (partner and partner.vat) or ''
 
-        html = f"""
+        html = Markup("""
         <div style="font-size: 13px; max-width: 500px;">
             <p class="mb-1 text-primary fw-bold">Factura digitalizada con IA</p>
-            {dup_badge}
-            {iban_badge}
-            {new_partner_badge}
+            %s
+            %s
+            %s
             <table class="table table-sm table-bordered mb-1">
-                <tr><td><b>{partner_label}</b></td><td>{partner_name} ({partner_vat})</td></tr>
-                <tr><td><b>Nº Factura:</b></td><td><code>{fac.get('numero') or self.ref or 'N/A'}</code></td></tr>
-                <tr><td><b>Fecha Emisión:</b></td><td>{fac.get('fecha_emision') or 'N/A'}</td></tr>
-                <tr><td><b>Base Imponible:</b></td><td>{base_eur}</td></tr>
-                <tr><td><b>IVA:</b></td><td>{iva_eur}</td></tr>
-                <tr class="table-light"><td><b>Total Factura:</b></td><td><b>{total_eur}</b></td></tr>
+                <tr><td><b>%s</b></td><td>%s (%s)</td></tr>
+                <tr><td><b>Nº Factura:</b></td><td><code>%s</code></td></tr>
+                <tr><td><b>Fecha Emisión:</b></td><td>%s</td></tr>
+                <tr><td><b>Base Imponible:</b></td><td>%s</td></tr>
+                <tr><td><b>IVA:</b></td><td>%s</td></tr>
+                <tr class="table-light"><td><b>Total Factura:</b></td><td><b>%s</b></td></tr>
             </table>
             <small class="text-muted"><i class="fa fa-check text-success"/> Borrador generado y listo para revisión contable.</small>
         </div>
-        """
-        self.message_post(body=Markup(html), subtype_xmlid='mail.mt_note')
+        """) % (
+            dup_badge,
+            iban_badge,
+            new_partner_badge,
+            partner_label,
+            partner_name,
+            partner_vat,
+            fac.get('numero') or self.ref or 'N/A',
+            fac.get('fecha_emision') or 'N/A',
+            base_eur,
+            iva_eur,
+            total_eur,
+        )
+        self.message_post(body=html, subtype_xmlid='mail.mt_note')

@@ -27,7 +27,7 @@ class AccountJournal(models.Model):
     def _create_document_from_attachment(self, attachment_ids):
         """Sobrescribe la creación de documentos desde archivos adjuntos para que,
         cuando se use el botón 'Subir' con la IA activa, cree los borradores al instante
-        y delegue la extracción al hilo en segundo plano del servidor (inmune a cierres de sesión).
+        y delegue la extracción al cron de Odoo (inmune a cierres de sesión).
         """
         icp = self.env['ir.config_parameter'].sudo()  # sudo justificado: icp es lectura admin-only (clave Gemini)
         api_key = icp.get_param('incoespacio_invoice_ocr.gemini_api_key', default='').strip()
@@ -57,6 +57,6 @@ class AccountJournal(models.Model):
 
         if all_invoices:
             _logger.info("Subida de %d facturas recibida en diario %s. Encolando para OCR en segundo plano...", len(all_invoices), self.name)
-            self.env['account.move']._trigger_background_ocr_worker(all_invoices.ids)
+            self.env['account.move']._trigger_ocr_cron()
 
         return all_invoices

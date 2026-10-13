@@ -29,9 +29,9 @@ class PurchaseOrder(models.Model):
             supplier_name = order.partner_id.name if order.partner_id else "Sin asignar"
             order.message_post(
                 body=Markup(
-                    f"🤖 <b>IncoBot</b>: He generado automáticamente la orden de compra "
-                    f"<b>{order.name}</b> para el proveedor <b>{supplier_name}</b>."
-                ),
+                    "🤖 <b>IncoBot</b>: He generado automáticamente la orden de compra "
+                    "<b>%s</b> para el proveedor <b>%s</b>."
+                ) % (order.name, supplier_name),
                 partner_ids=partner_ids,
                 subtype_xmlid="mail.mt_comment",
             )

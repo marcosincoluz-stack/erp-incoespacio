@@ -44,5 +44,5 @@ max_cron_threads = 2
 db_maxconn = 64
 
 ; --- Seguridad y Bases de Datos (Producción) ---
-; list_db = False
-; dbfilter = ^incoespacio$
+list_db = False
+dbfilter = ^incoespacio$

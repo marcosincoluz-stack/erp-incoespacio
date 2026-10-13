@@ -1,6 +1,5 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import config
 
 
 class ConstructionCertification(models.Model):
@@ -227,14 +226,23 @@ class ConstructionCertification(models.Model):
         )
         self.invalidate_recordset()
 
+    def _check_invoiceable(self):
+        self.ensure_one()
+        if self.invoice_id:
+            raise UserError(_("Esta certificación ya tiene una factura asignada: %s") % self.invoice_id.name)
+        if self.state not in ("draft", "confirmed"):
+            raise UserError(_("Solo se pueden facturar certificaciones en estado 'Aprobada'."))
+        if not self.line_ids.filtered(lambda l: not l.display_type):
+            raise UserError(_("La certificación debe tener al menos una partida de obra."))
+        if not self.line_ids.filtered(lambda l: not l.display_type and l.qty_period > 0):
+            raise UserError(_("No hay partidas con medición ejecutada en este periodo para facturar."))
+
     def action_confirm_and_invoice(self):
         self.ensure_one()
         self._lock_certification()
+        self._check_invoiceable()
         if self.state == "draft":
             self.action_confirm()
-            # ponytail: un RPC; sin commit el UserError de la factura deshace el aprobar
-            if not config["test_enable"]:
-                self.env.cr.commit()
         return self.action_create_invoice()
 
     def action_draft(self):
@@ -270,16 +278,13 @@ class ConstructionCertification(models.Model):
     def action_create_invoice(self):
         self.ensure_one()
         self._lock_certification()
-        if self.invoice_id:
-            raise UserError(_("Esta certificación ya tiene una factura asignada: %s") % self.invoice_id.name)
         if self.state != "confirmed":
             raise UserError(_("Solo se pueden facturar certificaciones en estado 'Aprobada'."))
+        self._check_invoiceable()
 
         valid_lines = self.line_ids.filtered(
             lambda l: not l.display_type and l.qty_period > 0
         )
-        if not valid_lines:
-            raise UserError(_("No hay partidas con medición ejecutada en este periodo para facturar."))
 
         invoice_lines = []
         for line in valid_lines:

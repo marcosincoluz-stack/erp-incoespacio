@@ -461,9 +461,7 @@ class TestConstruction(TransactionCase):
             cert.action_create_invoice()
         self.assertEqual(len(cert.invoice_id), 1)
 
-    def test_confirm_and_invoice_no_period_stays_confirmed(self):
-        # El botón confirma y luego factura. Si no hay periodo, UserError de la
-        # factura: la cert queda Aprobada (no vuelve a borrador).
+    def test_confirm_and_invoice_no_period_stays_draft(self):
         self.order.action_confirm()
         action = self.order.action_create_certification()
         cert = self.env["construction.certification"].browse(action["res_id"])
@@ -476,6 +474,7 @@ class TestConstruction(TransactionCase):
         cert.action_draft()
         with self.assertRaises(UserError):
             cert.action_confirm_and_invoice()
+        self.assertEqual(cert.state, "draft")
 
     def test_second_confirmed_so_same_project(self):
         self.order.action_confirm()
