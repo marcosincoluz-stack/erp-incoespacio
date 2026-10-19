@@ -56,7 +56,7 @@ export function sectionTotal(records, sectionIndex) {
     );
 }
 
-const CHAPTER_SUMS = ["price_subtotal", "amount_cert_origin"];
+const CHAPTER_SUMS = ["price_subtotal", "amount_cert_origin", "amount_origin", "amount_period"];
 
 export function sectionFieldTotal(records, sectionIndex, field) {
     if (!field || field === "price_subtotal") {

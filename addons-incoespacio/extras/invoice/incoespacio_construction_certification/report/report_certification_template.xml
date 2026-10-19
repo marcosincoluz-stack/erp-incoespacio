@@ -126,6 +126,48 @@
                             </div>
                         </div>
 
+                        <t t-if="o.show_measure_sheet">
+                            <div style="page-break-before: always;">
+                                <div style="font-weight: bold; font-size: 13px; margin-bottom: 10px; text-transform: uppercase;">
+                                    Hoja de mediciones — Certificación Nº <span t-field="o.number"/>
+                                </div>
+                                <t t-foreach="o.line_ids" t-as="l">
+                                    <t t-if="not l.display_type and l.bc3_cert_measures">
+                                        <div style="font-weight: bold; margin-top: 12px; font-size: 10px;">
+                                            <span t-esc="l._get_report_name()"/>
+                                        </div>
+                                        <table class="table table-sm table-bordered" style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 4px;">
+                                            <thead>
+                                                <tr style="background-color: #f1f3f5;">
+                                                    <th>Comentario</th>
+                                                    <th>N</th>
+                                                    <th>Largo</th>
+                                                    <th>Ancho</th>
+                                                    <th>Alto</th>
+                                                    <th>Parcial</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="l.bc3_cert_measures" t-as="row">
+                                                    <td><span t-esc="row.get('comment')"/></td>
+                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('units') or 0, digits=3)"/></td>
+                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('length') or 0, digits=3)"/></td>
+                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('width') or 0, digits=3)"/></td>
+                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('height') or 0, digits=3)"/></td>
+                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('partial') or 0, digits=3)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div style="font-size: 9px; margin-bottom: 8px;">
+                                            Anterior: <span t-esc="formatLang(l.qty_previous, digits=3)"/>
+                                            — Periodo: <span t-esc="formatLang(l.qty_period, digits=3)"/>
+                                            — Origen: <span t-esc="formatLang(l.qty_origin, digits=3)"/>
+                                        </div>
+                                    </t>
+                                </t>
+                            </div>
+                        </t>
+
                         <!-- FORMAL SIGNATURE BOXES (LOE ESPAÑA) -->
                         <div style="margin-top: 40px; page-break-inside: avoid;">
                             <div style="font-weight: bold; font-size: 11px; margin-bottom: 12px; text-transform: uppercase; color: #495057;">

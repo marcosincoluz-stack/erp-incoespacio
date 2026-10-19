@@ -9,10 +9,18 @@
                 <attribute name="t-call">incoespacio_reports.external_layout_incoespacio</attribute>
             </xpath>
 
+            <!-- mt-5 + mb-4 de Odoo empujan el pie (pago/fiscal) a una 2ª hoja vacía. -->
+            <xpath expr="//div[hasclass('mt-5') and hasclass('clearfix')]" position="attributes">
+                <attribute name="class">clearfix</attribute>
+            </xpath>
+            <xpath expr="//div[hasclass('page')]" position="attributes">
+                <attribute name="class">page</attribute>
+            </xpath>
+
             <!-- Bloque de Direcciones Emisor y Receptor en Tarjetas Limpias -->
             <xpath expr="//div[hasclass('row')][1]" position="replace">
                 <t t-set="company" t-value="o.company_id"/>
-                <table style="width: 100%; margin-top: 5px; margin-bottom: 20px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
+                <table style="width: 100%; margin-top: 6px; margin-bottom: 8px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
                     <tr>
                         <!-- Datos Emisor (Empresa) -->
                         <td class="inco-card" style="width: 50%; vertical-align: top;">
@@ -66,7 +74,7 @@
             <xpath expr="//h2" position="replace">
             </xpath>
             <xpath expr="//div[@id='informations']" position="replace">
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 8px 0; font-size: 0.82rem;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 4px 0; font-size: 0.82rem;">
                     <tr>
                         <td style="width: 25%; padding: 6px 0;" t-if="o.invoice_date">
                             <span style="color: #64748b;">Fecha Factura:</span><br/>
@@ -122,7 +130,7 @@
 
             <!-- Reemplazar bloque de totales por tarjeta limpia anclada a la derecha -->
             <xpath expr="//div[@id='right-elements']" position="replace">
-                <div class="clearfix" style="margin-top: 20px; margin-bottom: 25px;">
+                <div class="clearfix" style="margin-top: 6px; margin-bottom: 4px;">
                     <table class="incoespacio-totals-table">
                         <t t-set="tax_totals" t-value="o.tax_totals or {}"/>
                         <t t-call="account.document_tax_totals"/>
@@ -136,8 +144,7 @@
 
             <!-- Datos bancarios y condiciones de pago al pie debajo de totales estilo Incoluz -->
             <xpath expr="//div[hasclass('page')]" position="inside">
-                <div style="clear: both; height: 10px;"/>
-                <table style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 25px; page-break-inside: avoid; font-size: 0.82rem;">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 6px; page-break-inside: avoid; font-size: 0.82rem;">
                     <tr>
                         <!-- Datos bancarios y forma de pago -->
                         <td class="inco-card" style="width: 55%; vertical-align: top;">

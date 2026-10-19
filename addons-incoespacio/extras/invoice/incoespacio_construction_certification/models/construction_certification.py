@@ -97,6 +97,10 @@ class ConstructionCertification(models.Model):
         tracking=True,
     )
     notes = fields.Html(string="Observaciones")
+    show_measure_sheet = fields.Boolean(
+        string="Hoja de mediciones",
+        help="Añade al PDF el detalle de mediciones de este periodo.",
+    )
     lines_editable = fields.Boolean(
         string="Editar partidas",
         default=False,
@@ -420,6 +424,11 @@ class ConstructionCertificationLine(models.Model):
     name = fields.Text(string="Concepto / Partida", required=True)
     bc3_text = fields.Text(string="Descripción")
     bc3_measures = fields.Json(string="Mediciones")
+    bc3_cert_measures = fields.Json(string="Mediciones certificación")
+    bc3_prev_measures = fields.Json(
+        string="Mediciones anteriores",
+        compute="_compute_bc3_prev_measures",
+    )
     is_modification = fields.Boolean(string="Modificado")
     product_uom_id = fields.Many2one("uom.uom", string="Ud.")
     price_unit = fields.Float(string="Precio Unit.", digits="Product Price")
@@ -501,46 +510,94 @@ class ConstructionCertificationLine(models.Model):
                 continue
             line.qty_origin = (line.qty_previous or 0.0) + (line.qty_period or 0.0)
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        cleaned = []
-        for vals in vals_list:
-            if vals.get("bc3_measures"):
-                vals = dict(vals)
-                vals["bc3_measures"] = self._normalize_measures(vals["bc3_measures"])
-            cleaned.append(vals)
-        return super().create(cleaned)
-
     def write(self, vals):
-        if "bc3_measures" in vals:
-            vals = self._apply_measure_vals(vals)
+        if "bc3_cert_measures" in vals:
+            vals = self._apply_cert_measure_vals(vals)
         return super().write(vals)
 
-    def _apply_measure_vals(self, vals):
+    def _apply_cert_measure_vals(self, vals):
         vals = dict(vals)
-        rows = self._normalize_measures(vals.get("bc3_measures"))
-        vals["bc3_measures"] = rows
+        had_rows = bool(self.bc3_cert_measures) if len(self) == 1 else False
+        rows = self._normalize_cert_measures(vals.get("bc3_cert_measures"))
+        vals["bc3_cert_measures"] = rows
         if len(self) != 1 or self.display_type or vals.get("display_type"):
             return vals
         period = self._measures_period_qty(rows)
-        # ponytail: filas a 0 no pisan Med. Periodo escrito en la partida
-        if period is None:
+        # ponytail: una fila a 0 no pisa Med. Periodo; vaciar las filas sí lo deja a 0
+        if period is None and not (had_rows and not rows):
             return vals
         vals.pop("qty_period", None)
         previous = vals["qty_previous"] if "qty_previous" in vals else (self.qty_previous or 0.0)
-        vals["qty_origin"] = previous + period
+        vals["qty_origin"] = previous + (period or 0.0)
         return vals
 
-    @api.onchange("bc3_measures")
-    def _onchange_bc3_measures(self):
+    @api.onchange("bc3_cert_measures")
+    def _onchange_bc3_cert_measures(self):
         for line in self:
             if line.display_type:
                 continue
-            rows = line._normalize_measures(line.bc3_measures)
-            line.bc3_measures = rows
+            had_rows = bool(line._origin.bc3_cert_measures) if line._origin else False
+            rows = line._normalize_cert_measures(line.bc3_cert_measures)
+            line.bc3_cert_measures = rows
             period = line._measures_period_qty(rows)
             if period is not None:
                 line.qty_origin = (line.qty_previous or 0.0) + period
+            elif had_rows and not rows:
+                line.qty_origin = line.qty_previous or 0.0
+
+    @api.depends(
+        "certification_id.number",
+        "certification_id.order_id",
+        "sale_order_line_id",
+        "display_type",
+    )
+    def _compute_bc3_prev_measures(self):
+        lines = self.filtered(
+            lambda line: not line.display_type and line.sale_order_line_id and line.certification_id
+        )
+        for line in self - lines:
+            line.bc3_prev_measures = False
+        if not lines:
+            return
+        previous = self.search(
+            [
+                ("sale_order_line_id", "in", lines.sale_order_line_id.ids),
+                ("certification_id.order_id", "in", lines.certification_id.order_id.ids),
+                ("certification_id.state", "!=", "cancel"),
+                ("display_type", "=", False),
+            ]
+        )
+        grouped = {}
+        for pline in previous:
+            grouped.setdefault(pline.sale_order_line_id.id, []).append(pline)
+        for line in lines:
+            number = line.certification_id.number or 0
+            rows = []
+            siblings = grouped.get(line.sale_order_line_id.id, [])
+            for pline in sorted(siblings, key=lambda item: (item.certification_id.number, item.id)):
+                if pline.id == line.id or (pline.certification_id.number or 0) >= number:
+                    continue
+                for row in pline.bc3_cert_measures or []:
+                    copied = dict(row)
+                    copied["cert"] = pline.certification_id.number
+                    rows.append(copied)
+            line.bc3_prev_measures = rows or False
+
+    @api.model
+    def _budget_key(self, value):
+        if not value or not isinstance(value, str):
+            return None
+        return value
+
+    @api.model
+    def _budget_idx(self, value):
+        # 0 es la primera fila; `in (False,)` lo tragaría porque 0 == False.
+        if value is None or value is False or value == "":
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
 
     @api.model
     def _measure_num(self, value):
@@ -566,20 +623,14 @@ class ConstructionCertificationLine(models.Model):
         return partial
 
     @api.model
-    def _normalize_measures(self, rows):
+    def _normalize_cert_measures(self, rows):
         if not rows:
             return False
         cleaned = []
-        seen_manual = False
         for row in rows:
             if not isinstance(row, dict):
                 continue
-            if row.get("manual") and seen_manual:
-                continue
-            manual = bool(row.get("manual"))
-            seen_manual = seen_manual or manual
             partial = self._measure_partial(row)
-            qty = partial if manual else (self._measure_num(row.get("qty_period")) or 0.0)
             cleaned.append(
                 {
                     "comment": row.get("comment") or "",
@@ -588,8 +639,8 @@ class ConstructionCertificationLine(models.Model):
                     "width": self._measure_num(row.get("width")),
                     "height": self._measure_num(row.get("height")),
                     "partial": 0 if partial is None else partial,
-                    "qty_period": qty or 0.0,
-                    "manual": manual,
+                    "budget_idx": self._budget_idx(row.get("budget_idx")),
+                    "budget_key": self._budget_key(row.get("budget_key")),
                 }
             )
         return cleaned or False
@@ -599,7 +650,7 @@ class ConstructionCertificationLine(models.Model):
         total = 0.0
         any_qty = False
         for row in rows or []:
-            qty = row.get("qty_period") or 0.0
+            qty = row.get("partial") or 0.0
             if qty:
                 any_qty = True
                 total += qty

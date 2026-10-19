@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "INCOESPACIO: Informes PDF Corporativos",
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.0.4',
     'author': 'Incoespacio',
     'category': 'Customizations/Reports',
     'website': 'https://incoespacio.com',
@@ -14,7 +14,7 @@
         - Presupuestos y pedidos de venta con validez de oferta y bloque de firma/aceptación de cliente.
         - Datos de empresa 100% dinámicos procedentes de la ficha de compañía.
     """,
-    'depends': ['base', 'web', 'account', 'sale_management'],
+    'depends': ['base', 'web', 'account', 'sale_management', 'sale_pdf_quote_builder'],
     'data': [
         'data/paperformat_data.xml',
         'data/sequence_data.xml',

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bc3_price_import_wizard_form" model="ir.ui.view">
+        <field name="name">bc3.price.import.wizard.form</field>
+        <field name="model">bc3.price.import.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="bc3_file" widget="binary" filename="bc3_file_name"/>
+                </group>
+                <footer>
+                    <button string="Importar" name="action_import" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="bc3_price_import_wizard_action" model="ir.actions.act_window">
+        <field name="name">Importar base de precios</field>
+        <field name="res_model">bc3.price.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="product_template_price_db_tree" model="ir.ui.view">
+        <field name="name">product.template.price.db.tree</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="default_code" string="Código"/>
+                <field name="name" string="Nombre"/>
+                <field name="uom_id" string="Unidad de obra"/>
+                <field name="list_price" string="Precio"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="product_template_price_db_form" model="ir.ui.view">
+        <field name="name">product.template.price.db.form</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="default_code" string="Código"/>
+                        <field name="name" string="Nombre"/>
+                        <field name="uom_id" string="Unidad de obra"/>
+                        <field name="list_price" string="Precio"/>
+                        <field name="description_sale" string="Descripción"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_price_db" model="ir.actions.act_window">
+        <field name="name">Base de precios</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain" eval="[('categ_id', '=', ref('price_db_category'))]"/>
+        <field name="context" eval="{
+            'default_categ_id': ref('price_db_category'),
+            'default_detailed_type': 'service',
+            'default_sale_ok': True,
+            'default_purchase_ok': False,
+        }"/>
+    </record>
+
+    <record id="action_price_db_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="product_template_price_db_tree"/>
+        <field name="act_window_id" ref="action_price_db"/>
+    </record>
+    <record id="action_price_db_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="product_template_price_db_form"/>
+        <field name="act_window_id" ref="action_price_db"/>
+    </record>
+
+    <menuitem
+        id="menu_price_db_root"
+        name="Base de precios"
+        groups="bc3_importer.group_bc3_user"
+        web_icon="incoespacio_bc3_price_db,static/description/icon.png"
+        sequence="25"
+    />
+    <menuitem
+        id="menu_price_db"
+        name="Partidas"
+        parent="menu_price_db_root"
+        action="action_price_db"
+        sequence="1"
+    />
+    <menuitem
+        id="menu_price_db_import"
+        name="Importar"
+        parent="menu_price_db_root"
+        action="bc3_price_import_wizard_action"
+        sequence="2"
+    />
+</odoo>

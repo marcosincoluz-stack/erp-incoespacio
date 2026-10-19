@@ -19,7 +19,8 @@
                         </td>
                         <td style="width: 52%; text-align: right; vertical-align: middle; padding: 0;">
                             <div style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px; line-height: 1.2;">
-                                <t t-if="o and o._name == 'account.move'">
+                                <t t-if="report_title"><t t-out="report_title"/></t>
+                                <t t-elif="o and o._name == 'account.move'">
                                     <t t-if="o.move_type in ('out_refund','in_refund')">ABONO</t>
                                     <t t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">BORRADOR FACTURA</t>
                                     <t t-else="">FACTURA Nº</t>

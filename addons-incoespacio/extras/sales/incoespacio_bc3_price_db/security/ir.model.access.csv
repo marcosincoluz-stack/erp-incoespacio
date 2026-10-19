@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bc3_price_import_wizard,bc3.price.import.wizard,model_bc3_price_import_wizard,bc3_importer.group_bc3_user,1,1,1,1

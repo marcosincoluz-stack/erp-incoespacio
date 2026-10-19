@@ -4,7 +4,7 @@
     "author": "Binhex, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/vertical-construction",
     "category": "BC3",
-    "version": "17.0.1.0.10",
+    "version": "17.0.1.0.11",
     "license": "AGPL-3",
     "depends": ["project", "sale_management"],
     "data": [

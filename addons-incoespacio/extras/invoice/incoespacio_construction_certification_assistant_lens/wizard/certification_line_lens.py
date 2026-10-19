@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class ConstructionCertificationLine(models.Model):
@@ -213,6 +214,8 @@ class CertificationLineLens(models.TransientModel):
 
     def action_accept(self):
         self.ensure_one()
+        if self.line_id.bc3_cert_measures:
+            raise UserError(_("Esta partida se mide en el desglose de certificación."))
         self.line_id.qty_period = self.qty_period
         for bill in self.bill_line_ids:
             if bill.move_line_id.construction_line_id != bill.construction_line_id:

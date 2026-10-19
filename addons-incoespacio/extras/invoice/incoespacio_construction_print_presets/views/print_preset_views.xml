@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_print_preset" model="ir.ui.view">
+        <field name="name">sale.order.print.preset</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="incoespacio_construction_print_options.view_sale_order_print_custom"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/*[1]" position="before">
+                <group>
+                    <field name="print_preset_id" domain="[('res_model', '=', 'sale.order')]" context="{'default_res_model': 'sale.order'}"/>
+                </group>
+            </xpath>
+            <xpath expr="//button[@name='action_print_custom_pdf']" position="before">
+                <button name="action_save_print_preset" type="object" string="Guardar en perfil" class="btn-secondary"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_certification_print_preset" model="ir.ui.view">
+        <field name="name">construction.certification.print.preset</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_print_options.view_certification_print_custom"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/*[1]" position="before">
+                <group>
+                    <field name="print_preset_id" domain="[('res_model', '=', 'construction.certification')]" context="{'default_res_model': 'construction.certification'}"/>
+                </group>
+            </xpath>
+            <xpath expr="//button[@name='action_print_custom_pdf']" position="before">
+                <button name="action_save_print_preset" type="object" string="Guardar en perfil" class="btn-secondary"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

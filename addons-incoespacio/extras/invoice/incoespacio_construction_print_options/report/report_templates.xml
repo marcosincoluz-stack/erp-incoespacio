@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="chapter_summary">
+        <div t-if="chapters" class="inco-card" style="margin-top: 16px; page-break-inside: avoid;">
+            <div class="inco-card-title">Resumen de presupuesto</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; width: 18%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">Código</th>
+                        <th style="text-align: left; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">Capítulo</th>
+                        <th style="text-align: right; width: 22%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">Importe</th>
+                        <th style="text-align: right; width: 12%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="chapters" t-as="chapter">
+                        <td style="padding: 4px 6px;"><span t-out="chapter['code']"/></td>
+                        <td style="padding: 4px 6px;"><span t-out="chapter['name']"/></td>
+                        <td style="padding: 4px 6px; text-align: right;">
+                            <span t-out="chapter['amount']" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                        <td style="padding: 4px 6px; text-align: right;"><span t-out="'%.1f' % chapter['pct']"/> %</td>
+                    </tr>
+                    <tr style="font-weight: 700;">
+                        <td colspan="2" style="padding: 4px 6px; border-top: 1px solid #94a3b8;">TOTAL EJECUCIÓN MATERIAL</td>
+                        <td style="padding: 4px 6px; text-align: right; border-top: 1px solid #94a3b8;">
+                            <span t-if="summary_order_total" t-field="doc.amount_untaxed"/>
+                            <span t-else="" t-out="sum(chapter['amount'] for chapter in chapters)" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                        <td style="padding: 4px 6px; text-align: right; border-top: 1px solid #94a3b8;">100 %</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <template id="report_saleorder_print_options" inherit_id="sale.report_saleorder_document" priority="30">
+        <xpath expr="//t[@t-set='lines_to_report']" position="attributes">
+            <attribute name="t-value">doc._get_custom_report_lines() if custom else doc._get_order_lines_to_report()</attribute>
+        </xpath>
+        <xpath expr="//table[hasclass('o_main_table')]" position="after">
+            <t t-set="chapters" t-value="doc._get_chapter_summary(lines_to_report) if custom else doc._get_chapter_summary()"/>
+            <t t-set="summary_order_total" t-value="not custom"/>
+            <t t-call="incoespacio_construction_print_options.chapter_summary"/>
+        </xpath>
+    </template>
+
+    <template id="report_certification_print_options" inherit_id="incoespacio_construction_certification.report_certification_document">
+        <xpath expr="//t[@t-foreach='o._get_report_lines()']" position="attributes">
+            <attribute name="t-foreach">o._get_custom_report_lines() if custom else o._get_report_lines()</attribute>
+        </xpath>
+        <xpath expr="//t[@t-else='']//span[@t-esc='l._get_report_name()']" position="after">
+            <div t-if="custom and o.print_full_text and l.bc3_text" t-out="(l.bc3_text or '').strip().removesuffix('|').strip()" style="white-space: pre-line; font-size: 8px; color: #475569;"/>
+        </xpath>
+    </template>
+</odoo>

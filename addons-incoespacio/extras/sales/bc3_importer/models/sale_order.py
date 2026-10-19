@@ -1,4 +1,6 @@
-from odoo import fields, models
+import uuid
+
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -25,6 +27,35 @@ class SaleOrderLine(models.Model):
     bc3_text = fields.Text("BC3 description")
     bc3_measures = fields.Json("BC3 measurements")
 
+    def _with_measure_keys(self, rows):
+        if not rows:
+            return rows
+        keyed = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            row = dict(row)
+            if not row.get("key"):
+                row["key"] = uuid.uuid4().hex[:8]
+            keyed.append(row)
+        return keyed or False
+
+    def _ensure_measure_keys(self):
+        for line in self:
+            rows = line.bc3_measures or []
+            if any(isinstance(row, dict) and not row.get("key") for row in rows):
+                line.write({"bc3_measures": rows})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        cleaned = []
+        for vals in vals_list:
+            vals = dict(vals)
+            if vals.get("bc3_measures"):
+                vals["bc3_measures"] = self._with_measure_keys(vals["bc3_measures"])
+            cleaned.append(vals)
+        return super().create(cleaned)
+
     def write(self, vals):
         vals = dict(vals)
         if (
@@ -39,6 +70,7 @@ class SaleOrderLine(models.Model):
             if plain:
                 qty = vals["product_uom_qty"] or 0
                 comment = (rows[0].get("comment") if rows else "") or ""
+                old_key = rows[0].get("key") if rows else None
                 vals["bc3_measures"] = (
                     [
                         {
@@ -48,9 +80,12 @@ class SaleOrderLine(models.Model):
                             "width": None,
                             "height": None,
                             "partial": qty,
+                            "key": old_key,
                         }
                     ]
                     if qty
                     else False
                 )
+        if vals.get("bc3_measures"):
+            vals["bc3_measures"] = self._with_measure_keys(vals["bc3_measures"])
         return super().write(vals)

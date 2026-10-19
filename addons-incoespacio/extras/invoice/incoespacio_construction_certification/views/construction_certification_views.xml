@@ -44,6 +44,7 @@
                         <group>
                             <field name="date" readonly="state != 'draft'"/>
                             <field name="retention_rate" readonly="state != 'draft'"/>
+                            <field name="show_measure_sheet"/>
                             <field name="company_id" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
@@ -51,7 +52,7 @@
                     <notebook>
                         <page string="Partidas y Mediciones" name="lines">
                             <field name="line_ids" class="o_certification_lines" readonly="state != 'draft'">
-                                <tree editable="bottom" create="parent.lines_editable" delete="parent.lines_editable" decoration-info="display_type == 'line_section'" decoration-muted="display_type == 'line_note'" decoration-warning="is_modification">
+                                <tree editable="bottom" create="parent.lines_editable" delete="parent.lines_editable" decoration-info="display_type == 'line_section'" decoration-muted="display_type == 'line_note'" decoration-warning="is_modification" decoration-danger="percentage_origin &gt; 100">
                                     <field name="sequence" widget="handle" readonly="not parent.lines_editable"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="bc3_level" column_invisible="True"/>
@@ -60,15 +61,17 @@
                                     <field name="is_modification" column_invisible="True"/>
                                     <field name="bc3_text" column_invisible="True"/>
                                     <field name="bc3_measures" column_invisible="True"/>
+                                    <field name="bc3_cert_measures" column_invisible="True"/>
+                                    <field name="bc3_prev_measures" column_invisible="True"/>
                                     <field name="code" readonly="not parent.lines_editable or display_type != False" string="Cód."/>
                                     <field name="name" widget="section_and_note_text" readonly="not parent.lines_editable" string="Concepto / Partida"/>
                                     <field name="product_uom_id" readonly="not parent.lines_editable or display_type != False" string="Ud."/>
                                     <field name="price_unit" readonly="not parent.lines_editable or display_type != False" string="P.U. (€)"/>
                                     <field name="qty_budget" readonly="not parent.lines_editable or display_type != False" string="Med. Pto."/>
                                     <field name="qty_previous" readonly="1" string="Med. Ant."/>
-                                    <field name="qty_origin" readonly="display_type != False" string="Med. Origen"/>
-                                    <field name="qty_period" readonly="display_type != False" string="Med. Periodo"/>
-                                    <field name="percentage_origin" readonly="1" string="% Orig."/>
+                                    <field name="qty_origin" readonly="display_type != False or bc3_cert_measures" string="Med. Origen"/>
+                                    <field name="qty_period" readonly="display_type != False or bc3_cert_measures" string="Med. Periodo"/>
+                                    <field name="percentage_origin" readonly="1" string="% Orig." decoration-danger="percentage_origin &gt; 100"/>
                                     <field name="amount_origin" widget="monetary" readonly="1" string="Imp. Origen"/>
                                     <field name="amount_period" widget="monetary" readonly="1" string="Imp. Periodo"/>
                                 </tree>

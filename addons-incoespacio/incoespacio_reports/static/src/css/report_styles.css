@@ -158,3 +158,16 @@
 .footer {
     border-top: 2px solid #e72228;
 }
+
+/* Factura: menos aire vertical para que pago y fiscal quepan en la misma hoja. */
+.article[data-oe-model="account.move"] .o_main_table {
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+.article[data-oe-model="account.move"] .inco-card {
+    padding: 8px 10px;
+    line-height: 1.35;
+}
+.article[data-oe-model="account.move"] .incoespacio-totals-table {
+    margin-bottom: 0;
+}

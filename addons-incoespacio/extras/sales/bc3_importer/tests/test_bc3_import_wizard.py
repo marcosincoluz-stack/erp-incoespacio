@@ -195,8 +195,8 @@ class TestBC3ImportWizard(TransactionCase):
             b"~D|C01#|UO01\\1\\10\\|\n"
             b"~M|C01#\\UO01|001\\|10|\\Zona A\\10\\\\\\\\|\n"
             b"~C|UO01|m3|Excavacion en zanja|90.80||EU|\n"
-            b"~T|UO01|Excavacion de zanja en terreno compacto,\n"
-            b"Criterio de medicion: m3 de volumen teorico excavado.|\n"
+            b"~T|UO01|Excavacion de zanja en terreno compacto,\r\n"
+            b"Criterio de medicion: m3 de volumen teorico excavado.|\r\n"
             b"~D|UO01|MO01\\1\\2\\|\n"
             b"~C|MO01|h|Peon|20||1|\n"
         )
@@ -215,6 +215,8 @@ class TestBC3ImportWizard(TransactionCase):
         self.assertAlmostEqual(line.product_uom_qty, 10.0)
         self.assertIn("volumen teorico", line.bc3_text)
         self.assertIn("\n", line.bc3_text)
+        self.assertFalse(line.bc3_text.endswith("|"))
+        self.assertTrue(line.bc3_text.endswith("excavado."))
         self.assertEqual(len(line.bc3_measures), 1)
         measure = line.bc3_measures[0]
         self.assertEqual(measure["comment"], "Zona A")

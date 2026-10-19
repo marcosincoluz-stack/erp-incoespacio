@@ -265,6 +265,7 @@ class SaleOrder(models.Model):
 
         prev_cert = existing_certs.sorted(key=lambda c: c.number, reverse=True)[:1]
         prev_qty_map = {}
+        self.order_line._ensure_measure_keys()
         if prev_cert:
             for pline in prev_cert.line_ids:
                 if pline.sale_order_line_id:

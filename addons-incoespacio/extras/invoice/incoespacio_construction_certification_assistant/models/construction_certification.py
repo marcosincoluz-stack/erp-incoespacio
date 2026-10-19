@@ -291,6 +291,9 @@ class ConstructionCertificationLine(models.Model):
         return "sale", 0.0
 
     def action_apply_suggested(self):
+        blocked = self.filtered("bc3_cert_measures")
+        if blocked:
+            raise UserError(_("Esta partida se mide en el desglose de certificación."))
         for line in self:
             if line.qty_suggested:
                 line.qty_period = line.qty_suggested

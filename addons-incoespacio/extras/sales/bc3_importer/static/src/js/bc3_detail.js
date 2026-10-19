@@ -6,8 +6,8 @@ import { ListRenderer } from "@web/views/list/list_renderer";
 
 const MEASURE_NUMS = ["units", "length", "width", "height"];
 
-export function bc3Measures(data) {
-    const raw = data?.bc3_measures;
+export function bc3Measures(data, field = "bc3_measures") {
+    const raw = data?.[field];
     if (Array.isArray(raw)) {
         return raw;
     }
@@ -88,6 +88,7 @@ function bc3NormalizeRow(row) {
         width: bc3MeasureNum(row?.width),
         height: bc3MeasureNum(row?.height),
         partial: partial === null ? 0 : partial,
+        key: row?.key || crypto.randomUUID().slice(0, 8),
     };
 }
 

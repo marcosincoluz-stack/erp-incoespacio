@@ -172,8 +172,8 @@ class BC3ImportWizard(models.TransientModel):
         key = self._code_key(body[1])
         if not key:
             return
-        text = body[2][:-1] if body[2].endswith("|") else body[2]
-        text = text.strip()
+        # The register ends in "|\r\n", so the pipe is only trailing after strip.
+        text = body[2].strip().removesuffix("|").strip()
         if text:
             texts[key] = text
 

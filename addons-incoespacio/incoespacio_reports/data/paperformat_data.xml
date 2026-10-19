@@ -25,9 +25,22 @@
             <field name="paperformat_id" ref="incoespacio_reports.paperformat_incoespacio"/>
         </record>
 
+        <!-- Presupuesto / Pedido no trae formato; si no, usa el A4 de la compañía (45 mm vacíos). -->
+        <record id="sale_pdf_quote_builder.action_report_saleorder_raw" model="ir.actions.report">
+            <field name="paperformat_id" ref="incoespacio_reports.paperformat_incoespacio"/>
+        </record>
+
         <record id="account.account_invoices" model="ir.actions.report">
             <field name="paperformat_id" ref="incoespacio_reports.paperformat_incoespacio"/>
         </record>
 
+    </data>
+
+    <!-- wkhtmltopdf corre en el contenedor: el 8070 es el puerto del host. -->
+    <data noupdate="1">
+        <record id="report_url" model="ir.config_parameter">
+            <field name="key">report.url</field>
+            <field name="value">http://localhost:8069</field>
+        </record>
     </data>
 </odoo>

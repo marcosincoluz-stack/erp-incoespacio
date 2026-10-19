@@ -50,6 +50,31 @@ QUnit.test("chapter row puts sale and invoiced under those columns", (assert) =>
     assert.strictEqual(sectionFieldTotal(records, 0, "price_subtotal"), 150);
 });
 
+QUnit.test("certification chapter splits origin and this period", (assert) => {
+    const active = [
+        { widget: "handle", name: "sequence", type: "field" },
+        { name: "code", type: "field" },
+        { name: "name", type: "field" },
+        { name: "qty_origin", type: "field" },
+        { name: "amount_origin", type: "field" },
+        { name: "amount_period", type: "field" },
+        { name: "qty_suggested", type: "field" },
+    ];
+    const cols = sectionDisplayColumns(active, "name");
+    const span = cols.reduce((n, col) => n + (col.colspan || 1), 0);
+    assert.strictEqual(span, active.length);
+    assert.strictEqual(cols[1].colspan, 3);
+    assert.strictEqual(cols[2].sumField, "amount_origin");
+    assert.strictEqual(cols[3].sumField, "amount_period");
+    const records = [
+        { data: { display_type: "line_section", bc3_level: 0 } },
+        { data: { amount_origin: 528, amount_period: 0, bc3_level: 1 } },
+        { data: { amount_origin: 375, amount_period: 100, bc3_level: 1 } },
+    ];
+    assert.strictEqual(sectionFieldTotal(records, 0, "amount_origin"), 903);
+    assert.strictEqual(sectionFieldTotal(records, 0, "amount_period"), 100);
+});
+
 QUnit.test("sorted sale share accumulates partidas and chapters to 100", (assert) => {
     const records = [
         { id: 1, data: { display_type: "line_section", bc3_level: 0, sequence: 1 } },
