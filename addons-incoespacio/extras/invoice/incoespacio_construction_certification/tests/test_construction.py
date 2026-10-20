@@ -550,6 +550,22 @@ class TestConstruction(TransactionCase):
             cert.action_confirm_and_invoice()
         self.assertEqual(cert.state, "draft")
 
+    def test_draft_can_be_cancelled_or_deleted(self):
+        self.order.action_confirm()
+        cert = self.env["construction.certification"].browse(
+            self.order.action_create_certification()["res_id"]
+        )
+        cert.action_confirm()
+        with self.assertRaises(UserError):
+            cert.unlink()
+        self.assertEqual(cert.state, "confirmed")
+        cert.action_draft()
+        cert.action_cancel()
+        self.assertEqual(cert.state, "cancel")
+        cert.action_draft()
+        cert.action_unlink_draft()
+        self.assertFalse(cert.exists())
+
     def test_second_confirmed_so_same_project(self):
         self.order.action_confirm()
         project = self.order.project_id

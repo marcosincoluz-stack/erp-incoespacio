@@ -116,7 +116,9 @@ def _drop_emptied_subchapters(body, had):
 
 def _chapter_label(line):
     name = (line.name or "").strip()
-    code = line.bc3_code or ""
+    code = getattr(line, "bc3_code", False) or getattr(line, "code", False) or ""
+    if not code and name.startswith("[") and "]" in name:
+        code = name[1 : name.index("]")]
     prefix = "[%s]" % code
     if code and name.startswith(prefix):
         name = name[len(prefix) :].strip()
@@ -244,6 +246,7 @@ class ConstructionCertification(models.Model):
     _inherit = "construction.certification"
 
     print_full_text = fields.Boolean(string="Con texto completo")
+    print_measures = fields.Boolean(string="Mediciones parciales")
     print_chapter_first_id = fields.Many2one(
         "construction.certification.line", string="Capítulo inicial", ondelete="set null"
     )
@@ -276,6 +279,37 @@ class ConstructionCertification(models.Model):
             lambda line: line.amount_period or 0.0,
         )
 
+    def _get_chapter_summary(self, lines=None):
+        """Capítulos de nivel 0 con el importe del periodo, subcapítulos incluidos."""
+        self.ensure_one()
+        source = self._get_report_lines() if lines is None else lines
+        decimals = _decimal_code_map(self.line_ids)
+        chapters = []
+        current = None
+        for line in source:
+            if _is_root_chapter(line):
+                code, name = _chapter_label(line)
+                current = {
+                    "code": code,
+                    "decimal": decimals.get(line.id, code),
+                    "name": name,
+                    "amount": 0.0,
+                }
+                chapters.append(current)
+            elif not line.display_type and current:
+                current["amount"] += line.amount_period or 0.0
+        total = sum(chapter["amount"] for chapter in chapters)
+        for chapter in chapters:
+            chapter["pct"] = chapter["amount"] / total * 100.0 if total else 0.0
+        return chapters
+
+    def _cert_amount_words(self):
+        self.ensure_one()
+        lang = self.partner_id.lang or self.env.lang
+        return self.currency_id.with_context(lang=lang).amount_to_text(
+            self.amount_period_total or 0.0
+        )
+
     def action_print_custom(self):
         self.ensure_one()
         _fill_print_chapter_range(self, self._get_report_lines())
@@ -297,6 +331,35 @@ class ConstructionCertification(models.Model):
         return self.env.ref(
             "incoespacio_construction_certification.action_report_construction_certification"
         ).report_action(self, data={"custom": True})
+
+
+class ConstructionCertificationLine(models.Model):
+    _inherit = "construction.certification.line"
+
+    def _print_measure_groups(self):
+        """Partial rows grouped by certification, previous ones first."""
+        self.ensure_one()
+        buckets = {}
+        for row in self.bc3_prev_measures or []:
+            buckets.setdefault(row.get("cert") or 0, []).append(row)
+        number = self.certification_id.number or 0
+        current_rows = list(self.bc3_cert_measures or [])
+        if current_rows:
+            buckets.setdefault(number, []).extend(current_rows)
+        groups = []
+        for cert in sorted(buckets):
+            rows = buckets[cert]
+            if not rows:
+                continue
+            groups.append(
+                {
+                    "cert": cert,
+                    "current": bool(current_rows) and cert == number,
+                    "rows": rows,
+                    "total": sum(row.get("partial") or 0.0 for row in rows),
+                }
+            )
+        return groups
 
 
 class SaleOrderLine(models.Model):

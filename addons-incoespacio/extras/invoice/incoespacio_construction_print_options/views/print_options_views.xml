@@ -69,6 +69,7 @@
             <form string="PDF personalizado">
                 <group string="Contenido">
                     <field name="print_full_text"/>
+                    <field name="print_measures"/>
                     <field name="show_measure_sheet"/>
                 </group>
                 <group string="Capítulos">

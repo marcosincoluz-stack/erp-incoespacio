@@ -13,7 +13,8 @@
                     <button name="action_create_invoice" string="Crear Factura" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
                     <button name="action_print_certification" string="Imprimir Certificación" type="object" class="btn-secondary" icon="fa-print"/>
                     <button name="action_draft" string="Volver a Borrador" type="object" invisible="state not in ('confirmed', 'cancel')"/>
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state in ('draft', 'cancel') or invoice_id"/>
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state == 'cancel' or invoice_id"/>
+                    <button name="action_unlink_draft" string="Borrar" type="object" invisible="state != 'draft'" confirm="Se borrará esta certificación."/>
                     <button name="action_toggle_lines_editable" string="Editar partidas" type="object" icon="fa-pencil" invisible="lines_editable or state != 'draft'"/>
                     <button name="action_toggle_lines_editable" string="Bloquear partidas" type="object" icon="fa-lock" invisible="not lines_editable or state != 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,invoiced"/>

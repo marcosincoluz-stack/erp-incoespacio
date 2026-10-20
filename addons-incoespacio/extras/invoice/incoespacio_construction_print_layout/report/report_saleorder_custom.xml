@@ -196,6 +196,10 @@
                             <t t-set="summary_order_total" t-value="False"/>
                             <t t-set="show_chapter_pct" t-value="doc.print_summary_pct"/>
                             <t t-set="show_decimal_code" t-value="doc.print_code != 'project'"/>
+                            <t t-set="summary_title" t-value="'Resumen de presupuesto'"/>
+                            <t t-set="summary_total_label" t-value="'TOTAL EJECUCIÓN MATERIAL'"/>
+                            <t t-set="summary_compact" t-value="False"/>
+                            <t t-set="summary_break" t-value="False"/>
                             <t t-call="incoespacio_construction_print_options.chapter_summary"/>
                         </t>
 

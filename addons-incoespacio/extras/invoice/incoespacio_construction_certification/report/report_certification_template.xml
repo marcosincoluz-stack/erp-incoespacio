@@ -80,50 +80,45 @@
                             </tbody>
                         </table>
 
-                        <!-- LIQUIDATION SUMMARY TABLE -->
-                        <div class="row">
-                            <div class="col-6">
-                                <div t-if="o.notes" style="border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; background-color: #fcfcfc;">
-                                    <strong>Observaciones:</strong>
-                                    <div t-field="o.notes"/>
-                                </div>
+                        <div class="clearfix" style="margin-top: 16px;">
+                            <div t-if="o.notes" style="float: left; width: 50%; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; background-color: #fcfcfc;">
+                                <strong>Observaciones:</strong>
+                                <div t-field="o.notes"/>
                             </div>
-                            <div class="col-6">
-                                <table class="table table-sm" style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                                    <tr>
-                                        <td><strong>Presupuesto Contratado:</strong></td>
-                                        <td style="text-align: right;"><span t-field="o.amount_total_budget" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Total Ejecutado a Origen:</strong></td>
-                                        <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_total_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Menos Certificado Anteriormente:</td>
-                                        <td style="text-align: right; color: #666;">- <span t-field="o.amount_previous_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr style="border-top: 1px solid #333; background-color: #f8f9fa;">
-                                        <td><strong>Base Imponible del Periodo:</strong></td>
-                                        <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_period_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr t-if="o.retention_rate > 0">
-                                        <td>Menos Retención de Garantía (<span t-esc="round(o.retention_rate, 1)"/>%):</td>
-                                        <td style="text-align: right; color: #c00;">- <span t-field="o.amount_retention" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Base Neta del Periodo:</td>
-                                        <td style="text-align: right;"><span t-field="o.amount_net_period" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr>
-                                        <td>IVA del Periodo:</td>
-                                        <td style="text-align: right;"><span t-field="o.amount_period_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                    <tr style="border-top: 2px solid #000; background-color: #e9ecef; font-size: 13px;">
-                                        <td><strong>TOTAL A PERCIBIR (IVA inc.):</strong></td>
-                                        <td style="text-align: right; font-weight: bold; color: #000;"><span t-field="o.amount_period_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                    </tr>
-                                </table>
-                            </div>
+                            <table class="inco-cert-totals table table-sm" style="float: right; width: 48%; border-collapse: collapse; font-size: 11px;">
+                                <tr>
+                                    <td><strong>Presupuesto Contratado:</strong></td>
+                                    <td style="text-align: right;"><span t-field="o.amount_total_budget" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Ejecutado a Origen:</strong></td>
+                                    <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_total_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td>Menos Certificado Anteriormente:</td>
+                                    <td style="text-align: right; color: #666;">- <span t-field="o.amount_previous_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr style="border-top: 1px solid #333; background-color: #f8f9fa;">
+                                    <td><strong>Base Imponible del Periodo:</strong></td>
+                                    <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_period_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr t-if="o.retention_rate > 0">
+                                    <td>Menos Retención de Garantía (<span t-esc="round(o.retention_rate, 1)"/>%):</td>
+                                    <td style="text-align: right; color: #c00;">- <span t-field="o.amount_retention" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td>Base Neta del Periodo:</td>
+                                    <td style="text-align: right;"><span t-field="o.amount_net_period" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td>IVA del Periodo:</td>
+                                    <td style="text-align: right;"><span t-field="o.amount_period_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr style="border-top: 2px solid #000; background-color: #e9ecef; font-size: 13px;">
+                                    <td><strong>TOTAL A PERCIBIR (IVA inc.):</strong></td>
+                                    <td style="text-align: right; font-weight: bold; color: #000;"><span t-field="o.amount_period_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <t t-if="o.show_measure_sheet">
@@ -168,34 +163,19 @@
                             </div>
                         </t>
 
-                        <!-- FORMAL SIGNATURE BOXES (LOE ESPAÑA) -->
-                        <div style="margin-top: 40px; page-break-inside: avoid;">
-                            <div style="font-weight: bold; font-size: 11px; margin-bottom: 12px; text-transform: uppercase; color: #495057;">
-                                Conforme y Aprobación de la Certificación (Dirección Facultativa y Propiedad)
-                            </div>
-                            <div class="row text-center" style="font-size: 10px;">
-                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
-                                    <strong>LA CONSTRUCTORA</strong><br/>
-                                    <span t-field="o.company_id.name"/><br/><br/>
-                                    <span style="color: #888;">Firma y Sello</span>
-                                </div>
-                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
-                                    <strong>DIRECCIÓN DE OBRA</strong><br/>
-                                    <span>(Arquitecto / Ingeniero)</span><br/><br/>
-                                    <span style="color: #888;">Firma y Sello</span>
-                                </div>
-                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
-                                    <strong>DIRECCIÓN DE EJECUCIÓN</strong><br/>
-                                    <span>(Arquitecto Técnico / Aparejador)</span><br/><br/>
-                                    <span style="color: #888;">Firma y Sello</span>
-                                </div>
-                                <div class="col-3" style="border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
-                                    <strong>LA PROPIEDAD / PROMOTOR</strong><br/>
+                        <table style="width: 100%; margin-top: 36px; border-collapse: separate; border-spacing: 24px 0; page-break-inside: avoid; font-size: 10px;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top; border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
+                                    <strong>El promotor</strong><br/>
                                     <span t-field="o.partner_id.name"/><br/><br/>
-                                    <span style="color: #888;">Firma y Aceptación</span>
-                                </div>
-                            </div>
-                        </div>
+                                    <span style="color: #888;">Firma</span>
+                                </td>
+                                <td style="width: 50%; vertical-align: top; border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
+                                    <strong>La dirección facultativa</strong><br/><br/>
+                                    <span style="color: #888;">Firma</span>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </t>
             </t>

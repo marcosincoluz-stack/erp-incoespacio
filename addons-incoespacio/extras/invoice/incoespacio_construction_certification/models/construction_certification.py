@@ -259,6 +259,15 @@ class ConstructionCertification(models.Model):
             raise UserError(_("No puede cancelar una certificación cuya factura no haya sido cancelada."))
         self.write({"state": "cancel"})
 
+    def unlink(self):
+        if any(cert.state != "draft" for cert in self):
+            raise UserError(_("Solo se puede borrar una certificación en borrador."))
+        return super().unlink()
+
+    def action_unlink_draft(self):
+        self.unlink()
+        return {"type": "ir.actions.act_window_close"}
+
     def _get_or_create_retention_account(self, company):
         Account = self.env["account.account"]
         account = Account.search(
@@ -478,6 +487,11 @@ class ConstructionCertificationLine(models.Model):
         readonly=True,
     )
     tax_ids = fields.Many2many("account.tax", string="Impuestos")
+
+    def unlink(self):
+        if any(line.certification_id.state != "draft" for line in self):
+            raise UserError(_("Solo se puede borrar una certificación en borrador."))
+        return super().unlink()
 
     def _get_report_name(self):
         """PDF: código ya va en su columna; aquí el resumen, no el pliego."""
