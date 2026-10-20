@@ -3,23 +3,23 @@
     <template id="chapter_summary">
         <div t-if="chapters" class="inco-card" style="margin-top: 16px; page-break-inside: avoid;">
             <div class="inco-card-title">Resumen de presupuesto</div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.82rem;">
                 <thead>
                     <tr>
                         <th style="text-align: left; width: 18%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">Código</th>
                         <th style="text-align: left; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">Capítulo</th>
                         <th style="text-align: right; width: 22%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">Importe</th>
-                        <th style="text-align: right; width: 12%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">%</th>
+                        <th t-if="show_chapter_pct" style="text-align: right; width: 12%; padding: 4px 6px; border-bottom: 1px solid #cbd5e1;">%</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr t-foreach="chapters" t-as="chapter">
-                        <td style="padding: 4px 6px;"><span t-out="chapter['code']"/></td>
+                        <td style="padding: 4px 6px;"><span t-out="chapter['decimal'] if show_decimal_code else chapter['code']"/></td>
                         <td style="padding: 4px 6px;"><span t-out="chapter['name']"/></td>
                         <td style="padding: 4px 6px; text-align: right;">
                             <span t-out="chapter['amount']" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                         </td>
-                        <td style="padding: 4px 6px; text-align: right;"><span t-out="'%.1f' % chapter['pct']"/> %</td>
+                        <td t-if="show_chapter_pct" style="padding: 4px 6px; text-align: right;"><span t-out="'%.1f' % chapter['pct']"/> %</td>
                     </tr>
                     <tr style="font-weight: 700;">
                         <td colspan="2" style="padding: 4px 6px; border-top: 1px solid #94a3b8;">TOTAL EJECUCIÓN MATERIAL</td>
@@ -27,7 +27,7 @@
                             <span t-if="summary_order_total" t-field="doc.amount_untaxed"/>
                             <span t-else="" t-out="sum(chapter['amount'] for chapter in chapters)" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                         </td>
-                        <td style="padding: 4px 6px; text-align: right; border-top: 1px solid #94a3b8;">100 %</td>
+                        <td t-if="show_chapter_pct" style="padding: 4px 6px; text-align: right; border-top: 1px solid #94a3b8;">100 %</td>
                     </tr>
                 </tbody>
             </table>
@@ -41,7 +41,17 @@
         <xpath expr="//table[hasclass('o_main_table')]" position="after">
             <t t-set="chapters" t-value="doc._get_chapter_summary(lines_to_report) if custom else doc._get_chapter_summary()"/>
             <t t-set="summary_order_total" t-value="not custom"/>
+            <t t-set="show_chapter_pct" t-value="True"/>
+            <t t-set="show_decimal_code" t-value="doc.bc3"/>
             <t t-call="incoespacio_construction_print_options.chapter_summary"/>
+        </xpath>
+        <xpath expr="//td[@name='td_name']/span" position="replace">
+            <span t-if="doc.bc3" t-out="line._print_decimal_name()"/>
+            <span t-else="" t-field="line.name"/>
+        </xpath>
+        <xpath expr="//td[@name='td_section_line']/span" position="replace">
+            <span t-if="doc.bc3" t-out="line._print_decimal_name()"/>
+            <span t-else="" t-field="line.name"/>
         </xpath>
     </template>
 

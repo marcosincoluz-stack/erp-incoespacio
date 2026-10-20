@@ -24,7 +24,13 @@ class SaleOrder(models.Model):
     print_prices = fields.Boolean(string="Con precios", default=True)
     print_subtotals = fields.Boolean(string="Valorar subtotales", default=True)
     print_summary = fields.Boolean(string="Resumen por capítulos", default=True)
+    print_summary_pct = fields.Boolean(string="Porcentaje", default=True)
     print_show_code = fields.Boolean(string="Columna de código", default=True)
+    print_code = fields.Selection(
+        [("decimal", "Decimal"), ("project", "Proyecto")],
+        string="Codificación",
+        default="decimal",
+    )
     print_page_break = fields.Boolean(string="Salto de página por capítulo")
     print_only_chapters = fields.Boolean(string="Solo capítulos")
     print_cover = fields.Boolean(string="Portada")
@@ -33,6 +39,24 @@ class SaleOrder(models.Model):
     print_gg_pct = fields.Float(string="Gastos generales %", default=13.0)
     print_bi_pct = fields.Float(string="Beneficio industrial %", default=6.0)
     print_amount_words = fields.Boolean(string="Total en letra")
+
+    def init(self):
+        # ponytail: a new bool column lands NULL and reads as false. Fill once.
+        super().init()
+        self.env.cr.execute(
+            """
+            UPDATE sale_order
+               SET print_summary_pct = TRUE
+             WHERE print_summary_pct IS NULL
+            """
+        )
+        self.env.cr.execute(
+            """
+            UPDATE sale_order
+               SET print_code = 'decimal'
+             WHERE print_code IS NULL
+            """
+        )
 
     def _print_title(self):
         self.ensure_one()
@@ -103,7 +127,10 @@ class SaleOrderLine(models.Model):
 
     def _print_label(self):
         self.ensure_one()
-        return _chapter_label(self)
+        code, name = _chapter_label(self)
+        if self.order_id.print_code != "project":
+            code = self.order_id._decimal_codes().get(self.id) or code
+        return code, name
 
     def _print_uom(self):
         self.ensure_one()

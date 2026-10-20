@@ -1,7 +1,9 @@
 .inco-budget-table {
     width: 100%;
     table-layout: fixed;
-    border-collapse: collapse;
+    /* ponytail: collapse + gray cells makes Adobe draw vertical hairlines. */
+    border-collapse: separate;
+    border-spacing: 0;
     margin: 0 0 14px;
     font-size: 0.75rem;
     -webkit-print-color-adjust: exact;
@@ -10,12 +12,19 @@
 .inco-budget-table td {
     vertical-align: top;
     padding: 3px 4px;
+    border-left: 0;
+    border-right: 0;
 }
 .inco-budget-table thead th {
+    position: relative;
     background-color: #f1f5f9;
     border-bottom: 2px solid #94a3b8;
     font-size: 0.68rem;
     font-weight: 700;
+}
+/* ponytail: abutting fills become a vertical line in Adobe. 1px overlap, same color, covers it. */
+.inco-budget-table thead th + th {
+    left: -1px;
 }
 .inco-budget-table th.desc {
     text-align: left;
@@ -38,8 +47,12 @@
     text-align: center;
 }
 .inco-budget-table tr.inco-chapter td {
+    position: relative;
     background-color: #f1f5f9;
     font-weight: 700;
+}
+.inco-budget-table tr.inco-chapter td + td {
+    left: -1px;
 }
 .inco-budget-table tr.inco-subchapter td {
     font-weight: 700;
@@ -59,9 +72,13 @@
     color: #334155;
 }
 .inco-budget-table tr.inco-partida,
+.inco-budget-table tr.inco-amount,
 .inco-budget-table tr.inco-measure-total,
 .inco-budget-table tr.inco-chapter-total {
     page-break-inside: avoid;
+}
+.inco-budget-table tr.inco-amount td {
+    font-weight: 700;
 }
 .inco-budget-table tr.inco-measure-total td,
 .inco-budget-table tr.inco-chapter-total td {

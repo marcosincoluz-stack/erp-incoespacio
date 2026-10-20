@@ -23,6 +23,21 @@ def _is_root_chapter(line):
     return line.display_type == "line_section" and not line.bc3_level
 
 
+def _fill_print_chapter_range(record, lines):
+    """Empty range means the whole budget: show that as first and last chapter."""
+    if record.print_chapter_first_id and record.print_chapter_last_id:
+        return
+    chapters = lines.filtered(_is_root_chapter)
+    if not chapters:
+        return
+    vals = {}
+    if not record.print_chapter_first_id:
+        vals["print_chapter_first_id"] = chapters[0].id
+    if not record.print_chapter_last_id:
+        vals["print_chapter_last_id"] = chapters[-1].id
+    record.write(vals)
+
+
 def _filter_report_lines(lines, first, last, keep_partida, drop_null_chapters, amount):
     """Keep a chapter range, then drop null partidas and the chapters they empty."""
     if not lines:
@@ -108,6 +123,29 @@ def _chapter_label(line):
     return code, name or code
 
 
+def _decimal_code_map(lines):
+    """Presto decimal: capítulo 1, subcapítulo 1.1, partida 1.1.1."""
+    counters = []
+    section_depth = -1
+    codes = {}
+    for line in lines:
+        if line.display_type == "line_note":
+            continue
+        if line.display_type == "line_section":
+            depth = line.bc3_level or 0
+            section_depth = depth
+        elif line.bc3_level:
+            depth = line.bc3_level
+        else:
+            depth = section_depth + 1 if section_depth >= 0 else 0
+        if len(counters) <= depth:
+            counters.extend([0] * (depth + 1 - len(counters)))
+        counters[depth] += 1
+        del counters[depth + 1 :]
+        codes[line.id] = ".".join(str(number) for number in counters)
+    return codes
+
+
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
@@ -139,6 +177,12 @@ class SaleOrder(models.Model):
             lambda line: line.price_subtotal or 0.0,
         )
 
+    def _decimal_codes(self):
+        self.ensure_one()
+        return _decimal_code_map(
+            self.order_line.sorted(key=lambda item: (item.sequence, item.id))
+        )
+
     def _get_chapter_summary(self, lines=None):
         """Capítulos de nivel 0 con el importe de sus partidas, subcapítulos incluidos."""
         self.ensure_one()
@@ -147,12 +191,18 @@ class SaleOrder(models.Model):
             if lines is None
             else lines
         )
+        decimals = self._decimal_codes()
         chapters = []
         current = None
         for line in source:
             if _is_root_chapter(line):
                 code, name = _chapter_label(line)
-                current = {"code": code, "name": name, "amount": 0.0}
+                current = {
+                    "code": code,
+                    "decimal": decimals.get(line.id, code),
+                    "name": name,
+                    "amount": 0.0,
+                }
                 chapters.append(current)
             elif not line.display_type and current:
                 current["amount"] += line.price_subtotal or 0.0
@@ -169,6 +219,7 @@ class SaleOrder(models.Model):
 
     def action_print_custom(self):
         self.ensure_one()
+        _fill_print_chapter_range(self, self._get_order_lines_to_report())
         view = self.env.ref(
             "incoespacio_construction_print_options.view_sale_order_print_custom"
         )
@@ -227,6 +278,7 @@ class ConstructionCertification(models.Model):
 
     def action_print_custom(self):
         self.ensure_one()
+        _fill_print_chapter_range(self, self._get_report_lines())
         view = self.env.ref(
             "incoespacio_construction_print_options.view_certification_print_custom"
         )
@@ -245,6 +297,21 @@ class ConstructionCertification(models.Model):
         return self.env.ref(
             "incoespacio_construction_certification.action_report_construction_certification"
         ).report_action(self, data={"custom": True})
+
+
+class SaleOrderLine(models.Model):
+    _inherit = "sale.order.line"
+
+    def _print_decimal_name(self):
+        """Default PDF. Only a BC3 budget swaps the project code for the decimal one."""
+        self.ensure_one()
+        _project, name = _chapter_label(self)
+        if not self.order_id.bc3:
+            return self.name or name
+        decimal = self.order_id._decimal_codes().get(self.id)
+        if not decimal:
+            return name
+        return "[%s] %s" % (decimal, name)
 
 
 class ReportSaleOrder(models.AbstractModel):

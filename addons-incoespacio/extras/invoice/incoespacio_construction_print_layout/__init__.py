@@ -12,6 +12,8 @@ def post_init_hook(env):
                print_bi_pct = 6,
                print_prices = COALESCE(print_prices, TRUE),
                print_subtotals = COALESCE(print_subtotals, TRUE),
-               print_summary = COALESCE(print_summary, TRUE)
+               print_summary = COALESCE(print_summary, TRUE),
+               print_summary_pct = COALESCE(print_summary_pct, TRUE),
+               print_code = COALESCE(print_code, 'decimal')
         """
     )

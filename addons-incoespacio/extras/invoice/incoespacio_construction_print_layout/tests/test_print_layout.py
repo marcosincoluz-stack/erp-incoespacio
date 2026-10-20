@@ -79,13 +79,22 @@ class TestPrintLayout(TransactionCase):
         self.assertFalse(bare._report_measure_rows())
         self.assertEqual(line._print_uom(), "ud")
 
-        self.order.write({"print_full_text": True, "print_measures": True, "print_prices": True})
+        self.order.write(
+            {
+                "print_full_text": True,
+                "print_measures": True,
+                "print_prices": True,
+                "print_code": "project",
+            }
+        )
         html = self._html()
         self.assertIn("inco-budget-table", html)
         self.assertIn("00.01", html)
         self.assertNotIn("[00.01]", html)
         self.assertIn("DEMOLICION DE FABRICA", html)
         self.assertIn("Zona norte", html)
+        self.assertIn("inco-measure-total", html)
+        self.assertIn("inco-amount", html)
         self.assertTrue("4.500" in html or "4,500" in html)
         self.assertNotIn("0.000", html)
         self.assertNotIn("0,000", html)
@@ -102,8 +111,13 @@ class TestPrintLayout(TransactionCase):
         self.order.write({"print_only_chapters": True, "print_prices": True, "print_summary": True})
         summary = self._html()
         self.assertIn("RESUMEN DE PRESUPUESTO", summary)
+        self.assertIn("100 %", summary)
         self.assertNotIn("DEMOLICION DE FABRICA", summary)
         self.assertNotIn("inco-budget-table", summary)
+        self.order.print_summary_pct = False
+        hidden = self._html()
+        self.assertIn("RESUMEN DE PRESUPUESTO", hidden)
+        self.assertNotIn("100 %", hidden)
 
     def test_chapters_share_one_table_unless_page_break(self):
         self._section(1, "C01", "Uno")
@@ -113,7 +127,7 @@ class TestPrintLayout(TransactionCase):
         html = self._html()
         self.assertEqual(html.count("inco-budget-table"), 1)
         self.assertEqual(html.count("<colgroup>"), 1)
-        self.assertIn("Total <span>C01</span>", html)
+        self.assertIn("Total <span>1</span>", html)
         self.order.print_page_break = True
         broken = self._html()
         self.assertEqual(broken.count("inco-budget-table"), 2)
@@ -135,8 +149,20 @@ class TestPrintLayout(TransactionCase):
     def test_normal_pdf_keeps_the_client_card_without_the_code_column(self):
         self._section(1, "C01", "Albañilería")
         self._partida(2, "Tabique", 1, 10)
+        self.order.print_summary_pct = False
+        self.order.bc3 = True
+        self.order.print_code = "project"
         html = self._html("sale.report_saleorder")
         self.assertIn("DATOS DEL CLIENTE", html)
         self.assertIn("Elemento", html)
         self.assertNotIn("inco-budget-table", html)
         self.assertIn("Resumen de presupuesto", html)
+        self.assertIn("100 %", html)
+        self.assertIn("[1] Albañilería", html)
+        self.assertNotIn("[C01]", html)
+        custom = self._html()
+        self.assertIn("C01", custom)
+        self.order.print_code = "decimal"
+        decimal = self._html()
+        self.assertIn(">1.1<", decimal)
+        self.assertNotIn("C01", decimal)

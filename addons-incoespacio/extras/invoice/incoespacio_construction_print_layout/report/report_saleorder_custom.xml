@@ -86,15 +86,9 @@
                         <div t-if="doc.print_full_text and line._print_bc3_text()" class="inco-text" t-out="line._print_bc3_text()"/>
                     </td>
                     <td t-if="doc.print_measures" colspan="5"/>
-                    <td class="num">
-                        <span t-if="not measures" t-field="line.product_uom_qty" t-options='{"widget": "float", "precision": 3}'/>
-                    </td>
-                    <td t-if="doc.print_prices" class="num">
-                        <span t-if="not measures" t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                    </td>
-                    <td t-if="doc.print_prices" class="num">
-                        <span t-if="not measures" t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                    </td>
+                    <td class="num"/>
+                    <td t-if="doc.print_prices" class="num"/>
+                    <td t-if="doc.print_prices" class="num"/>
                 </tr>
                 <tr t-foreach="measures" t-as="row" class="inco-measure">
                     <td t-if="doc.print_show_code"/>
@@ -107,7 +101,7 @@
                     <td t-if="doc.print_prices" class="num"/>
                     <td t-if="doc.print_prices" class="num"/>
                 </tr>
-                <tr t-if="measures" class="inco-measure-total">
+                <tr t-att-class="'inco-measure-total' if measures else 'inco-amount'">
                     <td t-if="doc.print_show_code"/>
                     <td/>
                     <td/>
@@ -200,6 +194,8 @@
 
                         <t t-if="doc.print_summary and doc.print_prices">
                             <t t-set="summary_order_total" t-value="False"/>
+                            <t t-set="show_chapter_pct" t-value="doc.print_summary_pct"/>
+                            <t t-set="show_decimal_code" t-value="doc.print_code != 'project'"/>
                             <t t-call="incoespacio_construction_print_options.chapter_summary"/>
                         </t>
 

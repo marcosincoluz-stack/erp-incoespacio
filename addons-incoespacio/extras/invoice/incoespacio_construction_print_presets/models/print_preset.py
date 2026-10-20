@@ -10,7 +10,7 @@ _PRINT_SKIP = frozenset(
 )
 # The certification dialog stores its measure sheet under this name.
 _PRINT_EXTRA = frozenset({"show_measure_sheet"})
-_PRINT_TYPES = frozenset({"boolean", "float", "integer", "monetary"})
+_PRINT_TYPES = frozenset({"boolean", "float", "integer", "monetary", "selection"})
 
 
 def _print_option_fields(record):

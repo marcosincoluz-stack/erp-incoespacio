@@ -43,7 +43,26 @@
     width: 100%;
     margin-top: 20px;
     margin-bottom: 25px;
-    border-collapse: collapse;
+    /* ponytail: collapse + gray cells makes Adobe draw vertical hairlines. */
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.table.o_main_table > :not(caption) > * > * {
+    background-color: transparent;
+    box-shadow: none;
+    border-left: 0;
+    border-right: 0;
+}
+.table.o_main_table > thead > tr > th,
+.table.o_main_table > tbody > tr.o_line_section > td,
+.incoespacio-totals-table tr.o_total td {
+    position: relative;
+    background-color: #f1f5f9;
+}
+.table.o_main_table > thead > tr > th + th,
+.table.o_main_table > tbody > tr.o_line_section > td + td,
+.incoespacio-totals-table tr.o_total td + td {
+    left: -1px;
 }
 .o_main_table thead tr th {
     background-color: #f1f5f9;
@@ -113,7 +132,8 @@
     -webkit-print-color-adjust: exact;
     float: right;
     width: 44%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 0.85rem;
     margin-bottom: 20px;
     background-color: #fafbfc;

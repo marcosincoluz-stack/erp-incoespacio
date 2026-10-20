@@ -11,6 +11,7 @@
                     <field name="print_measures"/>
                     <field name="print_prices"/>
                     <field name="print_show_code"/>
+                    <field name="print_code"/>
                 </group>
             </xpath>
             <xpath expr="//field[@name='print_hide_null_chapters']" position="after">
@@ -21,6 +22,7 @@
             <xpath expr="//group[@name='group_partidas']" position="after">
                 <group string="Resumen y totales">
                     <field name="print_summary"/>
+                    <field name="print_summary_pct" invisible="not print_summary"/>
                     <field name="print_gg_bi"/>
                     <field name="print_gg_pct" invisible="not print_gg_bi"/>
                     <field name="print_bi_pct" invisible="not print_gg_bi"/>

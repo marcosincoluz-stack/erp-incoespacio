@@ -59,11 +59,42 @@ class TestPrintOptions(TransactionCase):
         self.assertAlmostEqual(chapters[0]["amount"], 250.0)
         self.assertAlmostEqual(chapters[1]["amount"], 300.0)
         self.assertAlmostEqual(sum(chapter["pct"] for chapter in chapters), 100.0)
+        self.assertEqual([chapter["decimal"] for chapter in chapters], ["1", "2"])
 
         plain = self._html()
         self.assertIn("Resumen de presupuesto", plain)
         self.assertIn("Albañilería", plain)
         self.assertIn("DATOS DEL CLIENTE", plain)
+
+    def test_decimal_codes_number_chapter_subchapter_and_partida(self):
+        chapter = self._section(1, "C01", "Uno")
+        sub = self._section(2, "C01A", "Sub", level=1)
+        partida = self._partida(3, 1, 10)
+        partida.write({"bc3_level": 2, "bc3_code": "UO1", "name": "[UO1] Ladrillo"})
+        other = self._section(4, "C02", "Dos")
+        direct = self._partida(5, 1, 5)
+        direct.bc3_level = 1
+        codes = self.order._decimal_codes()
+        self.assertEqual(
+            [codes[line.id] for line in (chapter, sub, partida, other, direct)],
+            ["1", "1.1", "1.1.1", "2", "2.1"],
+        )
+        html = self._html()
+        self.assertIn("[1.1.1] Ladrillo", html)
+        self.assertNotIn("[UO1]", html)
+        self.assertNotIn("[C01]", html)
+
+    def test_custom_dialog_selects_the_first_and_last_chapter(self):
+        first = self._section(1, "C01", "Uno")
+        self._section(2, "C01.1", "Sub", level=1)
+        self._partida(3, 1, 10)
+        last = self._section(4, "C02", "Dos")
+        self.order.action_print_custom()
+        self.assertEqual(self.order.print_chapter_first_id, first)
+        self.assertEqual(self.order.print_chapter_last_id, last)
+        self.order.print_chapter_first_id = last
+        self.order.action_print_custom()
+        self.assertEqual(self.order.print_chapter_first_id, last)
 
     def test_custom_flag_uses_active_ids_when_the_url_drops_docids(self):
         report = self.env["report.sale.report_saleorder"]
