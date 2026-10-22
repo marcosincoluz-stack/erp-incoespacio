@@ -78,6 +78,8 @@ class TestPrintLayout(TransactionCase):
         ]
         self.assertFalse(bare._report_measure_rows())
         self.assertEqual(line._print_uom(), "ud")
+        line.product_uom.name = "Minutos"
+        self.assertEqual(line._print_uom(), "min")
 
         self.order.write(
             {
@@ -95,6 +97,9 @@ class TestPrintLayout(TransactionCase):
         self.assertIn("Zona norte", html)
         self.assertIn("inco-measure-total", html)
         self.assertIn("inco-amount", html)
+        self.assertIn('colspan="6"', html)
+        self.assertIn("La dirección facultativa", html)
+        self.assertNotIn("CONDICIONES", html)
         self.assertTrue("4.500" in html or "4,500" in html)
         self.assertNotIn("0.000", html)
         self.assertNotIn("0,000", html)

@@ -15,6 +15,7 @@
                             name="bc3_file"
                             widget="binary"
                             filename="bc3_file_name"
+                            options="{'accepted_file_extensions': '.bc3'}"
                         />
                         <field name="partner_id" required="1" />
                     </group>

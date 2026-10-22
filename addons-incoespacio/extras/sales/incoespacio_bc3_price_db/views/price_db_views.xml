@@ -9,7 +9,7 @@
                     Un fichero grande se importa por tandas. No cierres la ventana hasta que se abra la lista.
                 </div>
                 <group>
-                    <field name="bc3_file" widget="binary" filename="bc3_file_name"/>
+                    <field name="bc3_file" widget="binary" filename="bc3_file_name" options="{'accepted_file_extensions': '.bc3'}"/>
                     <field name="batch_ready" invisible="1"/>
                 </group>
                 <footer>
@@ -33,9 +33,10 @@
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="default_code" string="Código"/>
-                <field name="name" string="Nombre"/>
                 <field name="uom_id" string="Unidad de obra"/>
+                <field name="name" string="Título"/>
                 <field name="list_price" string="Precio"/>
+                <button name="action_open_price_text" type="object" icon="fa-align-left" title="Descripción"/>
             </tree>
         </field>
     </record>
@@ -48,11 +49,12 @@
                 <sheet>
                     <group>
                         <field name="default_code" string="Código"/>
-                        <field name="name" string="Nombre"/>
                         <field name="uom_id" string="Unidad de obra"/>
+                        <field name="name" string="Título"/>
                         <field name="list_price" string="Precio"/>
-                        <field name="description_sale" string="Descripción"/>
                     </group>
+                    <separator string="Descripción"/>
+                    <field name="description_sale" nolabel="1" placeholder="Texto largo de la partida"/>
                 </sheet>
             </form>
         </field>

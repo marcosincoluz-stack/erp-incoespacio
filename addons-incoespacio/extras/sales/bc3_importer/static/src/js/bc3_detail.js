@@ -129,7 +129,8 @@ patch(ListRenderer.prototype, {
         return !bc3HasDetail(record.data);
     },
     _bc3ChevronHit(record, column, ev) {
-        if (!column || column.name !== "name" || !this.bc3ShowChevron(record)) {
+        // Partida (product_id) is the visible title on sale lines; name stays for chapters.
+        if (!column || (column.name !== "name" && column.name !== "product_id") || !this.bc3ShowChevron(record)) {
             return false;
         }
         const td = ev.target?.closest?.("td");

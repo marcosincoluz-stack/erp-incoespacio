@@ -96,8 +96,8 @@
                             <field name="bc3_measures" column_invisible="1"/>
                             <field name="qty_cert_origin" column_invisible="1"/>
                             <field name="bc3_code" string="Cód." optional="show"/>
-                            <field name="name" widget="section_and_note_text" string="Partida"/>
-                            <field name="product_uom" string="Ud." optional="hide"/>
+                            <field name="product_uom" string="Ud." optional="show"/>
+                            <field name="name" widget="section_and_note_text" string="Título"/>
                             <field name="product_uom_qty" string="Med."/>
                             <field name="price_unit" string="P.U."/>
                             <field name="price_subtotal" widget="monetary" string="Venta" sum="Venta"/>
@@ -121,11 +121,11 @@
                                 <group>
                                     <group>
                                         <field name="bc3_code"/>
-                                        <field name="bc3_section_id"/>
                                         <field name="product_uom"/>
+                                        <field name="name"/>
+                                        <field name="bc3_section_id"/>
                                     </group>
                                     <group>
-                                        <field name="name"/>
                                         <field name="currency_id" invisible="1"/>
                                         <field name="display_type" invisible="1"/>
                                     </group>

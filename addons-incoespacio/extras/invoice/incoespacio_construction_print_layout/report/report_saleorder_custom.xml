@@ -81,11 +81,10 @@
                 <tr class="inco-partida">
                     <td t-if="doc.print_show_code" class="code"><span t-out="label[0]"/></td>
                     <td class="ud"><span t-out="line._print_uom()"/></td>
-                    <td class="name">
+                    <td class="name" t-att-colspan="6 if doc.print_measures else 1">
                         <div t-out="label[1]"/>
                         <div t-if="doc.print_full_text and line._print_bc3_text()" class="inco-text" t-out="line._print_bc3_text()"/>
                     </td>
-                    <td t-if="doc.print_measures" colspan="5"/>
                     <td class="num"/>
                     <td t-if="doc.print_prices" class="num"/>
                     <td t-if="doc.print_prices" class="num"/>
@@ -198,12 +197,12 @@
                             <t t-set="show_decimal_code" t-value="doc.print_code != 'project'"/>
                             <t t-set="summary_title" t-value="'Resumen de presupuesto'"/>
                             <t t-set="summary_total_label" t-value="'TOTAL EJECUCIÓN MATERIAL'"/>
-                            <t t-set="summary_compact" t-value="False"/>
+                            <t t-set="summary_compact" t-value="True"/>
                             <t t-set="summary_break" t-value="False"/>
                             <t t-call="incoespacio_construction_print_options.chapter_summary"/>
                         </t>
 
-                        <div t-if="doc.print_prices and doc.print_gg_bi" class="clearfix" style="margin-top: 16px;">
+                        <div t-if="doc.print_prices and doc.print_gg_bi" class="clearfix inco-close" style="margin-top: 8px;">
                             <t t-set="totals" t-value="doc._get_print_totals(chapters)"/>
                             <table class="incoespacio-totals-table">
                                 <tr>
@@ -232,19 +231,32 @@
                                 </tr>
                             </table>
                         </div>
-                        <div t-elif="doc.print_prices and not doc.print_chapter_first_id and not doc.print_chapter_last_id" class="clearfix" style="margin-top: 16px;">
+                        <div t-elif="doc.print_prices and not doc.print_chapter_first_id and not doc.print_chapter_last_id" class="clearfix inco-close" style="margin-top: 8px;">
                             <table class="incoespacio-totals-table">
                                 <t t-set="tax_totals" t-value="doc.tax_totals"/>
                                 <t t-call="sale.document_tax_totals"/>
                             </table>
                         </div>
 
-                        <p t-if="doc.print_amount_words and doc.print_prices" class="inco-amount-words">
+                        <p t-if="doc.print_amount_words and doc.print_prices" class="inco-amount-words inco-close">
                             Asciende el presupuesto a la expresada cantidad de
                             <strong t-out="doc._print_words_amount(chapters)"/>.
                         </p>
 
-                        <t t-if="doc.print_signature" t-call="incoespacio_reports.sale_conditions_signature"/>
+                        <table t-if="doc.print_signature" class="inco-close" style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 10px; page-break-inside: avoid; font-size: 0.72rem;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 8px 10px; text-align: center;">
+                                    <div class="inco-card-title">La dirección facultativa</div>
+                                    <div style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">Firma y sello</div>
+                                    <div style="height: 28px;"/>
+                                </td>
+                                <td style="width: 50%; vertical-align: top; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 8px 10px; text-align: center;">
+                                    <div class="inco-card-title">Conforme y aceptado por el cliente</div>
+                                    <div style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">Firma y sello</div>
+                                    <div style="height: 28px;"/>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </t>
             </t>

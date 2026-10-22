@@ -22,6 +22,30 @@ tr.o_bc3_detail_empty:not(.o_bc3_detail_open) > td[name="name"] .o_field_widget:
     opacity: 0.35;
 }
 
+// Presupuesto: el título visible es Partida, la columna name va a ancho 0.
+.o_sale_order tr.o_bc3_has_detail > td[name="product_id"] .o_field_widget {
+    position: relative;
+    padding-left: 1.15rem;
+}
+
+.o_sale_order tr.o_bc3_has_detail > td[name="product_id"] .o_field_widget::before {
+    position: absolute;
+    left: 0;
+    top: 0.15rem;
+    font-family: FontAwesome;
+    content: "\f0da";
+    width: 0.8rem;
+    line-height: 1;
+}
+
+.o_sale_order tr.o_bc3_detail_open > td[name="product_id"] .o_field_widget::before {
+    content: "\f0d7";
+}
+
+.o_sale_order tr.o_bc3_detail_empty:not(.o_bc3_detail_open) > td[name="product_id"] .o_field_widget::before {
+    opacity: 0.35;
+}
+
 tr.o_section_folded_hidden + tr.o_bc3_detail {
     display: none;
 }

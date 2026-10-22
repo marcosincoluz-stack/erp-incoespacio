@@ -105,20 +105,40 @@ class TestPriceDb(TransactionCase):
         self.assertEqual(line.bc3_text, "Texto largo de desmontaje")
         self.assertAlmostEqual(line.price_unit, 12.5)
         self.assertEqual(line.product_uom, product.uom_id)
-        self.assertEqual(line.name, product.display_name)
+        self.assertEqual(line.name, product.name)
+        self.assertNotIn("[", line.name)
         self.assertNotIn("Texto largo", line.name)
 
-    def test_budget_links_exact_code_only(self):
+    def test_linked_code_snaps_back(self):
         self._import(_BASE)
-        categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
-        self.env["product.template"].create(
+        product = self.env["product.product"].search(
+            [("default_code", "=", "37.5")], limit=1
+        )
+        partner = self.env["res.partner"].create({"name": "Cliente obra"})
+        order = self.env["sale.order"].create({"partner_id": partner.id})
+        line = self.env["sale.order.line"].create(
+            {"order_id": order.id, "product_id": product.id}
+        )
+        line.write({"bc3_code": ""})
+        self.assertEqual(line.bc3_code, "37.5")
+        line.write({"bc3_code": "OTRO"})
+        self.assertEqual(line.bc3_code, "37.5")
+        loose = self.env["sale.order.line"].create(
             {
-                "name": "Casi",
-                "default_code": "137.5",
-                "categ_id": categ.id,
-                "detailed_type": "service",
-                "sale_ok": True,
+                "order_id": order.id,
+                "product_id": self.env.ref(
+                    "bc3_importer.product_product_product_units"
+                ).id,
+                "bc3_code": "ZZZ",
             }
+        )
+        loose.write({"bc3_code": "LIBRE"})
+        self.assertEqual(loose.bc3_code, "LIBRE")
+
+    def test_budget_keeps_bc3_title_unlinked(self):
+        self._import(_BASE)
+        catalog = self.env["product.product"].search(
+            [("default_code", "=", "37.5")], limit=1
         )
         partner = self.env["res.partner"].create({"name": "Cliente obra"})
         wizard = self.env["bc3.import.wizard"].create(
@@ -133,8 +153,10 @@ class TestPriceDb(TransactionCase):
         lines = wizard.sale_id.order_line.filtered(lambda line: not line.display_type)
         hit = lines.filtered(lambda line: line.bc3_code == "37.5")
         miss = lines.filtered(lambda line: line.bc3_code == "ZZZ")
-        self.assertEqual(hit.product_id.default_code, "37.5")
+        self.assertNotEqual(hit.product_id, catalog)
+        self.assertEqual(hit.product_id.name, "Sin vincular (m²)")
         self.assertAlmostEqual(hit.price_unit, 99.0)
+        self.assertIn("DESMONTAJE", hit.name)
         self.assertEqual(hit.product_uom, hit.product_id.uom_id)
         self.assertEqual(miss.product_id.name, "Sin vincular (ud)")
         square = self.env.ref("bc3_importer.product_product_product_square_meter")
@@ -145,6 +167,33 @@ class TestPriceDb(TransactionCase):
         self.env.add_to_compute(miss._fields["bc3_code"], miss)
         miss.flush_recordset(["bc3_code"])
         self.assertEqual(miss.bc3_code, "ZZZ")
+
+    def test_suggest_only_price_db(self):
+        self._import(_BASE)
+        other = self.env["product.product"].create(
+            {"name": "Tabique ajeno", "default_code": "ZZ-NO", "sale_ok": True}
+        )
+        Product = self.env["product.product"].with_context(price_db_only=True)
+        by_title = Product.name_search("tabique")
+        self.assertTrue(by_title)
+        self.assertNotIn(other.id, [row[0] for row in by_title])
+        self.assertNotIn(other.id, [row[0] for row in Product.name_search("ZZ-NO")])
+        by_code = Product.name_search("37.5")
+        self.assertEqual(len(by_code), 1)
+        self.assertIn("37.5", by_code[0][1])
+        self.assertIn("DESMONTAJE", by_code[0][1])
+        categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
+        self.assertIn(("categ_id", "=", categ.id), self.env["product.product"].price_db_domain())
+        created_id, _label = self.env["product.product"].with_context(
+            default_categ_id=categ.id,
+            default_detailed_type="service",
+            default_sale_ok=True,
+            default_purchase_ok=False,
+        ).name_create("Tabique nuevo ZZ")
+        created = self.env["product.product"].browse(created_id)
+        self.assertEqual(created.categ_id, categ)
+        self.assertTrue(created.sale_ok)
+        self.assertFalse(created.purchase_ok)
 
     def test_many_partidas_search(self):
         lines = [b"~C|C01#||Cap|0||0|"]

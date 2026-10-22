@@ -307,6 +307,15 @@ class TestConstruction(TransactionCase):
         self.order._ensure_project()
         self.assertEqual(self.order.project_id, project)
 
+    def test_unlink_draft_returns_to_order(self):
+        self.order.action_confirm()
+        action = self.order.action_create_certification()
+        cert = self.env["construction.certification"].browse(action["res_id"])
+        action = cert.action_unlink_draft()
+        self.assertEqual(action["res_model"], "sale.order")
+        self.assertEqual(action["res_id"], self.order.id)
+        self.assertFalse(cert.exists())
+
     def test_project_open_goes_to_order(self):
         self.order.action_confirm()
         action = self.order.project_id.with_context(

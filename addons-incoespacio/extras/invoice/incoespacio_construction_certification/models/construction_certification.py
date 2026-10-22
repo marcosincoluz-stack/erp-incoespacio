@@ -265,8 +265,12 @@ class ConstructionCertification(models.Model):
         return super().unlink()
 
     def action_unlink_draft(self):
+        self.ensure_one()
+        order = self.order_id
         self.unlink()
-        return {"type": "ir.actions.act_window_close"}
+        if not order:
+            return {"type": "ir.actions.act_window_close"}
+        return order.get_formview_action()
 
     def _get_or_create_retention_account(self, company):
         Account = self.env["account.account"]

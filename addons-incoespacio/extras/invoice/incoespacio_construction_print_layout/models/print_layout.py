@@ -13,6 +13,8 @@ _UOM_SHORT = {
     "metro lineal": "m",
     "metros lineales": "m",
     "metros": "m",
+    "minuto": "min",
+    "minutos": "min",
 }
 
 
@@ -34,7 +36,7 @@ class SaleOrder(models.Model):
     print_page_break = fields.Boolean(string="Salto de página por capítulo")
     print_only_chapters = fields.Boolean(string="Solo capítulos")
     print_cover = fields.Boolean(string="Portada")
-    print_signature = fields.Boolean(string="Condiciones y firma", default=True)
+    print_signature = fields.Boolean(string="Firma", default=True)
     print_gg_bi = fields.Boolean(string="Gastos generales y beneficio industrial")
     print_gg_pct = fields.Float(string="Gastos generales %", default=13.0)
     print_bi_pct = fields.Float(string="Beneficio industrial %", default=6.0)

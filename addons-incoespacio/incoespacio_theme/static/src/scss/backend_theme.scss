@@ -193,6 +193,47 @@ svg.o_spinner circle,
     color: inherit;
 }
 
+// Breadcrumb en una línea: camino › actual. flex-md-column es una utilidad
+// de Bootstrap con !important; solo se puede ganar con !important y más especificidad.
+.o_control_panel .o_breadcrumb {
+    --bs-breadcrumb-divider: "›";
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 0;
+
+    > .breadcrumb {
+        font-size: 1rem;
+        flex-shrink: 1;
+        min-width: 0;
+
+        &::after {
+            content: var(--bs-breadcrumb-divider);
+            padding: 0 0.5rem;
+            color: #495057;
+        }
+
+        .breadcrumb-item a {
+            color: $o-inco-blue;
+            font-weight: 500;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: #495057;
+        }
+    }
+
+    .o_last_breadcrumb_item {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+}
+
 // Navbar corporativa
 .o_main_navbar {
     --NavBar-background: #{$o-inco-gray};
@@ -556,6 +597,37 @@ html .o_web_client > .o_action_manager {
         &.o_list_many2one {
             white-space: normal !important;
             max-width: 12rem;
+        }
+    }
+}
+
+// Presupuesto: cada columna al texto que tiene, sin tope ni hueco fijo.
+.o_form_view.o_sale_order .o_field_x2many .o_list_table {
+    tbody td.o_list_char,
+    tbody td.o_list_text,
+    tbody td.o_list_many2one,
+    &.o_list_computing_widths > tbody > tr > td.o_list_char,
+    &.o_list_computing_widths > tbody > tr > td.o_list_text,
+    &.o_list_computing_widths > tbody > tr > td.o_list_many2one {
+        max-width: none;
+        white-space: nowrap;
+    }
+
+    .o_data_row:not(.o_selected_row):not(.o_is_line_section):not(.o_is_line_note) {
+        .o_list_char,
+        .o_list_text,
+        .o_list_many2one {
+            .o_field_widget,
+            .o_field_widget span:not(.o_m2o_avatar) {
+                display: block;
+                width: max-content;
+                -webkit-line-clamp: unset;
+                -webkit-box-orient: unset;
+                overflow: visible;
+                white-space: nowrap !important;
+                text-overflow: unset;
+                max-height: none;
+            }
         }
     }
 }

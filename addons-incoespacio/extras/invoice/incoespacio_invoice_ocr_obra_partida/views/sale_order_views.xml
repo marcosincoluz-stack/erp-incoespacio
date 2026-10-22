@@ -5,7 +5,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="incoespacio_construction_certification.view_order_form_inherit_certification"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
                 <field name="amount_vendor_cost" optional="show" widget="monetary"/>
             </xpath>
         </field>

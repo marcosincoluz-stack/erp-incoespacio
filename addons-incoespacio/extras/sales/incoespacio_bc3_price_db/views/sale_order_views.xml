@@ -5,14 +5,32 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="bc3_importer.view_sales_order_bc3"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='bc3_code']" position="before">
+                <field name="price_db_linked" column_invisible="True"/>
+                <field name="price_product_code" column_invisible="True"/>
+            </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='bc3_code']" position="attributes">
-                <attribute name="column_invisible">True</attribute>
+                <attribute name="string">Código</attribute>
+                <attribute name="widget">price_db_code</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='bc3_code']" position="after">
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom'][@groups='uom.group_uom']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom'][@groups='uom.group_uom']" position="after">
+                <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="move"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="attributes">
-                <attribute name="string">Partida</attribute>
+                <attribute name="column_invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_template_id']" position="attributes">
-                <attribute name="string">Partida</attribute>
+                <attribute name="column_invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="attributes">
+                <attribute name="string">Título</attribute>
+                <attribute name="widget">price_db_title</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
                 <attribute name="string">Partida</attribute>

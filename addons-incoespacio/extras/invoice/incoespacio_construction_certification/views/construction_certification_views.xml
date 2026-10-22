@@ -65,8 +65,8 @@
                                     <field name="bc3_cert_measures" column_invisible="True"/>
                                     <field name="bc3_prev_measures" column_invisible="True"/>
                                     <field name="code" readonly="not parent.lines_editable or display_type != False" string="Cód."/>
-                                    <field name="name" widget="section_and_note_text" readonly="not parent.lines_editable" string="Concepto / Partida"/>
                                     <field name="product_uom_id" readonly="not parent.lines_editable or display_type != False" string="Ud."/>
+                                    <field name="name" widget="section_and_note_text" readonly="not parent.lines_editable" string="Título"/>
                                     <field name="price_unit" readonly="not parent.lines_editable or display_type != False" string="P.U. (€)"/>
                                     <field name="qty_budget" readonly="not parent.lines_editable or display_type != False" string="Med. Pto."/>
                                     <field name="qty_previous" readonly="1" string="Med. Ant."/>

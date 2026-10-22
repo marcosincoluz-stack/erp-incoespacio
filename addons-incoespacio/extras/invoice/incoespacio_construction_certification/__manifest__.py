@@ -1,7 +1,7 @@
 {
     "name": "Incoespacio - Certificaciones de Obra y Retenciones",
     "summary": "Gestión de certificaciones a origen y retenciones de garantía en obras",
-    "version": "17.0.1.5.11",
+    "version": "17.0.1.5.12",
     "category": "Accounting/Sales",
     "author": "Incoespacio",
     "license": "LGPL-3",

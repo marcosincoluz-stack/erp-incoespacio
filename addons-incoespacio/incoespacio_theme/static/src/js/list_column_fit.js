@@ -48,6 +48,9 @@ patch(ListRenderer.prototype, {
             return;
         }
         const table = this.tableRef.el;
+        if (table.closest(".o_sale_order")) {
+            fitColumnsToText(table);
+        }
         for (const th of table.querySelectorAll("thead th.o_handle_cell")) {
             th.style.width = "33px";
         }
@@ -58,3 +61,56 @@ patch(ListRenderer.prototype, {
         table.style.width = `${Math.floor(total)}px`;
     },
 });
+
+// The laid-out cell is already stretched, so its box is the white space.
+// Measure the text and stop the column there.
+function textWidth(el) {
+    const prevWhite = el.style.whiteSpace;
+    const prevWidth = el.style.width;
+    el.style.whiteSpace = "nowrap";
+    el.style.width = "max-content";
+    const width = el.scrollWidth;
+    el.style.whiteSpace = prevWhite;
+    el.style.width = prevWidth;
+    return width;
+}
+
+function fitColumnsToText(table) {
+    const headers = [...table.querySelectorAll("thead th")];
+    headers.forEach((th, index) => {
+        if (
+            th.classList.contains("o_handle_cell") ||
+            th.classList.contains("o_list_button") ||
+            th.classList.contains("o_list_record_selector")
+        ) {
+            return;
+        }
+        const label = th.querySelector(".text-truncate") || th;
+        let width = textWidth(label);
+        const thStyle = getComputedStyle(th);
+        width += parseFloat(thStyle.paddingLeft) + parseFloat(thStyle.paddingRight);
+        for (const row of table.querySelectorAll("tbody > tr.o_data_row")) {
+            if (row.classList.contains("o_is_line_section") || row.classList.contains("o_is_line_note")) {
+                continue;
+            }
+            const cell = row.children[index];
+            if (!cell || cell.colSpan > 1) {
+                continue;
+            }
+            const field = cell.querySelector(".o_field_widget");
+            if (!field) {
+                continue;
+            }
+            const cellStyle = getComputedStyle(cell);
+            const need =
+                textWidth(field) +
+                parseFloat(cellStyle.paddingLeft) +
+                parseFloat(cellStyle.paddingRight);
+            width = Math.max(width, need);
+        }
+        const px = `${Math.ceil(width)}px`;
+        th.style.width = px;
+        th.style.minWidth = px;
+        th.style.maxWidth = px;
+    });
+}

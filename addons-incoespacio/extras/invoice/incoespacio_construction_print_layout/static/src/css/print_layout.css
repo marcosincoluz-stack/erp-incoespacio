@@ -38,13 +38,16 @@
     word-wrap: break-word;
 }
 .inco-budget-table th.num,
-.inco-budget-table td.num,
-.inco-budget-table td.ud {
+.inco-budget-table td.num {
     text-align: right;
     white-space: nowrap;
 }
 .inco-budget-table td.ud {
     text-align: center;
+    white-space: normal;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 .inco-budget-table tr.inco-chapter td {
     position: relative;
@@ -68,6 +71,7 @@
     margin-top: 2px;
 }
 .inco-budget-table tr.inco-measure td {
+    font-size: 0.68rem;
     font-weight: 400;
     color: #334155;
 }
@@ -77,12 +81,15 @@
 .inco-budget-table tr.inco-chapter-total {
     page-break-inside: avoid;
 }
-.inco-budget-table tr.inco-amount td {
-    font-weight: 700;
+.inco-budget-table tr.inco-amount td,
+.inco-budget-table tr.inco-measure-total td {
+    font-weight: 400;
 }
 .inco-budget-table tr.inco-measure-total td,
 .inco-budget-table tr.inco-chapter-total td {
     border-top: 1px solid #94a3b8;
+}
+.inco-budget-table tr.inco-chapter-total td {
     font-weight: 700;
 }
 .inco-budget-table tr.inco-chapter-total td.total-label {
@@ -124,4 +131,19 @@
     clear: both;
     margin-top: 12px;
     font-size: 0.82rem;
+}
+.inco-close.incoespacio-totals-table,
+.inco-close .incoespacio-totals-table,
+.inco-close.inco-amount-words {
+    font-size: 0.72rem;
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+.inco-close .incoespacio-totals-table tr td {
+    padding: 3px 8px;
+}
+.inco-close .incoespacio-totals-table tr.o_total td {
+    font-size: 0.78rem;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }

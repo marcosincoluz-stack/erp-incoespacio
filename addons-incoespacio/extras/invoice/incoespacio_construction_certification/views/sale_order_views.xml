@@ -83,7 +83,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
                 <field name="is_modification" optional="hide"/>
                 <field name="modification_ref" optional="show"/>
             </xpath>
