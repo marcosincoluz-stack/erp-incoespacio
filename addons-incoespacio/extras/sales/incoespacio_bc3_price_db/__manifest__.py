@@ -16,4 +16,9 @@
     ],
     "installable": True,
     "application": True,
+    "assets": {
+        "web.assets_backend": [
+            "incoespacio_bc3_price_db/static/src/js/price_import_continue.js",
+        ],
+    },
 }

@@ -5,8 +5,12 @@
         <field name="model">bc3.price.import.wizard</field>
         <field name="arch" type="xml">
             <form>
+                <div class="alert alert-info" role="alert">
+                    Un fichero grande se importa por tandas. No cierres la ventana hasta que se abra la lista.
+                </div>
                 <group>
                     <field name="bc3_file" widget="binary" filename="bc3_file_name"/>
+                    <field name="batch_ready" invisible="1"/>
                 </group>
                 <footer>
                     <button string="Importar" name="action_import" type="object" class="oe_highlight"/>

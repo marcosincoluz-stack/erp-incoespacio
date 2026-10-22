@@ -31,14 +31,20 @@ class TestPriceDb(TransactionCase):
         )
         return wizard.action_import()
 
-    def _products(self):
-        categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
-        return self.env["product.template"].search([("categ_id", "=", categ.id)])
+    def _products(self, codes=None):
+        domain = [
+            ("categ_id", "=", self.env.ref("incoespacio_bc3_price_db.price_db_category").id)
+        ]
+        if codes is not None:
+            domain.append(("default_code", "in", list(codes)))
+        return self.env["product.template"].search(domain)
 
     def test_import_partidas_and_skip_resources(self):
+        before_resources = len(self._products(["MAT01", "MO01"]))
         self._import(_BASE)
-        products = self._products()
+        products = self._products(["37.5", "TAB01"])
         self.assertEqual(set(products.mapped("default_code")), {"37.5", "TAB01"})
+        self.assertEqual(len(self._products(["MAT01", "MO01"])), before_resources)
         row = products.filtered(lambda p: p.default_code == "37.5")
         self.assertEqual(row.name, "DESMONTAJE CARPINTERIAS")
         self.assertAlmostEqual(row.list_price, 12.5)
@@ -51,13 +57,31 @@ class TestPriceDb(TransactionCase):
         self.assertTrue(row.sale_ok)
         self.assertFalse(row.purchase_ok)
 
+    def test_import_continues_across_requests(self):
+        raw = _HEADER + (
+            b"~C|C01#||Cap|0||0|\n"
+            b"~C|ZZBATCH1|m2|Uno batch|1.00||0|\n"
+            b"~C|ZZBATCH2|ud|Dos batch|2.00||0|\n"
+        )
+        wizard = self.env["bc3.price.import.wizard"].create(
+            {"bc3_file": base64.b64encode(raw), "bc3_file_name": "base.bc3"}
+        )
+        codes = ["ZZBATCH1", "ZZBATCH2"]
+        first = wizard.with_context(bc3_price_chunk=1).action_import()
+        self.assertEqual(first["tag"], "bc3_price_import_continue")
+        self.assertEqual(len(self._products(codes)), 1)
+        second = wizard.with_context(bc3_price_chunk=1).action_import()
+        self.assertEqual(second["type"], "ir.actions.act_window")
+        self.assertEqual(set(self._products(codes).mapped("default_code")), set(codes))
+        self.assertFalse(wizard.batch_rows)
+
     def test_reimport_updates_without_duplicating(self):
         self._import(_BASE)
         updated = _BASE.replace(b"|12.50|", b"|15.00|").replace(
             b"DESMONTAJE CARPINTERIAS", b"DESMONTAJE ACTUALIZADO"
         )
         self._import(updated)
-        products = self._products()
+        products = self._products(["37.5", "TAB01"])
         self.assertEqual(len(products), 2)
         row = products.filtered(lambda p: p.default_code == "37.5")
         self.assertAlmostEqual(row.list_price, 15.0)
@@ -134,7 +158,8 @@ class TestPriceDb(TransactionCase):
         started = time.time()
         self._import(_HEADER + b"\n".join(lines) + b"\n")
         elapsed = time.time() - started
-        products = self._products()
+        codes = ["T%04d" % index for index in range(200)]
+        products = self._products(codes)
         self.assertEqual(len(products), 200)
         self.assertEqual(
             len(products.filtered(lambda product: "tabique" in product.name.lower())),

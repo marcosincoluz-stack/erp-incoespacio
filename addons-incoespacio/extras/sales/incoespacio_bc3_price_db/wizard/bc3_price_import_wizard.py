@@ -20,8 +20,8 @@ _GENERIC_COPIES = (
     ("bc3_importer.product_product_product_template_g", "Sin vincular (g)"),
     ("bc3_importer.product_product_product_template_l", "Sin vincular (L)"),
 )
-# ponytail: one create() per chunk, no commit. Split with commit if a real bank exceeds the worker CPU limit.
-_CREATE_CHUNK = 500
+# One HTTP request per slice. limit_time_cpu is 60s per request; a commit inside the same request does not reset it.
+_BATCH = 500
 
 
 class Bc3PriceImportWizard(models.TransientModel):
@@ -30,6 +30,9 @@ class Bc3PriceImportWizard(models.TransientModel):
 
     bc3_file = fields.Binary(string="Fichero BC3", required=True)
     bc3_file_name = fields.Char(string="Nombre")
+    batch_ready = fields.Boolean()
+    batch_offset = fields.Integer()
+    batch_rows = fields.Json()
 
     def _rename_in_langs(self, xmlid, name, langs):
         record = self.env.ref(xmlid, raise_if_not_found=False)
@@ -55,8 +58,31 @@ class Bc3PriceImportWizard(models.TransientModel):
 
     def action_import(self):
         self.ensure_one()
-        if not self.bc3_file:
-            raise UserError(_("Falta el fichero BC3."))
+        if not self.batch_ready:
+            if not self.bc3_file:
+                raise UserError(_("Falta el fichero BC3."))
+            self._prepare_batch_rows()
+        rows = self.batch_rows or []
+        chunk = int(self.env.context.get("bc3_price_chunk") or _BATCH)
+        end = min(self.batch_offset + chunk, len(rows))
+        self._apply_rows(rows[self.batch_offset : end])
+        self.batch_offset = end
+        if end < len(rows):
+            return {
+                "type": "ir.actions.client",
+                "tag": "bc3_price_import_continue",
+                "params": {
+                    "wizard_id": self.id,
+                    "done": end,
+                    "total": len(rows),
+                },
+            }
+        self.batch_rows = False
+        return self.env["ir.actions.act_window"]._for_xml_id(
+            "incoespacio_bc3_price_db.action_price_db"
+        )
+
+    def _prepare_batch_rows(self):
         parser = self.env["bc3.import.wizard"].new({"bc3_file": self.bc3_file})
         concepts, tree, detail = parser._collect_tree()
         texts = detail.get("texts") or {}
@@ -69,7 +95,7 @@ class Bc3PriceImportWizard(models.TransientModel):
             raise UserError(_("El fichero no contiene partidas."))
         categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
         existing = {
-            product.default_code: product
+            product.default_code: product.id
             for product in self.env["product.template"].search(
                 [
                     ("default_code", "in", list(partidas)),
@@ -79,24 +105,36 @@ class Bc3PriceImportWizard(models.TransientModel):
         }
         prices = {}
         uoms = {}
-        to_create = []
+        rows = []
+        for code, concept in partidas.items():
+            rows.append(
+                {
+                    "product_id": existing.get(code) or 0,
+                    "vals": self._partida_vals(
+                        parser, code, concept, concepts, tree, prices, texts, categ, uoms
+                    ),
+                }
+            )
+        self.write(
+            {
+                "batch_rows": rows,
+                "batch_offset": 0,
+                "batch_ready": True,
+            }
+        )
+
+    def _apply_rows(self, rows):
         Product = self.env["product.template"].with_context(
             tracking_disable=True, mail_create_nolog=True
         )
-        for code, concept in partidas.items():
-            vals = self._partida_vals(
-                parser, code, concept, concepts, tree, prices, texts, categ, uoms
-            )
-            product = existing.get(code)
-            if product:
-                product.write(vals)
+        to_create = []
+        for row in rows:
+            if row["product_id"]:
+                Product.browse(row["product_id"]).write(row["vals"])
             else:
-                to_create.append(vals)
-        for start in range(0, len(to_create), _CREATE_CHUNK):
-            Product.create(to_create[start : start + _CREATE_CHUNK])
-        return self.env["ir.actions.act_window"]._for_xml_id(
-            "incoespacio_bc3_price_db.action_price_db"
-        )
+                to_create.append(row["vals"])
+        if to_create:
+            Product.create(to_create)
 
     def _is_partida(self, parser, code, concept, tree):
         unit = concept.get("unit") or ""
