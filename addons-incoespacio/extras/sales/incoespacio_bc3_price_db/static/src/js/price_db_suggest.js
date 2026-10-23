@@ -156,16 +156,29 @@ export class PriceDbSuggest extends Component {
         return this._priceDomain;
     }
 
+    _choiceCode() {
+        const label = (this.state.choices[0] && this.state.choices[0].label) || "";
+        const match = /^\[([^\]]+)\]/.exec(label);
+        return match ? match[1] : "";
+    }
+
     async priceContext(name) {
         const domain = await this.priceDomain();
         const categ = domain.find((item) => item[0] === "categ_id");
-        return {
+        const context = {
             default_name: name || false,
             default_categ_id: categ ? categ[2] : false,
             default_detailed_type: "service",
             default_sale_ok: true,
             default_purchase_ok: false,
         };
+        if (this.props.multiline) {
+            const base = this.props.record.data.price_product_code || this._choiceCode();
+            if (base) {
+                context.price_db_base_code = base;
+            }
+        }
+        return context;
     }
 
     async pickId(id) {

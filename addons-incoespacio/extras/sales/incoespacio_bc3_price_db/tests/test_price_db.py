@@ -194,6 +194,30 @@ class TestPriceDb(TransactionCase):
         self.assertEqual(created.categ_id, categ)
         self.assertTrue(created.sale_ok)
         self.assertFalse(created.purchase_ok)
+        self.assertFalse(created.default_code)
+
+    def test_name_create_next_code(self):
+        categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
+        Product = self.env["product.product"]
+        for code in ("plymnt200", "plymnt201"):
+            Product.create(
+                {
+                    "name": "Tabiquería",
+                    "default_code": code,
+                    "categ_id": categ.id,
+                    "detailed_type": "service",
+                    "sale_ok": True,
+                    "purchase_ok": False,
+                }
+            )
+        created_id, _label = Product.with_context(
+            default_categ_id=categ.id,
+            default_detailed_type="service",
+            default_sale_ok=True,
+            default_purchase_ok=False,
+            price_db_base_code="plymnt200",
+        ).name_create("Tabique 15x15")
+        self.assertEqual(Product.browse(created_id).default_code, "plymnt202")
 
     def test_many_partidas_search(self):
         lines = [b"~C|C01#||Cap|0||0|"]
