@@ -65,13 +65,14 @@ def _filter_report_lines(lines, first, last, keep_partida, drop_null_chapters, a
             if last and block[0] == last:
                 end = index + 1
         blocks = [
-            block
-            for block in blocks[start:end]
-            if block and _is_root_chapter(block[0])
+            block for block in blocks[start:end] if block and _is_root_chapter(block[0])
         ]
     ids = []
     for block in blocks:
-        ids.extend(line.id for line in _trim_block(block, keep_partida, drop_null_chapters, amount))
+        ids.extend(
+            line.id
+            for line in _trim_block(block, keep_partida, drop_null_chapters, amount)
+        )
     return lines.browse(ids)
 
 
@@ -157,7 +158,9 @@ class SaleOrder(models.Model):
     print_chapter_last_id = fields.Many2one(
         "sale.order.line", string="Capítulo final", ondelete="set null"
     )
-    print_hide_null_chapters = fields.Boolean(string="Ocultar capítulos con importe nulo")
+    print_hide_null_chapters = fields.Boolean(
+        string="Ocultar capítulos con importe nulo"
+    )
     print_hide_null_price = fields.Boolean(string="Ocultar partidas con precio nulo")
     print_hide_null_qty = fields.Boolean(string="Ocultar partidas con cantidad nula")
 
@@ -248,7 +251,9 @@ class ConstructionCertification(models.Model):
     print_full_text = fields.Boolean(string="Con texto completo")
     print_measures = fields.Boolean(string="Mediciones parciales")
     print_chapter_first_id = fields.Many2one(
-        "construction.certification.line", string="Capítulo inicial", ondelete="set null"
+        "construction.certification.line",
+        string="Capítulo inicial",
+        ondelete="set null",
     )
     print_chapter_last_id = fields.Many2one(
         "construction.certification.line", string="Capítulo final", ondelete="set null"
@@ -386,7 +391,9 @@ class ReportSaleOrder(models.AbstractModel):
 
 
 class ReportCertification(models.AbstractModel):
-    _name = "report.incoespacio_construction_certification.report_certification_document"
+    _name = (
+        "report.incoespacio_construction_certification.report_certification_document"
+    )
     _description = "Certificación"
     # The report name is fixed by the existing action; the default table name exceeds 63 chars.
     _table = "report_cert_print_options"

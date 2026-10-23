@@ -26,7 +26,7 @@ Excepciones, porque partirlas no deja un módulo instalable con sentido:
 - `incoespacio_theme` — chrome. Los colores salen de las variables SCSS del core; `backend_theme.scss` no usa `!important`.
 - `bc3_importer` — port OCA (AGPL, autores originales). No se reformatea.
 
-`incoespacio_construction_certification_assistant` está en su techo medido (503). No se deja crecer.
+`incoespacio_construction_certification_assistant` está en su techo medido (504). No se deja crecer.
 
 El `!important` de `report_styles.css` se queda: wkhtmltopdf lo necesita.
 

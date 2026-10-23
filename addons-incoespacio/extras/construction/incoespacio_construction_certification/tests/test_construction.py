@@ -58,7 +58,12 @@ class TestConstruction(TransactionCase):
         cert = self.env["construction.certification"].browse(action["res_id"])
         line = cert.line_ids.filtered(lambda l: not l.display_type)[:1]
         result = line.onchange(
-            {"qty_previous": 2.0, "qty_period": 3.0, "qty_origin": 2.0, "price_unit": 100.0},
+            {
+                "qty_previous": 2.0,
+                "qty_period": 3.0,
+                "qty_origin": 2.0,
+                "price_unit": 100.0,
+            },
             ["qty_period"],
             {
                 "qty_previous": {},
@@ -234,7 +239,9 @@ class TestConstruction(TransactionCase):
         action = self.order.action_create_certification()
         cert = self.env["construction.certification"].browse(action["res_id"])
         line = cert.line_ids.filtered(lambda item: not item.display_type)[:1]
-        line.bc3_cert_measures = [{"comment": "Zona A", "units": 4, "budget_key": "zona"}]
+        line.bc3_cert_measures = [
+            {"comment": "Zona A", "units": 4, "budget_key": "zona"}
+        ]
         action = self.order.action_create_certification()
         line2 = (
             self.env["construction.certification"]
@@ -244,9 +251,12 @@ class TestConstruction(TransactionCase):
         self.assertEqual(line2.bc3_measures[0]["key"], "zona")
         self.assertEqual(line2.bc3_prev_measures[0]["budget_key"], "zona")
         self.assertAlmostEqual(line2.bc3_prev_measures[0]["partial"], 4.0)
-        line2.bc3_cert_measures = [{"comment": "Zona A", "units": 2, "budget_key": "zona"}]
+        line2.bc3_cert_measures = [
+            {"comment": "Zona A", "units": 2, "budget_key": "zona"}
+        ]
         used = (
-            line2.bc3_prev_measures[0]["partial"] + line2.bc3_cert_measures[0]["partial"]
+            line2.bc3_prev_measures[0]["partial"]
+            + line2.bc3_cert_measures[0]["partial"]
         )
         self.assertAlmostEqual(line2.bc3_measures[0]["partial"] - used, 0.0)
 
@@ -283,17 +293,22 @@ class TestConstruction(TransactionCase):
             self.order.action_return_retention()
 
     def test_retention_account_wrong_type(self):
-        account = self.env["account.account"].search([
-            ("code", "=", "430800"),
-            ("company_id", "=", self.env.company.id),
-        ], limit=1)
+        account = self.env["account.account"].search(
+            [
+                ("code", "=", "430800"),
+                ("company_id", "=", self.env.company.id),
+            ],
+            limit=1,
+        )
         if not account:
-            account = self.env["account.account"].create({
-                "code": "430800",
-                "name": "Retención mal tipada",
-                "account_type": "asset_current",
-                "company_id": self.env.company.id,
-            })
+            account = self.env["account.account"].create(
+                {
+                    "code": "430800",
+                    "name": "Retención mal tipada",
+                    "account_type": "asset_current",
+                    "company_id": self.env.company.id,
+                }
+            )
         account.account_type = "income"
         with self.assertRaises(UserError):
             self.env["construction.certification"]._get_or_create_retention_account(
@@ -382,8 +397,20 @@ class TestConstruction(TransactionCase):
         self.order.write(
             {
                 "order_line": [
-                    (0, 0, {"display_type": "line_section", "name": "C01", "bc3_level": 0}),
-                    (0, 0, {"display_type": "line_section", "name": "C01A", "bc3_level": 1}),
+                    (
+                        0,
+                        0,
+                        {"display_type": "line_section", "name": "C01", "bc3_level": 0},
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "display_type": "line_section",
+                            "name": "C01A",
+                            "bc3_level": 1,
+                        },
+                    ),
                     (
                         0,
                         0,

@@ -5,7 +5,6 @@ from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 
 
 class AuthSignupHomeInternal(AuthSignupHome):
-
     def get_auth_signup_config(self):
         config = super().get_auth_signup_config()
         config["signup_enabled"] = False

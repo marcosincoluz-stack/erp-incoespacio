@@ -3,10 +3,13 @@
     <t t-inherit="web.FormView" t-inherit-mode="extension">
         <xpath expr="//t[@t-set-slot='control-panel-additional-actions']" position="before">
             <t t-set-slot="control-panel-navigation-additional">
-                <button t-if="hasChatter" type="button"
-                        class="btn btn-secondary o_chatter_fold_btn"
-                        t-att-class="{ active: !chatterFold.folded }"
-                        t-on-click="toggleChatterFold">
+                <button
+          t-if="hasChatter"
+          type="button"
+          class="btn btn-secondary o_chatter_fold_btn"
+          t-att-class="{ active: !chatterFold.folded }"
+          t-on-click="toggleChatterFold"
+        >
                     Mensajes
                 </button>
             </t>

@@ -27,9 +27,9 @@ class AccountMoveLine(models.Model):
             [("project_id", "=", self.move_id.project_id.id)],
             limit=1,
         )
-        last = order.certification_ids.filtered(
-            lambda c: c.state == "invoiced"
-        ).sorted("number")[-1:]
+        last = order.certification_ids.filtered(lambda c: c.state == "invoiced").sorted(
+            "number"
+        )[-1:]
         full = {
             line.sale_order_line_id.id
             for line in last.line_ids

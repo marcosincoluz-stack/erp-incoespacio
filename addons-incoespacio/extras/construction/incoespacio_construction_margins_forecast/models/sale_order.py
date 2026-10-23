@@ -48,9 +48,7 @@ class SaleOrder(models.Model):
             order.amount_cost_incurred = incurred
             order.amount_cost_forecast = cost_f
             order.amount_margin_forecast = margin_f
-            order.margin_percent_forecast = (
-                margin_f / sale * 100.0 if sale else 0.0
-            )
+            order.margin_percent_forecast = margin_f / sale * 100.0 if sale else 0.0
 
 
 class SaleOrderLine(models.Model):

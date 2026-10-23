@@ -15,7 +15,9 @@ class AccountMove(models.Model):
         search="_search_has_unassigned_partida",
     )
 
-    @api.depends("invoice_line_ids.construction_line_id", "invoice_line_ids.display_type")
+    @api.depends(
+        "invoice_line_ids.construction_line_id", "invoice_line_ids.display_type"
+    )
     def _compute_has_unassigned_partida(self):
         for move in self:
             move.has_unassigned_partida = any(

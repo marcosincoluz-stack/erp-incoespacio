@@ -1,35 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <template id="report_certification_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="incoespacio_reports.external_layout_incoespacio">
                     <div class="page" style="font-size: 12px; font-family: sans-serif; color: #212529;">
-                        <table style="width: 100%; margin-top: 5px; margin-bottom: 20px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
+                        <table
+              style="width: 100%; margin-top: 5px; margin-bottom: 20px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;"
+            >
                             <tr>
                                 <td class="inco-card" style="width: 50%; vertical-align: top;">
                                     <div class="inco-card-title">OBRA</div>
-                                    <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
-                                        <span t-field="o.order_id.name"/>
+                                    <div
+                    style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;"
+                  >
+                                        <span t-field="o.order_id.name" />
                                     </div>
                                     <div t-if="o.project_id" style="color: #334155;">
-                                        <strong>Proyecto:</strong> <span t-field="o.project_id.name"/>
+                                        <strong>Proyecto:</strong> <span t-field="o.project_id.name" />
                                     </div>
                                 </td>
                                 <td class="inco-card" style="width: 50%; vertical-align: top;">
                                     <div class="inco-card-title">CLIENTE</div>
-                                    <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
-                                        <span t-field="o.partner_id.name"/>
+                                    <div
+                    style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;"
+                  >
+                                        <span t-field="o.partner_id.name" />
                                     </div>
                                     <div t-if="o.partner_id.vat" style="color: #475569;">
-                                        <strong>CIF/NIF:</strong> <span t-field="o.partner_id.vat"/>
+                                        <strong>CIF/NIF:</strong> <span t-field="o.partner_id.vat" />
                                     </div>
                                 </td>
                             </tr>
                         </table>
 
                         <!-- PARTIDAS TABLE -->
-                        <table class="table table-sm table-bordered" style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 9.5px;">
+                        <table
+              class="table table-sm table-bordered"
+              style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 9.5px;"
+            >
                             <thead>
                                 <tr style="background-color: #f1f3f5; text-align: center; font-weight: bold;">
                                     <th style="width: 4%;">Ud.</th>
@@ -50,30 +59,50 @@
                                     <t t-if="l.display_type == 'line_section'">
                                         <tr style="background-color: #e9ecef; font-weight: bold;">
                                             <td colspan="11" style="padding-left: 8px;">
-                                                <span t-esc="l._get_report_name()"/>
+                                                <span t-esc="l._get_report_name()" />
                                             </td>
                                         </tr>
                                     </t>
                                     <t t-elif="l.display_type == 'line_note'">
                                         <tr style="font-style: italic; color: #6c757d;">
                                             <td colspan="11" style="padding-left: 12px;">
-                                                <span t-field="l.name"/>
+                                                <span t-field="l.name" />
                                             </td>
                                         </tr>
                                     </t>
                                     <t t-else="">
                                         <tr>
-                                            <td style="text-align: center;"><span t-field="l.product_uom_id.name"/></td>
-                                            <td style="font-size: 8.5px; line-height: 1.25;"><span t-esc="l._get_report_name()"/></td>
-                                            <td style="text-align: right;"><span t-field="l.qty_budget"/></td>
-                                            <td style="text-align: right;"><span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                            <td style="text-align: right;"><span t-field="l.amount_budget" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                            <td style="text-align: right;"><span t-field="l.qty_origin"/></td>
-                                            <td style="text-align: right;"><span t-field="l.amount_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                            <td style="text-align: right;"><span t-field="l.qty_previous"/></td>
-                                            <td style="text-align: right; font-weight: bold;"><span t-field="l.qty_period"/></td>
-                                            <td style="text-align: right; font-weight: bold;"><span t-field="l.amount_period" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-                                            <td style="text-align: right;"><span t-esc="round(l.percentage_origin, 1)"/> %</td>
+                                            <td style="text-align: center;"><span
+                          t-field="l.product_uom_id.name"
+                        /></td>
+                                            <td style="font-size: 8.5px; line-height: 1.25;"><span
+                          t-esc="l._get_report_name()"
+                        /></td>
+                                            <td style="text-align: right;"><span t-field="l.qty_budget" /></td>
+                                            <td style="text-align: right;"><span
+                          t-field="l.price_unit"
+                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                        /></td>
+                                            <td style="text-align: right;"><span
+                          t-field="l.amount_budget"
+                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                        /></td>
+                                            <td style="text-align: right;"><span t-field="l.qty_origin" /></td>
+                                            <td style="text-align: right;"><span
+                          t-field="l.amount_origin"
+                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                        /></td>
+                                            <td style="text-align: right;"><span t-field="l.qty_previous" /></td>
+                                            <td style="text-align: right; font-weight: bold;"><span
+                          t-field="l.qty_period"
+                        /></td>
+                                            <td style="text-align: right; font-weight: bold;"><span
+                          t-field="l.amount_period"
+                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                        /></td>
+                                            <td style="text-align: right;"><span
+                          t-esc="round(l.percentage_origin, 1)"
+                        /> %</td>
                                         </tr>
                                     </t>
                                 </t>
@@ -81,57 +110,92 @@
                         </table>
 
                         <div class="clearfix" style="margin-top: 16px;">
-                            <div t-if="o.notes" style="float: left; width: 50%; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; background-color: #fcfcfc;">
+                            <div
+                t-if="o.notes"
+                style="float: left; width: 50%; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; background-color: #fcfcfc;"
+              >
                                 <strong>Observaciones:</strong>
-                                <div t-field="o.notes"/>
+                                <div t-field="o.notes" />
                             </div>
-                            <table class="inco-cert-totals table table-sm" style="float: right; width: 48%; border-collapse: collapse; font-size: 11px;">
+                            <table
+                class="inco-cert-totals table table-sm"
+                style="float: right; width: 48%; border-collapse: collapse; font-size: 11px;"
+              >
                                 <tr>
                                     <td><strong>Presupuesto Contratado:</strong></td>
-                                    <td style="text-align: right;"><span t-field="o.amount_total_budget" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right;"><span
+                      t-field="o.amount_total_budget"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Total Ejecutado a Origen:</strong></td>
-                                    <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_total_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right; font-weight: bold;"><span
+                      t-field="o.amount_total_origin"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr>
                                     <td>Menos Certificado Anteriormente:</td>
-                                    <td style="text-align: right; color: #666;">- <span t-field="o.amount_previous_origin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right; color: #666;">- <span
+                      t-field="o.amount_previous_origin"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr style="border-top: 1px solid #333; background-color: #f8f9fa;">
                                     <td><strong>Base Imponible del Periodo:</strong></td>
-                                    <td style="text-align: right; font-weight: bold;"><span t-field="o.amount_period_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right; font-weight: bold;"><span
+                      t-field="o.amount_period_untaxed"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr t-if="o.retention_rate > 0">
-                                    <td>Menos Retención de Garantía (<span t-esc="round(o.retention_rate, 1)"/>%):</td>
-                                    <td style="text-align: right; color: #c00;">- <span t-field="o.amount_retention" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td>Menos Retención de Garantía (<span t-esc="round(o.retention_rate, 1)" />%):</td>
+                                    <td style="text-align: right; color: #c00;">- <span
+                      t-field="o.amount_retention"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr>
                                     <td>Base Neta del Periodo:</td>
-                                    <td style="text-align: right;"><span t-field="o.amount_net_period" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right;"><span
+                      t-field="o.amount_net_period"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr>
                                     <td>IVA del Periodo:</td>
-                                    <td style="text-align: right;"><span t-field="o.amount_period_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right;"><span
+                      t-field="o.amount_period_tax"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                                 <tr style="border-top: 2px solid #000; background-color: #e9ecef; font-size: 13px;">
                                     <td><strong>TOTAL A PERCIBIR (IVA inc.):</strong></td>
-                                    <td style="text-align: right; font-weight: bold; color: #000;"><span t-field="o.amount_period_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="text-align: right; font-weight: bold; color: #000;"><span
+                      t-field="o.amount_period_total"
+                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                    /></td>
                                 </tr>
                             </table>
                         </div>
 
                         <t t-if="o.show_measure_sheet">
                             <div style="page-break-before: always;">
-                                <div style="font-weight: bold; font-size: 13px; margin-bottom: 10px; text-transform: uppercase;">
-                                    Hoja de mediciones — Certificación Nº <span t-field="o.number"/>
+                                <div
+                  style="font-weight: bold; font-size: 13px; margin-bottom: 10px; text-transform: uppercase;"
+                >
+                                    Hoja de mediciones — Certificación Nº <span t-field="o.number" />
                                 </div>
                                 <t t-foreach="o.line_ids" t-as="l">
                                     <t t-if="not l.display_type and l.bc3_cert_measures">
                                         <div style="font-weight: bold; margin-top: 12px; font-size: 10px;">
-                                            <span t-esc="l._get_report_name()"/>
+                                            <span t-esc="l._get_report_name()" />
                                         </div>
-                                        <table class="table table-sm table-bordered" style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 4px;">
+                                        <table
+                      class="table table-sm table-bordered"
+                      style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 4px;"
+                    >
                                             <thead>
                                                 <tr style="background-color: #f1f3f5;">
                                                     <th>Comentario</th>
@@ -144,34 +208,50 @@
                                             </thead>
                                             <tbody>
                                                 <tr t-foreach="l.bc3_cert_measures" t-as="row">
-                                                    <td><span t-esc="row.get('comment')"/></td>
-                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('units') or 0, digits=3)"/></td>
-                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('length') or 0, digits=3)"/></td>
-                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('width') or 0, digits=3)"/></td>
-                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('height') or 0, digits=3)"/></td>
-                                                    <td style="text-align: right;"><span t-esc="formatLang(row.get('partial') or 0, digits=3)"/></td>
+                                                    <td><span t-esc="row.get('comment')" /></td>
+                                                    <td style="text-align: right;"><span
+                              t-esc="formatLang(row.get('units') or 0, digits=3)"
+                            /></td>
+                                                    <td style="text-align: right;"><span
+                              t-esc="formatLang(row.get('length') or 0, digits=3)"
+                            /></td>
+                                                    <td style="text-align: right;"><span
+                              t-esc="formatLang(row.get('width') or 0, digits=3)"
+                            /></td>
+                                                    <td style="text-align: right;"><span
+                              t-esc="formatLang(row.get('height') or 0, digits=3)"
+                            /></td>
+                                                    <td style="text-align: right;"><span
+                              t-esc="formatLang(row.get('partial') or 0, digits=3)"
+                            /></td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                         <div style="font-size: 9px; margin-bottom: 8px;">
-                                            Anterior: <span t-esc="formatLang(l.qty_previous, digits=3)"/>
-                                            — Periodo: <span t-esc="formatLang(l.qty_period, digits=3)"/>
-                                            — Origen: <span t-esc="formatLang(l.qty_origin, digits=3)"/>
+                                            Anterior: <span t-esc="formatLang(l.qty_previous, digits=3)" />
+                                            — Periodo: <span t-esc="formatLang(l.qty_period, digits=3)" />
+                                            — Origen: <span t-esc="formatLang(l.qty_origin, digits=3)" />
                                         </div>
                                     </t>
                                 </t>
                             </div>
                         </t>
 
-                        <table style="width: 100%; margin-top: 36px; border-collapse: separate; border-spacing: 24px 0; page-break-inside: avoid; font-size: 10px;">
+                        <table
+              style="width: 100%; margin-top: 36px; border-collapse: separate; border-spacing: 24px 0; page-break-inside: avoid; font-size: 10px;"
+            >
                             <tr>
-                                <td style="width: 50%; vertical-align: top; border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
-                                    <strong>El promotor</strong><br/>
-                                    <span t-field="o.partner_id.name"/><br/><br/>
+                                <td
+                  style="width: 50%; vertical-align: top; border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;"
+                >
+                                    <strong>El promotor</strong><br />
+                                    <span t-field="o.partner_id.name" /><br /><br />
                                     <span style="color: #888;">Firma</span>
                                 </td>
-                                <td style="width: 50%; vertical-align: top; border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;">
-                                    <strong>La dirección facultativa</strong><br/><br/>
+                                <td
+                  style="width: 50%; vertical-align: top; border: 1px solid #ced4da; padding: 10px; height: 110px; background-color: #fafafa;"
+                >
+                                    <strong>La dirección facultativa</strong><br /><br />
                                     <span style="color: #888;">Firma</span>
                                 </td>
                             </tr>

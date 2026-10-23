@@ -25,13 +25,16 @@ class PurchaseOrder(models.Model):
         for order in purchase_orders:
             if order.create_uid != bot:
                 continue
-            partner_ids = [user.partner_id.id for user in group.users if user.partner_id]
+            partner_ids = [
+                user.partner_id.id for user in group.users if user.partner_id
+            ]
             supplier_name = order.partner_id.name if order.partner_id else "Sin asignar"
             order.message_post(
                 body=Markup(
                     "🤖 <b>IncoBot</b>: He generado automáticamente la orden de compra "
                     "<b>%s</b> para el proveedor <b>%s</b>."
-                ) % (order.name, supplier_name),
+                )
+                % (order.name, supplier_name),
                 partner_ids=partner_ids,
                 subtype_xmlid="mail.mt_comment",
             )

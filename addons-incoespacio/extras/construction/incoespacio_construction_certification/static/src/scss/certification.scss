@@ -1,131 +1,141 @@
 // Odoo already sticks thead; x2many lists grow with content so it never triggers.
 .o_certification_lines .o_list_renderer {
-    // ponytail: 18rem ≈ control panel + cabecera de ficha; ajustar si crece el formulario
-    max-height: calc(100vh - 18rem);
+  // ponytail: 18rem ≈ control panel + cabecera de ficha; ajustar si crece el formulario
+  max-height: calc(100vh - 18rem);
 }
 
 .o_cert_grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+
+  .o_cert_panel {
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.25rem;
+    background: #fff;
+    padding: 0.5rem;
+  }
+
+  .o_cert_panel_head {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     gap: 1rem;
-    align-items: flex-start;
+    min-height: 1.75rem;
+    margin-bottom: 0.35rem;
 
-    .o_cert_panel {
-        border: 1px solid var(--bs-border-color, #dee2e6);
-        border-radius: 0.25rem;
-        background: #fff;
-        padding: 0.5rem;
+    > span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--bs-secondary-color, #6c757d);
+    }
+  }
+
+  .o_cert_table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.8125rem;
+    width: 31.9rem;
+
+    .o_cert_col_comment {
+      width: 8.5rem;
+    }
+    .o_cert_col_num {
+      width: 3.1rem;
+    }
+    .o_cert_col_partial {
+      width: 4.2rem;
+    }
+    .o_cert_col_act {
+      width: 5.2rem;
+    }
+    .o_cert_col_icon {
+      width: 1.6rem;
     }
 
-    .o_cert_panel_head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        min-height: 1.75rem;
-        margin-bottom: 0.35rem;
-
-        > span {
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--bs-secondary-color, #6c757d);
-        }
+    th,
+    td {
+      height: 1.9rem;
+      padding: 0 0.35rem;
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .o_cert_table {
-        table-layout: fixed;
-        border-collapse: collapse;
-        margin: 0;
-        font-size: 0.8125rem;
-        width: 31.9rem;
-
-        .o_cert_col_comment { width: 8.5rem; }
-        .o_cert_col_num { width: 3.1rem; }
-        .o_cert_col_partial { width: 4.2rem; }
-        .o_cert_col_act { width: 5.2rem; }
-        .o_cert_col_icon { width: 1.6rem; }
-
-        th,
-        td {
-            height: 1.9rem;
-            padding: 0 0.35rem;
-            vertical-align: middle;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        th:not(:first-child),
-        td:not(:first-child):not(.o_cert_text):not(.o_cert_act) {
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
-
-        thead th {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--bs-secondary-color, #6c757d);
-            border-bottom: 1px solid var(--bs-border-color, #dee2e6);
-        }
-
-        .o_cert_group td {
-            height: 1.4rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-align: left;
-            color: var(--bs-secondary-color, #6c757d);
-            border-top: 1px solid var(--bs-border-color, #dee2e6);
-        }
-
-        .o_cert_empty td {
-            font-style: italic;
-            text-align: left;
-            color: var(--bs-secondary-color, #6c757d);
-        }
-
-        tfoot td {
-            border-top: 1px solid var(--bs-border-color, #dee2e6);
-            color: var(--bs-secondary-color, #6c757d);
-        }
-
-        tfoot .o_cert_origin td {
-            font-weight: 700;
-            color: inherit;
-        }
+    th:not(:first-child),
+    td:not(:first-child):not(.o_cert_text):not(.o_cert_act) {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
-    .o_cert_panel:first-child .o_cert_table {
-        width: 34.5rem;
+    thead th {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--bs-secondary-color, #6c757d);
+      border-bottom: 1px solid var(--bs-border-color, #dee2e6);
     }
 
-    .o_cert_input {
-        width: 100%;
-        height: 1.4rem;
-        margin: 0;
-        padding: 0 0.25rem;
-        border: 0;
-        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
-        border-radius: 0;
-        background: transparent;
-        font-size: inherit;
-        line-height: 1.4rem;
-
-        &.o_cert_input_num {
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
+    .o_cert_group td {
+      height: 1.4rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-align: left;
+      color: var(--bs-secondary-color, #6c757d);
+      border-top: 1px solid var(--bs-border-color, #dee2e6);
     }
 
-    .o_cert_act {
-        text-align: left;
-        white-space: nowrap;
+    .o_cert_empty td {
+      font-style: italic;
+      text-align: left;
+      color: var(--bs-secondary-color, #6c757d);
     }
 
-    .o_cert_warn {
-        margin-top: 0.35rem;
-        font-size: 0.75rem;
-        color: var(--bs-warning-text-emphasis, #997404);
+    tfoot td {
+      border-top: 1px solid var(--bs-border-color, #dee2e6);
+      color: var(--bs-secondary-color, #6c757d);
     }
+
+    tfoot .o_cert_origin td {
+      font-weight: 700;
+      color: inherit;
+    }
+  }
+
+  .o_cert_panel:first-child .o_cert_table {
+    width: 34.5rem;
+  }
+
+  .o_cert_input {
+    width: 100%;
+    height: 1.4rem;
+    margin: 0;
+    padding: 0 0.25rem;
+    border: 0;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0;
+    background: transparent;
+    font-size: inherit;
+    line-height: 1.4rem;
+
+    &.o_cert_input_num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .o_cert_act {
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .o_cert_warn {
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--bs-warning-text-emphasis, #997404);
+  }
 }

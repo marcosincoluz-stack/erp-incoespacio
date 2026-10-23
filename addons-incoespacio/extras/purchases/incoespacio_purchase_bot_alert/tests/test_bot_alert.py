@@ -26,9 +26,7 @@ class TestPurchaseBotAlert(TransactionCase):
         bot = self.env.ref("base.user_root")
         partner = self.env["res.partner"].create({"name": "Proveedor bot"})
         order = (
-            self.env["purchase.order"]
-            .with_user(bot)
-            .create({"partner_id": partner.id})
+            self.env["purchase.order"].with_user(bot).create({"partner_id": partner.id})
         )
         self.assertIn("IncoBot", order.message_ids[:1].body)
         activity = self.env["mail.activity"].search(

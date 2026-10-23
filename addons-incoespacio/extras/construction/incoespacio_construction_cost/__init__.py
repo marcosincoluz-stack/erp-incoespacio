@@ -1,15 +1,30 @@
 from . import models
 
 MOVED_FIELDS = (
-    ("incoespacio_invoice_ocr_obra", "field_account_move_line__construction_section_id"),
+    (
+        "incoespacio_invoice_ocr_obra",
+        "field_account_move_line__construction_section_id",
+    ),
     ("incoespacio_invoice_ocr_obra", "field_sale_order__chapter_cost_text"),
     ("incoespacio_invoice_ocr_obra", "field_sale_order__amount_cost_in_chapter"),
     ("incoespacio_invoice_ocr_obra", "field_sale_order__amount_cost_no_chapter"),
-    ("incoespacio_invoice_ocr_obra_partida", "field_account_move_line__construction_line_id"),
+    (
+        "incoespacio_invoice_ocr_obra_partida",
+        "field_account_move_line__construction_line_id",
+    ),
     ("incoespacio_invoice_ocr_obra_partida", "field_sale_order_line__bc3_section_id"),
-    ("incoespacio_invoice_ocr_obra_partida", "field_sale_order_line__amount_vendor_cost"),
-    ("incoespacio_invoice_ocr_obra_partida", "field_account_move__has_unassigned_partida"),
-    ("incoespacio_invoice_ocr_obra_purchase", "field_purchase_order_line__construction_line_id"),
+    (
+        "incoespacio_invoice_ocr_obra_partida",
+        "field_sale_order_line__amount_vendor_cost",
+    ),
+    (
+        "incoespacio_invoice_ocr_obra_partida",
+        "field_account_move__has_unassigned_partida",
+    ),
+    (
+        "incoespacio_invoice_ocr_obra_purchase",
+        "field_purchase_order_line__construction_line_id",
+    ),
 )
 
 

@@ -62,7 +62,9 @@ class SaleOrderLine(models.Model):
                     ["construction_line_id"],
                 ):
                     sid = group["construction_line_id"][0]
-                    by_sol[sid] = by_sol.get(sid, 0.0) + (group["price_subtotal"] or 0.0) * sign
+                    by_sol[sid] = (
+                        by_sol.get(sid, 0.0) + (group["price_subtotal"] or 0.0) * sign
+                    )
         for line in self:
             line.amount_vendor_cost = (
                 by_sol.get(line.id, 0.0) if not line.display_type else 0.0

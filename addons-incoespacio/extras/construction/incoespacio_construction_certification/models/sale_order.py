@@ -117,9 +117,9 @@ class SaleOrder(models.Model):
     def _compute_retention(self):
         for order in self:
             held = sum(
-                order.certification_ids.filtered(lambda c: c.state == "invoiced").mapped(
-                    "amount_retention"
-                )
+                order.certification_ids.filtered(
+                    lambda c: c.state == "invoiced"
+                ).mapped("amount_retention")
             )
             returned = sum(
                 inv.amount_untaxed
@@ -165,7 +165,11 @@ class SaleOrder(models.Model):
                 lambda c: c.state == "invoiced"
             ).sorted("number")
             certified = invoiced[-1].amount_total_origin if invoiced else 0.0
-            cost = cost_by_project.get(order.project_id.id, 0.0) if order.project_id else 0.0
+            cost = (
+                cost_by_project.get(order.project_id.id, 0.0)
+                if order.project_id
+                else 0.0
+            )
             order.amount_certified_origin = certified
             order.amount_job_cost = cost
             order.amount_job_margin = certified - cost
@@ -347,9 +351,9 @@ class SaleOrder(models.Model):
             )
         if self.amount_retention_to_return <= 0:
             raise UserError(_("No hay retención pendiente de devolver."))
-        account = self.env["construction.certification"]._get_or_create_retention_account(
-            self.company_id
-        )
+        account = self.env[
+            "construction.certification"
+        ]._get_or_create_retention_account(self.company_id)
         line_vals = {
             "name": _("Devolución retención de garantía - %s") % self.name,
             "quantity": 1,

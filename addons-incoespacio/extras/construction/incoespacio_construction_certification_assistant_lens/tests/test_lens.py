@@ -103,9 +103,11 @@ class TestCertificationLineLens(TransactionCase):
         )
 
     def _lens(self, line):
-        return self.env["certification.line.lens"].with_context(
-            default_line_id=line.id
-        ).create({})
+        return (
+            self.env["certification.line.lens"]
+            .with_context(default_line_id=line.id)
+            .create({})
+        )
 
     def test_lens_values_and_accept(self):
         cert = self._cert()

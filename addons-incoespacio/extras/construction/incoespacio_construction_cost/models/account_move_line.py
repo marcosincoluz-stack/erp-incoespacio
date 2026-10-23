@@ -37,7 +37,10 @@ class AccountMoveLine(models.Model):
         ):
             if sol.display_type == "line_section":
                 current = sol.id
-            elif current in blobs and sol.display_type not in ("line_section", "line_note"):
+            elif current in blobs and sol.display_type not in (
+                "line_section",
+                "line_note",
+            ):
                 blobs[current] += " " + _fold(sol.name)
         words = [w for w in re.findall(r"[a-z0-9]+", desc) if len(w) > 4]
         best, score, tied = self.env["sale.order.line"], 0, False
@@ -84,7 +87,10 @@ class AccountMoveLine(models.Model):
                 continue
             section = line._section_of(line.construction_line_id)
             if section and line.construction_section_id != section:
-                super(AccountMoveLine, line).write({"construction_section_id": section.id})
+                super(AccountMoveLine, line).write(
+                    {"construction_section_id": section.id}
+                )
+        return True
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -100,7 +106,8 @@ class AccountMoveLine(models.Model):
             for line in self:
                 if (
                     line.construction_line_id
-                    and line._section_of(line.construction_line_id) != line.construction_section_id
+                    and line._section_of(line.construction_line_id)
+                    != line.construction_section_id
                 ):
                     super(AccountMoveLine, line).write({"construction_line_id": False})
         return res
@@ -114,6 +121,7 @@ class AccountMoveLine(models.Model):
     def _onchange_construction_section_clears_line(self):
         if (
             self.construction_line_id
-            and self._section_of(self.construction_line_id) != self.construction_section_id
+            and self._section_of(self.construction_line_id)
+            != self.construction_section_id
         ):
             self.construction_line_id = False

@@ -44,10 +44,14 @@ class TestPrintLayout(TransactionCase):
             }
         )
 
-    def _html(self, report="incoespacio_construction_print_layout.report_saleorder_custom"):
-        return self.env["ir.actions.report"]._render_qweb_html(
-            report, self.order.ids
-        )[0].decode()
+    def _html(
+        self, report="incoespacio_construction_print_layout.report_saleorder_custom"
+    ):
+        return (
+            self.env["ir.actions.report"]
+            ._render_qweb_html(report, self.order.ids)[0]
+            .decode()
+        )
 
     def test_custom_table_keeps_code_measures_and_drops_the_pipe(self):
         self._section(1, "00", "DEMOLICION")
@@ -74,7 +78,14 @@ class TestPrintLayout(TransactionCase):
         ]
         bare = self._partida(3, "Hecha a mano", 1, 5)
         bare.bc3_measures = [
-            {"comment": "", "units": 1, "length": None, "width": None, "height": None, "partial": 1}
+            {
+                "comment": "",
+                "units": 1,
+                "length": None,
+                "width": None,
+                "height": None,
+                "partial": 1,
+            }
         ]
         self.assertFalse(bare._report_measure_rows())
         self.assertEqual(line._print_uom(), "ud")
@@ -113,7 +124,9 @@ class TestPrintLayout(TransactionCase):
         self.assertIn("MEDICIONES", measures)
         self.assertNotIn("PEDIDO DE VENTA", measures)
 
-        self.order.write({"print_only_chapters": True, "print_prices": True, "print_summary": True})
+        self.order.write(
+            {"print_only_chapters": True, "print_prices": True, "print_summary": True}
+        )
         summary = self._html()
         self.assertIn("RESUMEN DE PRESUPUESTO", summary)
         self.assertIn("100 %", summary)

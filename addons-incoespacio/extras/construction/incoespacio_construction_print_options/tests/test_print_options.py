@@ -40,9 +40,11 @@ class TestPrintOptions(TransactionCase):
 
     def _html(self, custom=False):
         data = {"custom": True} if custom else None
-        return self.env["ir.actions.report"]._render_qweb_html(
-            "sale.report_saleorder", self.order.ids, data=data
-        )[0].decode()
+        return (
+            self.env["ir.actions.report"]
+            ._render_qweb_html("sale.report_saleorder", self.order.ids, data=data)[0]
+            .decode()
+        )
 
     def test_chapter_summary_rolls_subchapters_into_parent(self):
         self.assertFalse(self.order._get_chapter_summary())
@@ -148,7 +150,9 @@ class TestPrintOptions(TransactionCase):
         self._partida(4, 1, 50)
 
         lines = self.order._get_custom_report_lines()
-        self.assertEqual(lines.filtered("display_type").mapped("bc3_code"), ["C01", "C02"])
+        self.assertEqual(
+            lines.filtered("display_type").mapped("bc3_code"), ["C01", "C02"]
+        )
         self.order.print_hide_null_chapters = True
         lines = self.order._get_custom_report_lines()
         self.assertEqual(lines.filtered("display_type").mapped("bc3_code"), ["C02"])
@@ -159,29 +163,94 @@ class TestPrintOptions(TransactionCase):
                 "order_id": self.order.id,
                 "number": 1,
                 "line_ids": [
-                    (0, 0, {"display_type": "line_section", "name": "[C01] Albañilería", "bc3_level": 0, "sequence": 1}),
-                    (0, 0, {"name": "Tabique", "price_unit": 100, "qty_budget": 2, "qty_origin": 2, "sequence": 2}),
-                    (0, 0, {"display_type": "line_section", "name": "[C01.1] Interior", "bc3_level": 1, "sequence": 3}),
-                    (0, 0, {"name": "Ladrillo", "price_unit": 50, "qty_budget": 1, "qty_origin": 1, "sequence": 4}),
-                    (0, 0, {"display_type": "line_section", "name": "[C02] Pintura", "bc3_level": 0, "sequence": 5}),
-                    (0, 0, {"name": "Pintar", "price_unit": 10, "qty_budget": 3, "qty_origin": 3, "sequence": 6}),
+                    (
+                        0,
+                        0,
+                        {
+                            "display_type": "line_section",
+                            "name": "[C01] Albañilería",
+                            "bc3_level": 0,
+                            "sequence": 1,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Tabique",
+                            "price_unit": 100,
+                            "qty_budget": 2,
+                            "qty_origin": 2,
+                            "sequence": 2,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "display_type": "line_section",
+                            "name": "[C01.1] Interior",
+                            "bc3_level": 1,
+                            "sequence": 3,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Ladrillo",
+                            "price_unit": 50,
+                            "qty_budget": 1,
+                            "qty_origin": 1,
+                            "sequence": 4,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "display_type": "line_section",
+                            "name": "[C02] Pintura",
+                            "bc3_level": 0,
+                            "sequence": 5,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Pintar",
+                            "price_unit": 10,
+                            "qty_budget": 3,
+                            "qty_origin": 3,
+                            "sequence": 6,
+                        },
+                    ),
                 ],
             }
         )
         chapters = cert._get_chapter_summary()
         self.assertEqual([chapter["decimal"] for chapter in chapters], ["1", "2"])
-        self.assertEqual([chapter["name"] for chapter in chapters], ["Albañilería", "Pintura"])
+        self.assertEqual(
+            [chapter["name"] for chapter in chapters], ["Albañilería", "Pintura"]
+        )
         self.assertAlmostEqual(chapters[0]["amount"], 250.0)
         self.assertAlmostEqual(chapters[1]["amount"], 30.0)
         self.assertEqual(
             cert._cert_amount_words(),
-            cert.currency_id.with_context(lang=self.env.lang).amount_to_text(cert.amount_period_total),
+            cert.currency_id.with_context(lang=self.env.lang).amount_to_text(
+                cert.amount_period_total
+            ),
         )
 
-        html = self.env["ir.actions.report"]._render_qweb_html(
-            "incoespacio_construction_certification.report_certification_document",
-            cert.ids,
-        )[0].decode()
+        html = (
+            self.env["ir.actions.report"]
+            ._render_qweb_html(
+                "incoespacio_construction_certification.report_certification_document",
+                cert.ids,
+            )[0]
+            .decode()
+        )
         self.assertIn("Resumen de capítulos", html)
         self.assertIn("page-break-before: always", html)
         self.assertIn("font-size: 9.5px", html)
@@ -192,20 +261,28 @@ class TestPrintOptions(TransactionCase):
         self.assertIn("La dirección facultativa", html)
         self.assertNotIn("LA CONSTRUCTORA", html)
 
-        custom = self.env["ir.actions.report"]._render_qweb_html(
-            "incoespacio_construction_certification.report_certification_document",
-            cert.ids,
-            data={"custom": True},
-        )[0].decode()
+        custom = (
+            self.env["ir.actions.report"]
+            ._render_qweb_html(
+                "incoespacio_construction_certification.report_certification_document",
+                cert.ids,
+                data={"custom": True},
+            )[0]
+            .decode()
+        )
         self.assertNotIn("Resumen de capítulos", custom)
 
     def _cert_html(self, cert, custom=False):
         data = {"custom": True} if custom else None
-        return self.env["ir.actions.report"]._render_qweb_html(
-            "incoespacio_construction_certification.report_certification_document",
-            cert.ids,
-            data=data,
-        )[0].decode()
+        return (
+            self.env["ir.actions.report"]
+            ._render_qweb_html(
+                "incoespacio_construction_certification.report_certification_document",
+                cert.ids,
+                data=data,
+            )[0]
+            .decode()
+        )
 
     def test_custom_pdf_groups_partial_measures_by_certification(self):
         partida = self._partida(1, 10, 100)

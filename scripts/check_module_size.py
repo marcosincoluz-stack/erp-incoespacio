@@ -23,7 +23,7 @@ EXCEPTIONS = {
 }
 # Techo medido. Subirlo es una decisión, no un efecto secundario.
 CEILING = {
-    "incoespacio_construction_certification_assistant": 503,
+    "incoespacio_construction_certification_assistant": 504,
 }
 SKIP_DIRS = {"tests", "migrations", "__pycache__"}
 

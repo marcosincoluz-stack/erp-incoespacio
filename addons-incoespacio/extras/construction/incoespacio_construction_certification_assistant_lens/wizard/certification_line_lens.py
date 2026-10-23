@@ -85,8 +85,10 @@ class CertificationLineLens(models.TransientModel):
             res["qty_period"] = line.qty_period or line.qty_suggested
         if "bill_line_ids" in fields_list:
             amls = line.certification_id.pending_bill_ids.invoice_line_ids.filtered(
-                lambda l: l.display_type == "product"
-                and l.construction_line_id == line.sale_order_line_id
+                lambda l: (
+                    l.display_type == "product"
+                    and l.construction_line_id == line.sale_order_line_id
+                )
             )
             res["bill_line_ids"] = [
                 (
@@ -161,33 +163,48 @@ class CertificationLineLens(models.TransientModel):
             suffix = (" %s." % suffix) if suffix else ""
             if wiz.cost_alert == "over_sale":
                 wiz.verdict_level = "danger"
-                wiz.verdict = _(
-                    "La factura (%.2f) supera la venta que queda por certificar (%.2f). "
-                    "Crea un modificado o reparte el coste."
-                ) % (cost, sale_left) + suffix
+                wiz.verdict = (
+                    _(
+                        "La factura (%.2f) supera la venta que queda por certificar (%.2f). "
+                        "Crea un modificado o reparte el coste."
+                    )
+                    % (cost, sale_left)
+                    + suffix
+                )
             elif wiz.cost_alert == "certified":
                 wiz.verdict_level = "warning"
-                wiz.verdict = _(
-                    "Esta partida ya está certificada al 100 %. "
-                    "El coste debería ir a otra partida."
-                ) + suffix
+                wiz.verdict = (
+                    _(
+                        "Esta partida ya está certificada al 100 %. "
+                        "El coste debería ir a otra partida."
+                    )
+                    + suffix
+                )
             elif wiz.cost_vs_planned_percent > 100:
                 wiz.verdict_level = "warning"
-                wiz.verdict = _(
-                    "El coste supera el objetivo (%.0f %% del objetivo restante). "
-                    "Certificando esta medición el margen es %.2f."
-                ) % (wiz.cost_vs_planned_percent, wiz.margin_new) + suffix
+                wiz.verdict = (
+                    _(
+                        "El coste supera el objetivo (%.0f %% del objetivo restante). "
+                        "Certificando esta medición el margen es %.2f."
+                    )
+                    % (wiz.cost_vs_planned_percent, wiz.margin_new)
+                    + suffix
+                )
             else:
                 wiz.verdict_level = "success"
                 suggested = wiz.qty_suggested or 0.0
-                wiz.verdict = _(
-                    "Coste dentro de objetivo (%.0f %%). "
-                    "Sugerido certificar %s ud. por %.2f."
-                ) % (
-                    wiz.cost_vs_planned_percent,
-                    suggested,
-                    suggested * (wiz.price_unit or 0.0),
-                ) + suffix
+                wiz.verdict = (
+                    _(
+                        "Coste dentro de objetivo (%.0f %%). "
+                        "Sugerido certificar %s ud. por %.2f."
+                    )
+                    % (
+                        wiz.cost_vs_planned_percent,
+                        suggested,
+                        suggested * (wiz.price_unit or 0.0),
+                    )
+                    + suffix
+                )
 
     def _reopen(self):
         self.ensure_one()

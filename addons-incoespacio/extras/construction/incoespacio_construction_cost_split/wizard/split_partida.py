@@ -9,7 +9,9 @@ class ConstructionCostSplitWizard(models.TransientModel):
 
     line_id = fields.Many2one("account.move.line", required=True, ondelete="cascade")
     currency_id = fields.Many2one(related="line_id.currency_id")
-    amount_total = fields.Monetary(related="line_id.price_subtotal", currency_field="currency_id")
+    amount_total = fields.Monetary(
+        related="line_id.price_subtotal", currency_field="currency_id"
+    )
     amount_remaining = fields.Monetary(
         string="Queda por repartir",
         compute="_compute_amount_remaining",
@@ -66,7 +68,14 @@ class ConstructionCostSplitWizard(models.TransientModel):
         if any(not item.construction_line_id for item in splits):
             raise UserError(_("Cada importe necesita una partida."))
         rounding = aml.currency_id.rounding or 0.01
-        if float_compare(sum(splits.mapped("amount")), aml.price_subtotal, precision_rounding=rounding) != 0:
+        if (
+            float_compare(
+                sum(splits.mapped("amount")),
+                aml.price_subtotal,
+                precision_rounding=rounding,
+            )
+            != 0
+        ):
             raise UserError(_("Los importes deben sumar %s.") % aml.price_subtotal)
         first, *rest = splits
         self._apply_amount(aml, first.amount, first.construction_line_id)
@@ -100,4 +109,6 @@ class ConstructionCostSplitWizardLine(models.TransientModel):
         domain="[('display_type', '=', False), ('order_id.project_id', '=', project_id)]",
     )
     currency_id = fields.Many2one(related="wizard_id.currency_id")
-    amount = fields.Monetary(string="Importe", currency_field="currency_id", required=True)
+    amount = fields.Monetary(
+        string="Importe", currency_field="currency_id", required=True
+    )

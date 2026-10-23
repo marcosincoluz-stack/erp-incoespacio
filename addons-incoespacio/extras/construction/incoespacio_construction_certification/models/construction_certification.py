@@ -208,18 +208,17 @@ class ConstructionCertification(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get("name", _("Nuevo")) == _("Nuevo"):
-                vals["name"] = (
-                    self.env["ir.sequence"].next_by_code(
-                        "construction.certification"
-                    )
-                    or _("Nuevo")
-                )
+                vals["name"] = self.env["ir.sequence"].next_by_code(
+                    "construction.certification"
+                ) or _("Nuevo")
         return super().create(vals_list)
 
     def action_confirm(self):
         self.ensure_one()
         if not self.line_ids.filtered(lambda l: not l.display_type):
-            raise UserError(_("La certificación debe tener al menos una partida de obra."))
+            raise UserError(
+                _("La certificación debe tener al menos una partida de obra.")
+            )
         self.write({"state": "confirmed"})
 
     def _lock_certification(self):
@@ -233,13 +232,26 @@ class ConstructionCertification(models.Model):
     def _check_invoiceable(self):
         self.ensure_one()
         if self.invoice_id:
-            raise UserError(_("Esta certificación ya tiene una factura asignada: %s") % self.invoice_id.name)
+            raise UserError(
+                _("Esta certificación ya tiene una factura asignada: %s")
+                % self.invoice_id.name
+            )
         if self.state not in ("draft", "confirmed"):
-            raise UserError(_("Solo se pueden facturar certificaciones en estado 'Aprobada'."))
+            raise UserError(
+                _("Solo se pueden facturar certificaciones en estado 'Aprobada'.")
+            )
         if not self.line_ids.filtered(lambda l: not l.display_type):
-            raise UserError(_("La certificación debe tener al menos una partida de obra."))
-        if not self.line_ids.filtered(lambda l: not l.display_type and l.qty_period > 0):
-            raise UserError(_("No hay partidas con medición ejecutada en este periodo para facturar."))
+            raise UserError(
+                _("La certificación debe tener al menos una partida de obra.")
+            )
+        if not self.line_ids.filtered(
+            lambda l: not l.display_type and l.qty_period > 0
+        ):
+            raise UserError(
+                _(
+                    "No hay partidas con medición ejecutada en este periodo para facturar."
+                )
+            )
 
     def action_confirm_and_invoice(self):
         self.ensure_one()
@@ -251,12 +263,20 @@ class ConstructionCertification(models.Model):
 
     def action_draft(self):
         if any(c.invoice_id and c.invoice_id.state != "cancel" for c in self):
-            raise UserError(_("No puede volver a borrador una certificación cuya factura no haya sido cancelada."))
+            raise UserError(
+                _(
+                    "No puede volver a borrador una certificación cuya factura no haya sido cancelada."
+                )
+            )
         self.write({"state": "draft"})
 
     def action_cancel(self):
         if any(c.invoice_id and c.invoice_id.state != "cancel" for c in self):
-            raise UserError(_("No puede cancelar una certificación cuya factura no haya sido cancelada."))
+            raise UserError(
+                _(
+                    "No puede cancelar una certificación cuya factura no haya sido cancelada."
+                )
+            )
         self.write({"state": "cancel"})
 
     def unlink(self):
@@ -279,24 +299,30 @@ class ConstructionCertification(models.Model):
             limit=1,
         )
         if not account:
-            return Account.create({
-                "code": "430800",
-                "name": "Clientes, retenciones por garantía de obra",
-                "account_type": "asset_current",
-                "company_id": company.id,
-            })
+            return Account.create(
+                {
+                    "code": "430800",
+                    "name": "Clientes, retenciones por garantía de obra",
+                    "account_type": "asset_current",
+                    "company_id": company.id,
+                }
+            )
         if account.account_type != "asset_current":
-            raise UserError(_(
-                "La cuenta 430800 existe pero no es de activo corriente. "
-                "Corrija el tipo en el plan contable antes de facturar la retención."
-            ))
+            raise UserError(
+                _(
+                    "La cuenta 430800 existe pero no es de activo corriente. "
+                    "Corrija el tipo en el plan contable antes de facturar la retención."
+                )
+            )
         return account
 
     def action_create_invoice(self):
         self.ensure_one()
         self._lock_certification()
         if self.state != "confirmed":
-            raise UserError(_("Solo se pueden facturar certificaciones en estado 'Aprobada'."))
+            raise UserError(
+                _("Solo se pueden facturar certificaciones en estado 'Aprobada'.")
+            )
         self._check_invoiceable()
 
         valid_lines = self.line_ids.filtered(
@@ -315,7 +341,9 @@ class ConstructionCertification(models.Model):
                 "quantity": line.qty_period,
                 "price_unit": line.price_unit,
                 "tax_ids": [(6, 0, line.tax_ids.ids)],
-                "product_uom_id": line.product_uom_id.id if line.product_uom_id else False,
+                "product_uom_id": line.product_uom_id.id
+                if line.product_uom_id
+                else False,
             }
             if prod_id:
                 line_vals["product_id"] = prod_id
@@ -340,22 +368,30 @@ class ConstructionCertification(models.Model):
                 ret_vals["analytic_distribution"] = {str(analytic.id): 100}
             invoice_lines.append((0, 0, ret_vals))
 
-        move = self.env["account.move"].with_context(default_move_type="out_invoice").create({
-            "move_type": "out_invoice",
-            "partner_id": self.partner_id.id,
-            "invoice_date": self.date,
-            "ref": f"Certificación Nº {self.number} - {self.order_id.name}",
-            "invoice_origin": f"{self.name} ({self.order_id.name})",
-            "project_id": self.project_id.id if self.project_id else False,
-            "company_id": self.company_id.id,
-            "currency_id": self.currency_id.id,
-            "invoice_line_ids": invoice_lines,
-        })
+        move = (
+            self.env["account.move"]
+            .with_context(default_move_type="out_invoice")
+            .create(
+                {
+                    "move_type": "out_invoice",
+                    "partner_id": self.partner_id.id,
+                    "invoice_date": self.date,
+                    "ref": f"Certificación Nº {self.number} - {self.order_id.name}",
+                    "invoice_origin": f"{self.name} ({self.order_id.name})",
+                    "project_id": self.project_id.id if self.project_id else False,
+                    "company_id": self.company_id.id,
+                    "currency_id": self.currency_id.id,
+                    "invoice_line_ids": invoice_lines,
+                }
+            )
+        )
 
-        self.write({
-            "invoice_id": move.id,
-            "state": "invoiced",
-        })
+        self.write(
+            {
+                "invoice_id": move.id,
+                "state": "invoiced",
+            }
+        )
 
         return {
             "name": _("Factura de Certificación"),
@@ -445,9 +481,15 @@ class ConstructionCertificationLine(models.Model):
     is_modification = fields.Boolean(string="Modificado")
     product_uom_id = fields.Many2one("uom.uom", string="Ud.")
     price_unit = fields.Float(string="Precio Unit.", digits="Product Price")
-    qty_budget = fields.Float(string="Med. Presupuesto", digits="Product Unit of Measure")
-    qty_previous = fields.Float(string="Med. Anterior", digits="Product Unit of Measure", default=0.0)
-    qty_origin = fields.Float(string="Med. a Origen", digits="Product Unit of Measure", default=0.0)
+    qty_budget = fields.Float(
+        string="Med. Presupuesto", digits="Product Unit of Measure"
+    )
+    qty_previous = fields.Float(
+        string="Med. Anterior", digits="Product Unit of Measure", default=0.0
+    )
+    qty_origin = fields.Float(
+        string="Med. a Origen", digits="Product Unit of Measure", default=0.0
+    )
     qty_period = fields.Float(
         string="Med. Periodo",
         digits="Product Unit of Measure",
@@ -545,7 +587,11 @@ class ConstructionCertificationLine(models.Model):
         if period is None and not (had_rows and not rows):
             return vals
         vals.pop("qty_period", None)
-        previous = vals["qty_previous"] if "qty_previous" in vals else (self.qty_previous or 0.0)
+        previous = (
+            vals["qty_previous"]
+            if "qty_previous" in vals
+            else (self.qty_previous or 0.0)
+        )
         vals["qty_origin"] = previous + (period or 0.0)
         return vals
 
@@ -571,7 +617,11 @@ class ConstructionCertificationLine(models.Model):
     )
     def _compute_bc3_prev_measures(self):
         lines = self.filtered(
-            lambda line: not line.display_type and line.sale_order_line_id and line.certification_id
+            lambda line: (
+                not line.display_type
+                and line.sale_order_line_id
+                and line.certification_id
+            )
         )
         for line in self - lines:
             line.bc3_prev_measures = False
@@ -580,7 +630,11 @@ class ConstructionCertificationLine(models.Model):
         previous = self.search(
             [
                 ("sale_order_line_id", "in", lines.sale_order_line_id.ids),
-                ("certification_id.order_id", "in", lines.certification_id.order_id.ids),
+                (
+                    "certification_id.order_id",
+                    "in",
+                    lines.certification_id.order_id.ids,
+                ),
                 ("certification_id.state", "!=", "cancel"),
                 ("display_type", "=", False),
             ]
@@ -592,8 +646,13 @@ class ConstructionCertificationLine(models.Model):
             number = line.certification_id.number or 0
             rows = []
             siblings = grouped.get(line.sale_order_line_id.id, [])
-            for pline in sorted(siblings, key=lambda item: (item.certification_id.number, item.id)):
-                if pline.id == line.id or (pline.certification_id.number or 0) >= number:
+            for pline in sorted(
+                siblings, key=lambda item: (item.certification_id.number, item.id)
+            ):
+                if (
+                    pline.id == line.id
+                    or (pline.certification_id.number or 0) >= number
+                ):
                     continue
                 for row in pline.bc3_cert_measures or []:
                     copied = dict(row)
@@ -630,7 +689,10 @@ class ConstructionCertificationLine(models.Model):
     def _measure_partial(self, row):
         nums = [
             num
-            for num in (self._measure_num((row or {}).get(key)) for key in ("units", "length", "width", "height"))
+            for num in (
+                self._measure_num((row or {}).get(key))
+                for key in ("units", "length", "width", "height")
+            )
             if num is not None
         ]
         if not nums:
@@ -684,9 +746,15 @@ class ConstructionCertificationLine(models.Model):
                 line.amount_origin = 0.0
                 line.amount_period = 0.0
             else:
-                rnd = line.currency_id.round if line.currency_id else lambda amount: amount
+                rnd = (
+                    line.currency_id.round
+                    if line.currency_id
+                    else lambda amount: amount
+                )
                 line.percentage_origin = (
-                    (line.qty_origin / line.qty_budget * 100.0) if line.qty_budget else 0.0
+                    (line.qty_origin / line.qty_budget * 100.0)
+                    if line.qty_budget
+                    else 0.0
                 )
                 line.amount_budget = rnd(line.qty_budget * line.price_unit)
                 line.amount_previous = rnd(line.qty_previous * line.price_unit)

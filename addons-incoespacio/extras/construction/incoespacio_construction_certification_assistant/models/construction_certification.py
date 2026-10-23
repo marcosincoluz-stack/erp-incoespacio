@@ -69,9 +69,7 @@ class ConstructionCertification(models.Model):
             cert.assistant_line_count = len(need)
             cert.assistant_pending_cost = cost
             cert.assistant_suggested_amount = suggested
-            cert.assistant_suggested_percent = (
-                suggested / cost * 100.0 if cost else 0.0
-            )
+            cert.assistant_suggested_percent = suggested / cost * 100.0 if cost else 0.0
 
     @api.depends(
         "order_id.certification_ids.number",
@@ -113,10 +111,12 @@ class ConstructionCertification(models.Model):
                 "sale_order_line_id"
             )
             cert.pending_review_line_ids = bills.invoice_line_ids.filtered(
-                lambda l: l.display_type == "product"
-                and (
-                    not l.construction_line_id
-                    or l.construction_line_id in alert_sols
+                lambda l: (
+                    l.display_type == "product"
+                    and (
+                        not l.construction_line_id
+                        or l.construction_line_id in alert_sols
+                    )
                 )
             )
 
@@ -243,7 +243,9 @@ class ConstructionCertificationLine(models.Model):
             line.needs_measure = bool(amount) and not line.qty_period
             line.uom_mismatch = mismatch
             remaining = (
-                max(line.qty_budget - line.qty_previous, 0.0) if line.qty_budget else 0.0
+                max(line.qty_budget - line.qty_previous, 0.0)
+                if line.qty_budget
+                else 0.0
             )
             if amount:
                 basis, raw = line._suggestion(amount, qty, mismatch)
@@ -314,8 +316,7 @@ class ConstructionCertificationLine(models.Model):
             {
                 "order_id": order.id,
                 "product_id": origin.product_id.id,
-                "name": _("Modificado s/ [%s] — %s")
-                % (code, self.pending_bill_names),
+                "name": _("Modificado s/ [%s] — %s") % (code, self.pending_bill_names),
                 "product_uom_qty": 1,
                 "price_unit": price,
                 "is_modification": True,

@@ -99,7 +99,9 @@ class TestPriceDbSuggest(TransactionCase):
         self.assertEqual(miss.product_id.name, "Sin vincular (ud)")
         square = self.env.ref("bc3_importer.product_product_product_square_meter")
         self.assertEqual(square.with_context(lang="es_ES").name, "Sin vincular (m²)")
-        copy = self.env.ref("bc3_importer.product_product_product_template_square_meter")
+        copy = self.env.ref(
+            "bc3_importer.product_product_product_template_square_meter"
+        )
         self.assertFalse(copy.sale_ok)
         self.assertEqual(copy.with_context(lang="es_ES").name, "Sin vincular (m²)")
         self.env.add_to_compute(miss._fields["bc3_code"], miss)

@@ -35,7 +35,9 @@ class ProductProduct(models.Model):
         prefix, digits = match.group(1), match.group(2)
         codes = list(extra)
         codes.extend(
-            self.search([("default_code", "=ilike", prefix + "%")]).mapped("default_code")
+            self.search([("default_code", "=ilike", prefix + "%")]).mapped(
+                "default_code"
+            )
         )
         tail = re.compile("^" + re.escape(prefix) + r"(\d+)$", re.IGNORECASE)
         max_n = int(digits)
@@ -57,7 +59,9 @@ class ProductProduct(models.Model):
             for vals in vals_list:
                 if vals.get("default_code"):
                     continue
-                categ_id = vals.get("categ_id") or self.env.context.get("default_categ_id")
+                categ_id = vals.get("categ_id") or self.env.context.get(
+                    "default_categ_id"
+                )
                 if categ_id != categ.id:
                     continue
                 code = self._next_price_code(base, given)

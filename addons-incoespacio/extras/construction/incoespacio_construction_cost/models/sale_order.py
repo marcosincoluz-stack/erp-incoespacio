@@ -24,7 +24,9 @@ class SaleOrder(models.Model):
     def _compute_chapter_cost(self):
         Line = self.env["account.move.line"]
         for order in self:
-            sections = order.order_line.filtered(lambda line: line.display_type == "line_section")
+            sections = order.order_line.filtered(
+                lambda line: line.display_type == "line_section"
+            )
             in_chapter = 0.0
             by_sec = {}
             if sections:

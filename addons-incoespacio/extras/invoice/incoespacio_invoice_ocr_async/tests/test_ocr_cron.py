@@ -10,22 +10,27 @@ class TestOcrCron(TransactionCase):
         super().setUp()
         # La cola es global. En el test no deben colarse facturas ya pendientes;
         # el rollback de TransactionCase las deja como estaban.
-        queued = self.env["account.move"].search([
-            ("ocr_status", "in", ("pending", "processing")),
-        ])
+        queued = self.env["account.move"].search(
+            [
+                ("ocr_status", "in", ("pending", "processing")),
+            ]
+        )
         if queued:
             queued.write({"ocr_status": "done"})
 
     def _bill(self, status):
-        return self.env["account.move"].create({
-            "move_type": "in_invoice",
-            "ocr_status": status,
-        })
+        return self.env["account.move"].create(
+            {
+                "move_type": "in_invoice",
+                "ocr_status": status,
+            }
+        )
 
     def _scan(self, seen):
         def _run(move):
             seen.append(move.id)
             move.write({"ocr_status": "done"})
+
         return _run
 
     def test_pending_is_processed(self):

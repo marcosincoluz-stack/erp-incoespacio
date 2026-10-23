@@ -57,9 +57,20 @@ class TestCertificationAssistant(TransactionCase):
         cls.order.action_confirm()
         cls.sol = cls.order.order_line.filtered(lambda l: not l.display_type)
 
-    def _bill(self, qty, price, move_type="in_invoice", partida=None, date=None, name=None, uom=None):
+    def _bill(
+        self,
+        qty,
+        price,
+        move_type="in_invoice",
+        partida=None,
+        date=None,
+        name=None,
+        uom=None,
+    ):
         sol = self.sol if partida is None else (partida or self.sol)
-        project = sol.order_id.project_id if partida is not False else self.order.project_id
+        project = (
+            sol.order_id.project_id if partida is not False else self.order.project_id
+        )
         line_vals = {
             "name": name or "Coste obra",
             "quantity": qty,
@@ -73,7 +84,12 @@ class TestCertificationAssistant(TransactionCase):
             {
                 "move_type": move_type,
                 "partner_id": self.partner.id,
-                "invoice_date": date or (sol.order_id.date_order if partida is not False else self.order.date_order),
+                "invoice_date": date
+                or (
+                    sol.order_id.date_order
+                    if partida is not False
+                    else self.order.date_order
+                ),
                 "project_id": project.id,
                 "invoice_line_ids": [(0, 0, line_vals)],
             }
@@ -241,7 +257,9 @@ class TestCertificationAssistant(TransactionCase):
         self._invalidate(cert)
         self.assertFalse(line.cost_alert)
         self.assertAlmostEqual(cert_mod.pending_cost_amount, 1020.0)
-        self.assertTrue(cert.message_ids.filtered(lambda m: "Modificado" in (m.body or "")))
+        self.assertTrue(
+            cert.message_ids.filtered(lambda m: "Modificado" in (m.body or ""))
+        )
 
     def test_certified_alert_and_suggested_partida(self):
         self.env["sale.order.line"].create(

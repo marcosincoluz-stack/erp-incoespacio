@@ -10,7 +10,9 @@ class TestObraPath(TransactionCase):
             [("account_type", "=", "income"), ("company_id", "=", company.id)],
             limit=1,
         )
-        cls.partner = cls.env["res.partner"].create({"name": "Obra Nav", "is_company": True})
+        cls.partner = cls.env["res.partner"].create(
+            {"name": "Obra Nav", "is_company": True}
+        )
         cls.product = cls.env["product.product"].create(
             {
                 "name": "Partida nav",

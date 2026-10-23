@@ -44,7 +44,7 @@ class SaleOrder(models.Model):
 
     def init(self):
         # ponytail: a new bool column lands NULL and reads as false. Fill once.
-        super().init()
+        res = super().init()
         self.env.cr.execute(
             """
             UPDATE sale_order
@@ -59,6 +59,7 @@ class SaleOrder(models.Model):
              WHERE print_code IS NULL
             """
         )
+        return res
 
     def _print_title(self):
         self.ensure_one()
@@ -147,8 +148,10 @@ class SaleOrderLine(models.Model):
         """Skip the single quantity row Odoo stores for a hand-made line."""
         self.ensure_one()
         rows = [row for row in (self.bc3_measures or []) if isinstance(row, dict)]
-        if len(rows) == 1 and not rows[0].get("comment") and not any(
-            rows[0].get(key) for key in ("length", "width", "height")
+        if (
+            len(rows) == 1
+            and not rows[0].get("comment")
+            and not any(rows[0].get(key) for key in ("length", "width", "height"))
         ):
             return []
         return rows

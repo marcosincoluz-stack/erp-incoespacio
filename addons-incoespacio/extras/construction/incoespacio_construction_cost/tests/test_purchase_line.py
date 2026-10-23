@@ -40,7 +40,11 @@ class TestPurchaseLine(TransactionCase):
                 "partner_id": cls.customer.id,
                 "bc3": True,
                 "order_line": [
-                    (0, 0, {"display_type": "line_section", "name": "[C04] Tabiqueria"}),
+                    (
+                        0,
+                        0,
+                        {"display_type": "line_section", "name": "[C04] Tabiqueria"},
+                    ),
                     (
                         0,
                         0,
@@ -83,6 +87,8 @@ class TestPurchaseLine(TransactionCase):
         po.button_confirm()
         action = po.action_create_invoice()
         bill = self.env["account.move"].browse(action["res_id"])
-        line = bill.invoice_line_ids.filtered(lambda item: item.display_type == "product")
+        line = bill.invoice_line_ids.filtered(
+            lambda item: item.display_type == "product"
+        )
         self.assertEqual(line.construction_line_id, self.uo1)
         self.assertEqual(bill.project_id, self.order.project_id)

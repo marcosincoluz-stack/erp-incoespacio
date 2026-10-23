@@ -1,27 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
     <t t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="extension">
         <xpath expr="//tr" position="after">
             <tr t-if="certDetailOpen(record)" class="o_bc3_detail" t-on-click.stop="">
                 <td t-att-colspan="nbCols">
-                    <div t-if="record.data.bc3_text" class="o_bc3_text" t-esc="record.data.bc3_text"/>
+                    <div t-if="record.data.bc3_text" class="o_bc3_text" t-esc="record.data.bc3_text" />
                     <div class="o_cert_grid">
                         <div class="o_cert_panel">
                             <div class="o_cert_panel_head">
                                 <span>Presupuesto</span>
-                                <a t-if="props.editable" href="#" role="button"
-                                    t-on-click.prevent="() => this.certCopyPending(record)">Copiar pendiente</a>
+                                <a
+                  t-if="props.editable"
+                  href="#"
+                  role="button"
+                  t-on-click.prevent="() => this.certCopyPending(record)"
+                >Copiar pendiente</a>
                             </div>
                             <table class="o_cert_table">
                                 <colgroup>
-                                    <col class="o_cert_col_comment"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_partial"/>
-                                    <col class="o_cert_col_partial"/>
-                                    <col class="o_cert_col_act"/>
+                                    <col class="o_cert_col_comment" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_partial" />
+                                    <col class="o_cert_col_partial" />
+                                    <col class="o_cert_col_act" />
                                 </colgroup>
                                 <thead>
                                     <tr>
@@ -38,22 +42,29 @@
                                 <tbody>
                                     <t t-foreach="budgetRows(record)" t-as="measure" t-key="measure_index">
                                         <tr>
-                                            <td class="o_cert_text" t-esc="measure.comment"/>
-                                            <td t-esc="certFmt(measure.units)"/>
-                                            <td t-esc="certFmt(measure.length)"/>
-                                            <td t-esc="certFmt(measure.width)"/>
-                                            <td t-esc="certFmt(measure.height)"/>
-                                            <td t-esc="certFmt(measure.partial)"/>
-                                            <td t-att-class="budgetPendingClass(record, measure_index)"
-                                                t-esc="certFmt(budgetPending(record, measure_index))"/>
+                                            <td class="o_cert_text" t-esc="measure.comment" />
+                                            <td t-esc="certFmt(measure.units)" />
+                                            <td t-esc="certFmt(measure.length)" />
+                                            <td t-esc="certFmt(measure.width)" />
+                                            <td t-esc="certFmt(measure.height)" />
+                                            <td t-esc="certFmt(measure.partial)" />
+                                            <td
+                        t-att-class="budgetPendingClass(record, measure_index)"
+                        t-esc="certFmt(budgetPending(record, measure_index))"
+                      />
                                             <td class="o_cert_act">
-                                                <span t-if="budgetCertLabel(record, measure_index)"
-                                                    class="badge text-bg-secondary"
-                                                    t-esc="budgetCertLabel(record, measure_index)"/>
-                                                <button t-if="props.editable" type="button"
-                                                    class="btn btn-link fa fa-copy p-0"
-                                                    title="Copiar a certificación"
-                                                    t-on-click="() => this.certCopyMeasure(record, measure_index)"/>
+                                                <span
+                          t-if="budgetCertLabel(record, measure_index)"
+                          class="badge text-bg-secondary"
+                          t-esc="budgetCertLabel(record, measure_index)"
+                        />
+                                                <button
+                          t-if="props.editable"
+                          type="button"
+                          class="btn btn-link fa fa-copy p-0"
+                          title="Copiar a certificación"
+                          t-on-click="() => this.certCopyMeasure(record, measure_index)"
+                        />
                                             </td>
                                         </tr>
                                     </t>
@@ -61,9 +72,9 @@
                                 <tfoot t-if="budgetRows(record).length">
                                     <tr>
                                         <td colspan="5" class="text-end">Total</td>
-                                        <td t-esc="certFmt(budgetTotal(record))"/>
-                                        <td t-esc="certFmt(budgetPendingTotal(record))"/>
-                                        <td/>
+                                        <td t-esc="certFmt(budgetTotal(record))" />
+                                        <td t-esc="certFmt(budgetPendingTotal(record))" />
+                                        <td />
                                     </tr>
                                 </tfoot>
                             </table>
@@ -71,22 +82,26 @@
                         <div class="o_cert_panel">
                             <div class="o_cert_panel_head">
                                 <span>
-                                    <t t-if="certNumber(record)">Certificación Nº <t t-esc="certNumber(record)"/></t>
+                                    <t t-if="certNumber(record)">Certificación Nº <t t-esc="certNumber(record)" /></t>
                                     <t t-else="">Certificación</t>
                                 </span>
-                                <a t-if="props.editable" href="#" role="button"
-                                    t-on-click.prevent="() => this.certAddMeasure(record)">Añadir medición</a>
+                                <a
+                  t-if="props.editable"
+                  href="#"
+                  role="button"
+                  t-on-click.prevent="() => this.certAddMeasure(record)"
+                >Añadir medición</a>
                             </div>
                             <table class="o_cert_table">
                                 <colgroup>
-                                    <col class="o_cert_col_comment"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_num"/>
-                                    <col class="o_cert_col_partial"/>
-                                    <col class="o_cert_col_act"/>
-                                    <col class="o_cert_col_icon"/>
+                                    <col class="o_cert_col_comment" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_num" />
+                                    <col class="o_cert_col_partial" />
+                                    <col class="o_cert_col_act" />
+                                    <col class="o_cert_col_icon" />
                                 </colgroup>
                                 <thead>
                                     <tr>
@@ -97,7 +112,7 @@
                                         <th>Alto</th>
                                         <th>Parcial</th>
                                         <th>Cert.</th>
-                                        <th/>
+                                        <th />
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,14 +121,14 @@
                                     </tr>
                                     <t t-foreach="prevRows(record)" t-as="measure" t-key="'prev_' + measure_index">
                                         <tr t-att-class="certRowOver(record, measure) ? 'text-danger' : 'text-muted'">
-                                            <td class="o_cert_text" t-esc="measure.comment"/>
-                                            <td t-esc="certFmt(measure.units)"/>
-                                            <td t-esc="certFmt(measure.length)"/>
-                                            <td t-esc="certFmt(measure.width)"/>
-                                            <td t-esc="certFmt(measure.height)"/>
-                                            <td t-esc="certFmt(measure.partial)"/>
-                                            <td class="o_cert_act" t-esc="certRowLabel(measure, record)"/>
-                                            <td/>
+                                            <td class="o_cert_text" t-esc="measure.comment" />
+                                            <td t-esc="certFmt(measure.units)" />
+                                            <td t-esc="certFmt(measure.length)" />
+                                            <td t-esc="certFmt(measure.width)" />
+                                            <td t-esc="certFmt(measure.height)" />
+                                            <td t-esc="certFmt(measure.partial)" />
+                                            <td class="o_cert_act" t-esc="certRowLabel(measure, record)" />
+                                            <td />
                                         </tr>
                                     </t>
                                     <tr class="o_cert_group">
@@ -126,40 +141,58 @@
                                         <tr t-att-class="certRowOver(record, measure) ? 'text-danger' : ''">
                                             <t t-if="props.editable">
                                                 <td>
-                                                    <input class="o_cert_input" t-att-value="measure.comment || ''"
-                                                        t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'comment', ev)"/>
+                                                    <input
+                            class="o_cert_input"
+                            t-att-value="measure.comment || ''"
+                            t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'comment', ev)"
+                          />
                                                 </td>
                                                 <td>
-                                                    <input class="o_cert_input o_cert_input_num" t-att-value="certFmt(measure.units)"
-                                                        t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'units', ev)"/>
+                                                    <input
+                            class="o_cert_input o_cert_input_num"
+                            t-att-value="certFmt(measure.units)"
+                            t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'units', ev)"
+                          />
                                                 </td>
                                                 <td>
-                                                    <input class="o_cert_input o_cert_input_num" t-att-value="certFmt(measure.length)"
-                                                        t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'length', ev)"/>
+                                                    <input
+                            class="o_cert_input o_cert_input_num"
+                            t-att-value="certFmt(measure.length)"
+                            t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'length', ev)"
+                          />
                                                 </td>
                                                 <td>
-                                                    <input class="o_cert_input o_cert_input_num" t-att-value="certFmt(measure.width)"
-                                                        t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'width', ev)"/>
+                                                    <input
+                            class="o_cert_input o_cert_input_num"
+                            t-att-value="certFmt(measure.width)"
+                            t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'width', ev)"
+                          />
                                                 </td>
                                                 <td>
-                                                    <input class="o_cert_input o_cert_input_num" t-att-value="certFmt(measure.height)"
-                                                        t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'height', ev)"/>
+                                                    <input
+                            class="o_cert_input o_cert_input_num"
+                            t-att-value="certFmt(measure.height)"
+                            t-on-change="(ev) => this.certSetMeasure(record, measure_index, 'height', ev)"
+                          />
                                                 </td>
                                             </t>
                                             <t t-else="">
-                                                <td class="o_cert_text" t-esc="measure.comment"/>
-                                                <td t-esc="certFmt(measure.units)"/>
-                                                <td t-esc="certFmt(measure.length)"/>
-                                                <td t-esc="certFmt(measure.width)"/>
-                                                <td t-esc="certFmt(measure.height)"/>
+                                                <td class="o_cert_text" t-esc="measure.comment" />
+                                                <td t-esc="certFmt(measure.units)" />
+                                                <td t-esc="certFmt(measure.length)" />
+                                                <td t-esc="certFmt(measure.width)" />
+                                                <td t-esc="certFmt(measure.height)" />
                                             </t>
-                                            <td t-esc="certFmt(measure.partial)"/>
-                                            <td class="o_cert_act" t-esc="certRowLabel(measure, record)"/>
+                                            <td t-esc="certFmt(measure.partial)" />
+                                            <td class="o_cert_act" t-esc="certRowLabel(measure, record)" />
                                             <td class="o_cert_act">
-                                                <button t-if="props.editable" type="button"
-                                                    class="btn btn-link fa fa-trash-o p-0"
-                                                    title="Eliminar"
-                                                    t-on-click="() => this.certRemoveMeasure(record, measure_index)"/>
+                                                <button
+                          t-if="props.editable"
+                          type="button"
+                          class="btn btn-link fa fa-trash-o p-0"
+                          title="Eliminar"
+                          t-on-click="() => this.certRemoveMeasure(record, measure_index)"
+                        />
                                             </td>
                                         </tr>
                                     </t>
@@ -167,24 +200,26 @@
                                 <tfoot t-if="prevRows(record).length || certRows(record).length">
                                     <tr>
                                         <td colspan="5" class="text-end">Anterior</td>
-                                        <td t-esc="certFmt(record.data.qty_previous)"/>
-                                        <td/><td/>
+                                        <td t-esc="certFmt(record.data.qty_previous)" />
+                                        <td /><td />
                                     </tr>
                                     <tr>
-                                        <td colspan="5" class="text-end">Periodo (Cert. <t t-esc="certNumber(record)"/>)</td>
-                                        <td t-esc="certFmt(record.data.qty_period)"/>
-                                        <td/><td/>
+                                        <td colspan="5" class="text-end">Periodo (Cert. <t
+                        t-esc="certNumber(record)"
+                      />)</td>
+                                        <td t-esc="certFmt(record.data.qty_period)" />
+                                        <td /><td />
                                     </tr>
                                     <tr class="o_cert_origin">
                                         <td colspan="5" class="text-end">A origen</td>
-                                        <td t-esc="certFmt(record.data.qty_origin)"/>
-                                        <td/><td/>
+                                        <td t-esc="certFmt(record.data.qty_origin)" />
+                                        <td /><td />
                                     </tr>
                                 </tfoot>
                             </table>
                             <div t-if="certUndetailed(record)" class="o_cert_warn">
-                                <i class="fa fa-exclamation-triangle" title="Sin desglose"/>
-                                Hay <t t-esc="certFmt(certUndetailed(record))"/> ud. certificadas sin desglose
+                                <i class="fa fa-exclamation-triangle" title="Sin desglose" />
+                                Hay <t t-esc="certFmt(certUndetailed(record))" /> ud. certificadas sin desglose
                             </div>
                         </div>
                     </div>

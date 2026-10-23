@@ -24,7 +24,9 @@ class ConstructionCostAssignWizard(models.TransientModel):
             res["line_ids"] = [
                 (0, 0, {"move_line_id": line.id})
                 for line in move.invoice_line_ids.filtered(
-                    lambda item: item.display_type == "product" and not item.construction_line_id
+                    lambda item: (
+                        item.display_type == "product" and not item.construction_line_id
+                    )
                 )
             ]
         return res
@@ -50,14 +52,20 @@ class ConstructionCostAssignWizardLine(models.TransientModel):
     wizard_id = fields.Many2one(
         "construction.cost.assign.wizard", required=True, ondelete="cascade"
     )
-    move_line_id = fields.Many2one("account.move.line", required=True, ondelete="cascade")
+    move_line_id = fields.Many2one(
+        "account.move.line", required=True, ondelete="cascade"
+    )
     name = fields.Char(related="move_line_id.name")
     project_id = fields.Many2one(related="wizard_id.project_id")
-    construction_section_id = fields.Many2one(related="move_line_id.construction_section_id")
+    construction_section_id = fields.Many2one(
+        related="move_line_id.construction_section_id"
+    )
     construction_line_id = fields.Many2one(
         "sale.order.line",
         string="Partida",
         domain="[('display_type', '=', False), ('order_id.project_id', '=', project_id), ('bc3_section_id', '=?', construction_section_id)]",
     )
     currency_id = fields.Many2one(related="move_line_id.currency_id")
-    amount = fields.Monetary(related="move_line_id.price_subtotal", currency_field="currency_id")
+    amount = fields.Monetary(
+        related="move_line_id.price_subtotal", currency_field="currency_id"
+    )

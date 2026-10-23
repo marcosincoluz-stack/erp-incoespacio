@@ -26,7 +26,11 @@ class TestPriceDb(TransactionCase):
 
     def _products(self, codes=None):
         domain = [
-            ("categ_id", "=", self.env.ref("incoespacio_bc3_price_db.price_db_category").id)
+            (
+                "categ_id",
+                "=",
+                self.env.ref("incoespacio_bc3_price_db.price_db_category").id,
+            )
         ]
         if codes is not None:
             domain.append(("default_code", "in", list(codes)))
@@ -99,13 +103,19 @@ class TestPriceDb(TransactionCase):
         self.assertIn("37.5", by_code[0][1])
         self.assertIn("DESMONTAJE", by_code[0][1])
         categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
-        self.assertIn(("categ_id", "=", categ.id), self.env["product.product"].price_db_domain())
-        created_id, _label = self.env["product.product"].with_context(
-            default_categ_id=categ.id,
-            default_detailed_type="service",
-            default_sale_ok=True,
-            default_purchase_ok=False,
-        ).name_create("Tabique nuevo ZZ")
+        self.assertIn(
+            ("categ_id", "=", categ.id), self.env["product.product"].price_db_domain()
+        )
+        created_id, _label = (
+            self.env["product.product"]
+            .with_context(
+                default_categ_id=categ.id,
+                default_detailed_type="service",
+                default_sale_ok=True,
+                default_purchase_ok=False,
+            )
+            .name_create("Tabique nuevo ZZ")
+        )
         created = self.env["product.product"].browse(created_id)
         self.assertEqual(created.categ_id, categ)
         self.assertTrue(created.sale_ok)
@@ -155,4 +165,3 @@ class TestPriceDb(TransactionCase):
             1,
         )
         self.assertLess(elapsed, 45, "import of 200 partidas took %ss" % elapsed)
-

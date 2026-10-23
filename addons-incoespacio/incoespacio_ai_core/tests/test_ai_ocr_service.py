@@ -41,7 +41,9 @@ class TestAiOcrService(TransactionCase):
 
     def test_connection_error(self):
         with patch.object(AiOcrService, "_new_session") as session:
-            session.return_value.post.side_effect = requests.exceptions.ConnectionError("down")
+            session.return_value.post.side_effect = requests.exceptions.ConnectionError(
+                "down"
+            )
             with self.assertRaises(UserError):
                 AiOcrService.analyze_invoice_document(self.env, b"hola", "a.pdf")
 

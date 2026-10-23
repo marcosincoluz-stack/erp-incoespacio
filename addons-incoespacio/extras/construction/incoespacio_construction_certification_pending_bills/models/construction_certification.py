@@ -55,25 +55,23 @@ class ConstructionCertification(models.Model):
         if bills:
             bills.write({"certification_id": self.id})
             self.message_post(
-                body=_(
-                    "Facturas de proveedor cubiertas: %s"
-                )
+                body=_("Facturas de proveedor cubiertas: %s")
                 % ", ".join(bills.mapped("name"))
             )
         return res
 
     def action_draft(self):
         res = super().action_draft()
-        self.env["account.move"].search(
-            [("certification_id", "in", self.ids)]
-        ).write({"certification_id": False})
+        self.env["account.move"].search([("certification_id", "in", self.ids)]).write(
+            {"certification_id": False}
+        )
         return res
 
     def action_cancel(self):
         res = super().action_cancel()
-        self.env["account.move"].search(
-            [("certification_id", "in", self.ids)]
-        ).write({"certification_id": False})
+        self.env["account.move"].search([("certification_id", "in", self.ids)]).write(
+            {"certification_id": False}
+        )
         return res
 
     def action_view_pending_bills(self):

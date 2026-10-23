@@ -28,11 +28,22 @@ class TestObrasList(TransactionCase):
         )
         cls.order = cls.env["sale.order"].create(
             {
-                "partner_id": cls.env["res.partner"].create({"name": "Cliente lista"}).id,
+                "partner_id": cls.env["res.partner"]
+                .create({"name": "Cliente lista"})
+                .id,
                 "bc3": True,
                 "planned_percent": 20.0,
                 "order_line": [
-                    (0, 0, {"product_id": product.id, "product_uom_qty": 10, "price_unit": 100, "tax_id": [(6, 0, [])]})
+                    (
+                        0,
+                        0,
+                        {
+                            "product_id": product.id,
+                            "product_uom_qty": 10,
+                            "price_unit": 100,
+                            "tax_id": [(6, 0, [])],
+                        },
+                    )
                 ],
             }
         )
@@ -45,7 +56,18 @@ class TestObrasList(TransactionCase):
                 "partner_id": self.vendor.id,
                 "invoice_date": self.order.date_order,
                 "project_id": self.order.project_id.id,
-                "invoice_line_ids": [(0, 0, {"name": "Coste", "quantity": 1, "price_unit": price, "tax_ids": [(6, 0, [])]})],
+                "invoice_line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Coste",
+                            "quantity": 1,
+                            "price_unit": price,
+                            "tax_ids": [(6, 0, [])],
+                        },
+                    )
+                ],
             }
         )
         bill.action_post()

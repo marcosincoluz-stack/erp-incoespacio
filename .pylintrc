@@ -4,7 +4,7 @@ score=n
 
 [ODOOLINT]
 manifest-required-keys=license
-manifest-deprecated-keys=description,active
+manifest-deprecated-keys=active
 license-allowed=AGPL-3,LGPL-3
 valid-odoo-versions=17.0
 

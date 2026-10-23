@@ -1,36 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
 
         <template id="sale_address_cards">
-            <table style="width: 100%; margin-top: 5px; margin-bottom: 25px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;">
+            <table
+        style="width: 100%; margin-top: 5px; margin-bottom: 25px; border-collapse: separate; border-spacing: 14px 0; font-size: 0.85rem;"
+      >
                 <tr>
                     <td class="inco-card" style="width: 50%; vertical-align: top;">
                         <div class="inco-card-title">
                             DATOS DEL CLIENTE
                         </div>
                         <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 3px;">
-                            <span t-field="doc.partner_id.name"/>
+                            <span t-field="doc.partner_id.name" />
                         </div>
                         <div t-if="doc.partner_id.vat" style="color: #475569;">
-                            <strong>NIF/CIF:</strong> <span t-field="doc.partner_id.vat"/>
+                            <strong>NIF/CIF:</strong> <span t-field="doc.partner_id.vat" />
                         </div>
                         <div t-if="doc.partner_id.street" style="color: #334155;">
-                            <span t-field="doc.partner_id.street"/>
+                            <span t-field="doc.partner_id.street" />
                         </div>
                         <div t-if="doc.partner_id.street2" style="color: #334155;">
-                            <span t-field="doc.partner_id.street2"/>
+                            <span t-field="doc.partner_id.street2" />
                         </div>
                         <div style="color: #334155;">
-                            <span t-if="doc.partner_id.zip" t-field="doc.partner_id.zip"/>
-                            <span t-if="doc.partner_id.city"> <span t-field="doc.partner_id.city"/></span>
-                            <span t-if="doc.partner_id.state_id"> (<span t-out="doc.partner_id.state_id.name"/>)</span>
+                            <span t-if="doc.partner_id.zip" t-field="doc.partner_id.zip" />
+                            <span t-if="doc.partner_id.city"> <span t-field="doc.partner_id.city" /></span>
+                            <span t-if="doc.partner_id.state_id"> (<span t-out="doc.partner_id.state_id.name" />)</span>
                         </div>
                         <div t-if="doc.partner_id.country_id" style="color: #334155;">
-                            <span t-field="doc.partner_id.country_id"/>
+                            <span t-field="doc.partner_id.country_id" />
                         </div>
                         <div t-if="doc.partner_id.phone" style="color: #475569; margin-top: 3px;">
-                            <strong>Tel:</strong> <span t-field="doc.partner_id.phone"/>
+                            <strong>Tel:</strong> <span t-field="doc.partner_id.phone" />
                         </div>
                     </td>
                     <td class="inco-card" style="width: 50%; vertical-align: top;">
@@ -39,24 +41,30 @@
                         </div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
                             <tr t-if="doc.date_order">
-                                <td style="padding: 3px 0; color: #475569; width: 45%;"><strong>Fecha de Oferta:</strong></td>
-                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.date_order" t-options='{"widget": "date"}'/></td>
+                                <td style="padding: 3px 0; color: #475569; width: 45%;"><strong
+                  >Fecha de Oferta:</strong></td>
+                                <td style="padding: 3px 0; color: #0f172a;"><span
+                    t-field="doc.date_order"
+                    t-options='{"widget": "date"}'
+                  /></td>
                             </tr>
                             <tr t-if="doc.validity_date and doc.state in ['draft', 'sent']">
                                 <td style="padding: 3px 0; color: #475569;"><strong>Validez de Oferta:</strong></td>
-                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.validity_date"/></td>
+                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.validity_date" /></td>
                             </tr>
                             <tr t-if="doc.client_order_ref">
                                 <td style="padding: 3px 0; color: #475569;"><strong>Su Referencia:</strong></td>
-                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.client_order_ref"/></td>
+                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.client_order_ref" /></td>
                             </tr>
                             <tr t-if="doc.user_id.name">
                                 <td style="padding: 3px 0; color: #475569;"><strong>Comercial:</strong></td>
-                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.user_id.name"/></td>
+                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.user_id.name" /></td>
                             </tr>
                             <tr t-if="doc.payment_term_id">
                                 <td style="padding: 3px 0; color: #475569;"><strong>Forma de pago:</strong></td>
-                                <td style="padding: 3px 0; color: #0f172a;"><span t-field="doc.payment_term_id.name"/></td>
+                                <td style="padding: 3px 0; color: #0f172a;"><span
+                    t-field="doc.payment_term_id.name"
+                  /></td>
                             </tr>
                         </table>
                     </td>
@@ -65,29 +73,35 @@
         </template>
 
         <template id="sale_conditions_signature">
-            <div style="clear: both; height: 10px;"/>
-            <table style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 25px; page-break-inside: avoid; font-size: 0.82rem;">
+            <div style="clear: both; height: 10px;" />
+            <table
+        style="width: 100%; border-collapse: separate; border-spacing: 14px 0; margin-top: 25px; page-break-inside: avoid; font-size: 0.82rem;"
+      >
                 <tr>
                     <td class="inco-card" style="width: 50%; vertical-align: top;">
                         <div class="inco-card-title">
                             CONDICIONES Y OBSERVACIONES
                         </div>
                         <div t-if="doc.payment_term_id" style="margin-top: 4px; color: #334155;">
-                            <strong>Forma de pago:</strong> <span t-field="doc.payment_term_id.name"/>
+                            <strong>Forma de pago:</strong> <span t-field="doc.payment_term_id.name" />
                         </div>
                         <div t-if="doc.note" style="margin-top: 6px; color: #475569;">
-                            <span t-field="doc.note"/>
+                            <span t-field="doc.note" />
                         </div>
                     </td>
-                    <td style="width: 50%; vertical-align: top; background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 12px 14px; text-align: center;">
+                    <td
+            style="width: 50%; vertical-align: top; background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 12px 14px; text-align: center;"
+          >
                         <div class="inco-card-title">
                             CONFORME Y ACEPTADO POR EL CLIENTE
                         </div>
                         <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">
                             Firma y Sello
                         </div>
-                        <div style="height: 50px;"/>
-                        <div style="border-top: 1px solid #cbd5e1; width: 80%; margin: 0 auto; padding-top: 4px; font-size: 0.75rem; color: #64748b;">
+                        <div style="height: 50px;" />
+                        <div
+              style="border-top: 1px solid #cbd5e1; width: 80%; margin: 0 auto; padding-top: 4px; font-size: 0.75rem; color: #64748b;"
+            >
                             Fecha: _____ / _____ / 202___
                         </div>
                     </td>
@@ -104,7 +118,7 @@
 
             <!-- Bloque de Direcciones y Metadatos en Tarjetas Limpias -->
             <xpath expr="//t[@t-set='address']" position="replace">
-                <t t-call="incoespacio_reports.sale_address_cards"/>
+                <t t-call="incoespacio_reports.sale_address_cards" />
             </xpath>
 
             <!-- Ocultar bloque redundante de información y h2 estándar -->
@@ -149,8 +163,8 @@
             <xpath expr="//div[@name='so_total_summary']" position="replace">
                 <div class="clearfix" style="margin-top: 20px; margin-bottom: 25px;">
                     <table class="incoespacio-totals-table">
-                        <t t-set="tax_totals" t-value="doc.tax_totals"/>
-                        <t t-call="sale.document_tax_totals"/>
+                        <t t-set="tax_totals" t-value="doc.tax_totals" />
+                        <t t-call="sale.document_tax_totals" />
                     </table>
                 </div>
             </xpath>
@@ -161,7 +175,7 @@
 
             <!-- Bloque de condiciones y firma de aceptación al pie estilo Incoluz -->
             <xpath expr="//div[hasclass('page')]" position="inside">
-                <t t-call="incoespacio_reports.sale_conditions_signature"/>
+                <t t-call="incoespacio_reports.sale_conditions_signature" />
             </xpath>
         </template>
 

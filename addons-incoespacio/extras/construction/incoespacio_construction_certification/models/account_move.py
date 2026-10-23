@@ -19,7 +19,9 @@ class AccountMove(models.Model):
         ondelete="set null",
     )
 
-    @api.depends("project_id", "retention_order_id", "invoice_line_ids.sale_line_ids.order_id")
+    @api.depends(
+        "project_id", "retention_order_id", "invoice_line_ids.sale_line_ids.order_id"
+    )
     def _compute_construction_order_id(self):
         by_project = {}
         projects = self.mapped("project_id")
@@ -34,4 +36,6 @@ class AccountMove(models.Model):
             elif move.project_id:
                 move.construction_order_id = by_project.get(move.project_id.id, False)
             else:
-                move.construction_order_id = move.invoice_line_ids.sale_line_ids.order_id[:1]
+                move.construction_order_id = (
+                    move.invoice_line_ids.sale_line_ids.order_id[:1]
+                )

@@ -122,7 +122,9 @@ class TestOcrObra(TransactionCase):
 
     def test_so_code_bonus(self):
         draft = self._bill(state="draft")
-        draft._suggest_obra({"lineas": [{"descripcion": "Certificación marzo %s" % self.order_a.name}]})
+        draft._suggest_obra(
+            {"lineas": [{"descripcion": "Certificación marzo %s" % self.order_a.name}]}
+        )
         self.assertEqual(draft.project_id, self.project_a)
 
     def test_chapter_match(self):
@@ -146,7 +148,9 @@ class TestOcrObra(TransactionCase):
             {"name": "Montaje tabiques de pladur en planta 1"}
         )
         draft._suggest_chapters()
-        section = self.order_b.order_line.filtered(lambda l: l.display_type == "line_section")
+        section = self.order_b.order_line.filtered(
+            lambda l: l.display_type == "line_section"
+        )
         content = draft.invoice_line_ids.filtered(lambda l: l.display_type == "product")
         self.assertTrue(section, self.order_b.order_line.mapped("name"))
         self.assertTrue(content, draft.invoice_line_ids.mapped("name"))
@@ -179,7 +183,9 @@ class TestOcrObra(TransactionCase):
         draft.project_id = self.project_b
         self.assertEqual(
             content.construction_section_id,
-            self.order_b.order_line.filtered(lambda l: l.display_type == "line_section"),
+            self.order_b.order_line.filtered(
+                lambda l: l.display_type == "line_section"
+            ),
         )
 
     def test_chapter_matches_uo_under_section(self):
@@ -316,7 +322,9 @@ class TestOcrObra(TransactionCase):
                 )
             ],
         )
-        section = self.order_b.order_line.filtered(lambda l: l.display_type == "line_section")
+        section = self.order_b.order_line.filtered(
+            lambda l: l.display_type == "line_section"
+        )
         bill.invoice_line_ids.filtered(lambda l: l.display_type == "product").write(
             {"construction_section_id": section.id}
         )

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <record id="view_move_form_inherit_ocr_obra_partida" model="ir.ui.view">
         <field name="name">account.move.form.inherit.ocr.obra.partida</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="incoespacio_invoice_ocr_obra.view_move_form_inherit_ocr_obra"/>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_obra.view_move_form_inherit_ocr_obra" />
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_confirm_obra'][last()]" position="attributes">
                 <attribute name="string">Rellenar capítulos y partidas</attribute>

@@ -113,7 +113,11 @@ class AccountMove(models.Model):
         return self.env["project.project"]
 
     def _obra_from_so_code(self, data):
-        blob = (json.dumps(data or {}, ensure_ascii=False) + " " + " ".join(self.invoice_line_ids.mapped("name") or [])).upper()
+        blob = (
+            json.dumps(data or {}, ensure_ascii=False)
+            + " "
+            + " ".join(self.invoice_line_ids.mapped("name") or [])
+        ).upper()
         codes = list({m.group(1).upper() for m in _SO_CODE.finditer(blob)})
         if not codes:
             return self.env["project.project"]
@@ -142,7 +146,13 @@ class AccountMove(models.Model):
         obras = []
         for project in candidates:
             so = by_project.get(project.id)
-            caps = so.order_line.filtered(lambda l: l.display_type == "line_section").mapped("name") if so else []
+            caps = (
+                so.order_line.filtered(
+                    lambda l: l.display_type == "line_section"
+                ).mapped("name")
+                if so
+                else []
+            )
             obras.append(
                 {
                     "id": project.id,
@@ -158,19 +168,19 @@ class AccountMove(models.Model):
         prompt = (
             "Elige la obra de esta factura de subcontrata. "
             "Casi nunca trae el número de pedido del ERP. "
-            "Devuelve {\"project_id\": <id o null>}.\n"
+            'Devuelve {"project_id": <id o null>}.\n'
             f"Conceptos: {lineas}\nProveedor: {self.partner_id.name}\n"
             f"Obras candidatas: {json.dumps(obras, ensure_ascii=False)}"
         )
         result = AiOcrService.complete_json(self.env, prompt)
         if not result:
             self.message_post(
-                body=Markup(
-                    "<div class='alert alert-warning'><b>%s</b> %s</div>"
-                )
+                body=Markup("<div class='alert alert-warning'><b>%s</b> %s</div>")
                 % (
                     _("Obra IA:"),
-                    _("no se pudo sugerir obra automáticamente. Elige el proyecto a mano."),
+                    _(
+                        "no se pudo sugerir obra automáticamente. Elige el proyecto a mano."
+                    ),
                 ),
                 subtype_xmlid="mail.mt_note",
             )
@@ -217,9 +227,7 @@ class AccountMove(models.Model):
             vals["project_id"] = project.id
         self.write(vals)
         self.message_post(
-            body=Markup(
-                "<div class='alert alert-info'><b>%s</b> %s (%s).</div>"
-            )
+            body=Markup("<div class='alert alert-info'><b>%s</b> %s (%s).</div>")
             % (_("Obra sugerida:"), project.display_name, reason),
             subtype_xmlid="mail.mt_note",
         )
@@ -231,13 +239,18 @@ class AccountMove(models.Model):
         if not self.project_id:
             return
         so = self.env["sale.order"].search(
-            [("project_id", "=", self.project_id.id), ("state", "in", ("sale", "done"))],
+            [
+                ("project_id", "=", self.project_id.id),
+                ("state", "in", ("sale", "done")),
+            ],
             limit=1,
         )
         sections = so.order_line.filtered(lambda l: l.display_type == "line_section")
         if not sections:
             return
-        for line in self.invoice_line_ids.filtered(lambda l: l.display_type == "product"):
+        for line in self.invoice_line_ids.filtered(
+            lambda l: l.display_type == "product"
+        ):
             if (
                 line.construction_section_id
                 and line.construction_section_id.order_id.project_id == self.project_id
@@ -270,7 +283,9 @@ class AccountMove(models.Model):
             vals["ocr_obra_state"] = "confirmed"
         res = super().write(vals)
         if vals.get("project_id"):
-            for move in self.filtered(lambda m: m.move_type in ("in_invoice", "in_refund")):
+            for move in self.filtered(
+                lambda m: m.move_type in ("in_invoice", "in_refund")
+            ):
                 move._suggest_chapters()
         return res
 

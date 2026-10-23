@@ -206,7 +206,9 @@ class SaleOrderLine(models.Model):
             sale = line.price_subtotal or 0.0
             target = line.amount_planned or 0.0
             line.amount_margin_planned = sale - target
-            line.margin_percent_planned = (sale - target) / sale * 100.0 if sale else 0.0
+            line.margin_percent_planned = (
+                (sale - target) / sale * 100.0 if sale else 0.0
+            )
             line.amount_margin = cert_amt - cost
             line.margin_percent = (
                 (cert_amt - cost) / cert_amt * 100.0 if cert_amt else 0.0
