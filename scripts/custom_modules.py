@@ -5,10 +5,9 @@ import sys
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "addons-incoespacio"))
 
 
-def custom_modules(root=None):
-    root = root or ROOT
+def custom_modules():
     names = []
-    for dp, _dns, fns in os.walk(root):
+    for dp, _dns, fns in os.walk(ROOT):
         if "__manifest__.py" in fns:
             names.append(os.path.basename(dp))
     return sorted(names)

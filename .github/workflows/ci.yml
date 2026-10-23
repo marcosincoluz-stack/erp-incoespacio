@@ -12,11 +12,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
       - run: pip install pre-commit
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Imagen de la aplicacion
         run: docker build -t incoespacio-odoo:17.0 .
       - name: Postgres
@@ -41,36 +41,22 @@ jobs:
             docker exec db pg_isready -U odoo && break
             sleep 2
           done
-      - name: odoo.conf de CI
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          text = Path("config/odoo.conf_example").read_text(encoding="utf-8")
-          text = text.replace("dbfilter = ^incoespacio$", "dbfilter = ^ci$")
-          text = text.replace("workers = 4", "workers = 0")
-          text = text.replace("max_cron_threads = 2", "max_cron_threads = 0")
-          Path("config/odoo.ci.conf").write_text(text, encoding="utf-8")
-          PY
       - name: Tests
         run: |
           mods=$(python scripts/custom_modules.py --csv)
           tags=$(python scripts/custom_modules.py --tags)
           run() {
-            docker run --rm --network ci \
+            docker run --rm --network ci -i \
               -v "$PWD/addons:/mnt/extra-addons" \
               -v "$PWD/addons-incoespacio:/mnt/incoespacio-addons" \
-              -v "$PWD/config/odoo.ci.conf:/etc/odoo/odoo.conf:ro" \
+              -v "$PWD/config/odoo.conf_example:/etc/odoo/odoo.conf:ro" \
               incoespacio-odoo:17.0 \
               "$@"
           }
           run odoo -d ci -i l10n_es --stop-after-init --without-demo=all \
             --workers=0 --max-cron-threads=0
-          docker run --rm --network ci -i \
-            -v "$PWD/addons:/mnt/extra-addons" \
-            -v "$PWD/addons-incoespacio:/mnt/incoespacio-addons" \
-            -v "$PWD/config/odoo.ci.conf:/etc/odoo/odoo.conf:ro" \
-            incoespacio-odoo:17.0 \
-            odoo shell -d ci --no-http --workers=0 --http-port=8097 \
+          run odoo shell -d ci --no-http --workers=0 --http-port=8097 \
             < scripts/ci_chart.py
-          run odoo -d ci -i "$mods" --test-enable --test-tags "$tags" \
+          # Los tests HTTP buscan la base por dbfilter: la del ejemplo es la de produccion.
+          run odoo -d ci -i "$mods" --test-enable --test-tags "$tags" --db-filter='^ci$' \
             --stop-after-init --without-demo=all --workers=0 --max-cron-threads=0

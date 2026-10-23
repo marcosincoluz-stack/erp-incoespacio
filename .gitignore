@@ -1,7 +1,6 @@
 # Secretos — nunca al repo
 .env
 config/odoo.conf
-config/odoo.ci.conf
 nginx/ssl/*.pem
 nginx/ssl/*.key
 backups/
