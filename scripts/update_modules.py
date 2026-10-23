@@ -6,7 +6,6 @@
   python scripts/update_modules.py incoespacio_theme otro_modulo
 """
 import os
-import re
 import subprocess
 import sys
 
@@ -28,13 +27,10 @@ def _env(key, default):
 def main():
     known = custom_modules()
     mods = sys.argv[1:] or known
-    bad = [name for name in mods if not re.fullmatch(r"[A-Za-z0-9_]+", name)]
+    # Solo carpetas de modulo reales: los nombres van a un comando de shell.
     missing = [name for name in mods if name not in known]
-    if bad or missing:
-        sys.exit(
-            "Modulo no valido o fuera de addons-incoespacio: "
-            + ", ".join(bad + missing)
-        )
+    if missing:
+        sys.exit("Modulo fuera de addons-incoespacio: " + ", ".join(missing))
     db = _env("POSTGRES_DB", "incoespacio")
     web = _env("WEB_CONTAINER", "incoespacio_web")
     listed = ",".join(mods)

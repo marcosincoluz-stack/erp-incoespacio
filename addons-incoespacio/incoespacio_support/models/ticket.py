@@ -182,34 +182,6 @@ class Ticket(models.Model):
             require_resolution=True,
         )
 
-    @api.model
-    def _fix_seed_mojibake(self):
-        """noupdate freeze: a Windows install stored accents as '?'."""
-        seeds = (
-            ("incoespacio_support.ticket_cat_it", "Informática / Conectividad"),
-            ("incoespacio_support.ticket_cat_erp", "ERP & Facturación"),
-            ("incoespacio_support.ticket_type_error", "Error crítico"),
-        )
-        for xid, name in seeds:
-            rec = self.env.ref(xid, raise_if_not_found=False)
-            if rec is None or rec.name == name:
-                continue
-            broken = name.encode("ascii", "replace").decode()
-            if rec.name in (broken, broken.replace("?", "\ufffd")):
-                rec.name = name
-        self.env.cr.execute(
-            """
-            UPDATE mail_message
-               SET body = replace(replace(replace(body, '&lt;b&gt;', '<b>'),
-                                          '&lt;/b&gt;', '</b>'),
-                                  '&lt;br/&gt;', '<br/>')
-             WHERE model = %s AND body LIKE %s
-            """,
-            (self._name, "%&lt;b&gt;%"),
-        )
-        if self.env.cr.rowcount:
-            self.env["mail.message"].invalidate_model(["body"])
-
     def button_reset(self):
         user = self.env.user
         if not user.has_group("incoespacio_security.support_group_admin"):
