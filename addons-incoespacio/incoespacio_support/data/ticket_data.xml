@@ -39,7 +39,4 @@
         </record>
 
     </data>
-    <data noupdate="0">
-        <function model="incoespacio_support.ticket" name="_fix_seed_mojibake"/>
-    </data>
 </odoo>

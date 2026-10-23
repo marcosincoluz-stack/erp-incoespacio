@@ -4,8 +4,6 @@ import {
     addedLineLevel,
     createContext,
     foldedHiddenIds,
-    cumulativeSalePercent,
-    formatShare,
     lineAmount,
     sectionDisplayColumns,
     sectionFieldTotal,
@@ -75,25 +73,7 @@ QUnit.test("certification chapter splits origin and this period", (assert) => {
     assert.strictEqual(sectionFieldTotal(records, 0, "amount_period"), 100);
 });
 
-QUnit.test("sorted sale share accumulates partidas and chapters to 100", (assert) => {
-    const records = [
-        { id: 1, data: { display_type: "line_section", bc3_level: 0, sequence: 1 } },
-        { id: 2, data: { price_subtotal: 200, sequence: 2, bc3_level: 1 } },
-        { id: 3, data: { display_type: "line_section", bc3_level: 1, sequence: 3 } },
-        { id: 4, data: { price_subtotal: 50, sequence: 4, bc3_level: 2 } },
-        { id: 5, data: { display_type: "line_section", bc3_level: 0, sequence: 5 } },
-        { id: 6, data: { price_subtotal: 750, sequence: 6, bc3_level: 1 } },
-    ];
-    const shown = [records[5], records[1], records[3], records[0], records[4], records[2]];
-    const pct = cumulativeSalePercent(shown);
-    assert.strictEqual(pct.get(6), 75);
-    assert.strictEqual(pct.get(2), 95);
-    assert.strictEqual(pct.get(4), 100);
-    assert.strictEqual(pct.get(1), 25);
-    assert.strictEqual(pct.get(5), 100);
-    assert.strictEqual(pct.get(3), 5);
-    assert.strictEqual(formatShare(20), "20%");
-    assert.strictEqual(formatShare(12.5), "12.5%");
+QUnit.test("chapter row keeps the cumulative sale column", (assert) => {
     const active = [
         { widget: "handle", name: "sequence", type: "field" },
         { name: "name", type: "field" },

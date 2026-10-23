@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_construction_cost_split_wizard,construction.cost.split.wizard,model_construction_cost_split_wizard,account.group_account_invoice,1,1,1,1
+access_construction_cost_split_wizard_line,construction.cost.split.wizard.line,model_construction_cost_split_wizard_line,account.group_account_invoice,1,1,1,1
+access_construction_cost_assign_wizard,construction.cost.assign.wizard,model_construction_cost_assign_wizard,account.group_account_invoice,1,1,1,1
+access_construction_cost_assign_wizard_line,construction.cost.assign.wizard.line,model_construction_cost_assign_wizard_line,account.group_account_invoice,1,1,1,1

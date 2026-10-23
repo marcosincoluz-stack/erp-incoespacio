@@ -6,10 +6,5 @@
             <field name="prefix">P%(y)s</field>
             <field name="padding">4</field>
         </record>
-
-        <!-- Código del Diario de Facturas de Cliente a 'P26' (estándar Incoluz) -->
-        <record id="account.1_sale" model="account.journal">
-            <field name="code">P26</field>
-        </record>
     </data>
 </odoo>

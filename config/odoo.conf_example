@@ -16,6 +16,7 @@ addons_path =
     /mnt/extra-addons/vertical-construction,
     /mnt/incoespacio-addons,
     /mnt/incoespacio-addons/extras/invoice,
+    /mnt/incoespacio-addons/extras/construction,
     /mnt/incoespacio-addons/extras/partner,
     /mnt/incoespacio-addons/extras/purchases,
     /mnt/incoespacio-addons/extras/sales

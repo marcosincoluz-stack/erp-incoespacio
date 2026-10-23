@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:72ba65eb42c10344912a84ff42408db7d34f2feb642204570ab8fc5ffd29f1d3
     container_name: incoespacio_nginx
     depends_on:
       - web
@@ -52,7 +52,7 @@ services:
     restart: always
 
   db:
-    image: postgres:16
+    image: postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94
     container_name: incoespacio_db
     environment:
       - POSTGRES_DB=postgres

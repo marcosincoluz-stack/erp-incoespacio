@@ -1,50 +1,8 @@
-from odoo import _, api, fields, models
+from odoo import models
 
 
 class AccountMove(models.Model):
     _inherit = "account.move"
-
-    has_unassigned_partida = fields.Boolean(
-        compute="_compute_has_unassigned_partida",
-        search="_search_has_unassigned_partida",
-    )
-
-    @api.depends("invoice_line_ids.construction_line_id", "invoice_line_ids.display_type")
-    def _compute_has_unassigned_partida(self):
-        for move in self:
-            move.has_unassigned_partida = any(
-                line.display_type == "product" and not line.construction_line_id
-                for line in move.invoice_line_ids
-            )
-
-    @api.model
-    def _search_has_unassigned_partida(self, operator, value):
-        if operator not in ("=", "!="):
-            return [("id", "=", False)]
-        wanted = (operator == "=" and value) or (operator == "!=" and not value)
-        moves = (
-            self.env["account.move.line"]
-            .search(
-                [
-                    ("display_type", "=", "product"),
-                    ("construction_line_id", "=", False),
-                    ("move_id.move_type", "in", ("in_invoice", "in_refund")),
-                ]
-            )
-            .move_id
-        )
-        return [("id", "in" if wanted else "not in", moves.ids)]
-
-    def action_assign_partida(self):
-        self.ensure_one()
-        return {
-            "type": "ir.actions.act_window",
-            "name": _("Imputar a partidas"),
-            "res_model": "ocr.obra.assign.wizard",
-            "view_mode": "form",
-            "target": "new",
-            "context": {"default_move_id": self.id},
-        }
 
     def _suggest_partidas(self):
         self.ensure_one()
@@ -54,10 +12,10 @@ class AccountMove(models.Model):
             [("project_id", "=", self.project_id.id), ("state", "in", ("sale", "done"))],
             limit=1,
         )
-        partidas = so.order_line.filtered(lambda l: not l.display_type)
+        partidas = so.order_line.filtered(lambda line: not line.display_type)
         if not partidas:
             return
-        for line in self.invoice_line_ids.filtered(lambda l: l.display_type == "product"):
+        for line in self.invoice_line_ids.filtered(lambda item: item.display_type == "product"):
             if (
                 line.construction_line_id
                 and line.construction_line_id.order_id.project_id == self.project_id
@@ -66,7 +24,7 @@ class AccountMove(models.Model):
             pool = partidas
             if line.construction_section_id:
                 pool = partidas.filtered(
-                    lambda p: p.bc3_section_id == line.construction_section_id
+                    lambda partida: partida.bc3_section_id == line.construction_section_id
                 )
             matched = line._match_bc3_line(pool)
             if matched:
@@ -89,7 +47,7 @@ class AccountMove(models.Model):
         )
         if not last:
             return
-        products = last.invoice_line_ids.filtered(lambda l: l.display_type == "product")
+        products = last.invoice_line_ids.filtered(lambda line: line.display_type == "product")
         uos = products.mapped("construction_line_id")
         if (
             not products
@@ -101,7 +59,7 @@ class AccountMove(models.Model):
         so = sticky.order_id
         if so.project_id != self.project_id:
             return
-        for line in self.invoice_line_ids.filtered(lambda l: l.display_type == "product"):
+        for line in self.invoice_line_ids.filtered(lambda item: item.display_type == "product"):
             if line.construction_line_id:
                 continue
             if (

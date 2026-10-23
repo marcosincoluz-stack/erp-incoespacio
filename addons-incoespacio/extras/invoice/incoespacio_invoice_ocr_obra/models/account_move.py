@@ -4,7 +4,6 @@ import re
 
 from markupsafe import Markup
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
 from odoo.tools import config
 
 _logger = logging.getLogger(__name__)
@@ -51,10 +50,12 @@ class AccountMove(models.Model):
         for move in self:
             if move.ocr_obra_not_job:
                 move.ocr_obra_state = "skipped"
+                move.construction_not_job = True
                 move.project_id = False
                 move.ocr_obra_suggested_id = False
             elif move.ocr_obra_state == "skipped":
                 move.ocr_obra_state = "none"
+                move.construction_not_job = False
 
     def _open_obra_projects(self):
         cr = self.env.cr
@@ -277,18 +278,6 @@ class AccountMove(models.Model):
     def _onchange_project_id_chapters(self):
         if self.project_id:
             self._suggest_chapters()
-
-    def action_post(self):
-        for move in self:
-            if (
-                move.move_type in ("in_invoice", "in_refund")
-                and not move.project_id
-                and move.ocr_obra_state != "skipped"
-            ):
-                raise UserError(
-                    _("Elige la obra o marca «No es de obra» antes de publicar.")
-                )
-        return super().action_post()
 
     @api.model
     def get_active_ocr_batch(self, move_ids=None):

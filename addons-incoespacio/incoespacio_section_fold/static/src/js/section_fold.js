@@ -110,71 +110,6 @@ export function sectionDisplayColumns(active, titleField) {
     return out;
 }
 
-export function formatShare(pct) {
-    if (pct === undefined || pct === null || Number.isNaN(pct)) {
-        return "";
-    }
-    const rounded = Math.round(pct * 10) / 10;
-    const text =
-        Math.abs(rounded - Math.round(rounded)) < 0.05
-            ? String(Math.round(rounded))
-            : rounded.toFixed(1);
-    return `${text}%`;
-}
-
-function sharePct(run, total) {
-    if (!total) {
-        return 0;
-    }
-    if (Math.abs(run - total) <= 0.0001) {
-        return 100;
-    }
-    return (run / total) * 100;
-}
-
-// Partidas climb in the order on screen. Chapters use their summed sale and
-// climb on their own, because a chapter plus its partidas would pass 100%.
-// ponytail: uses the loaded page; raise the order-line limit if a budget is cut off.
-export function cumulativeSalePercent(records) {
-    const ordered = records.slice().sort((a, b) => {
-        const sa = Number((a.data || a).sequence) || 0;
-        const sb = Number((b.data || b).sequence) || 0;
-        return sa - sb;
-    });
-    let total = 0;
-    const chapterAmt = new Map();
-    for (let i = 0; i < ordered.length; i++) {
-        const data = ordered[i].data || ordered[i];
-        if (data.display_type === "line_section") {
-            chapterAmt.set(ordered[i].id, sectionFieldTotal(ordered, i, "price_subtotal"));
-        } else if (!data.display_type) {
-            total += Number(data.price_subtotal) || 0;
-        }
-    }
-    const out = new Map();
-    let run = 0;
-    let chapterRun = 0;
-    for (const rec of records) {
-        const data = rec.data || rec;
-        if (!data || data.display_type === "line_note") {
-            continue;
-        }
-        if (data.display_type === "line_section") {
-            const amt = chapterAmt.get(rec.id) || 0;
-            if (sectionLevel(data) === 0) {
-                chapterRun += amt;
-                out.set(rec.id, sharePct(chapterRun, total));
-            } else {
-                out.set(rec.id, sharePct(amt, total));
-            }
-            continue;
-        }
-        run += Number(data.price_subtotal) || 0;
-        out.set(rec.id, sharePct(run, total));
-    }
-    return out;
-}
-
 export function isSectionFoldColumn(column) {
     const id = column && column.id;
     return (
@@ -243,52 +178,6 @@ patch(SectionAndNoteListRenderer.prototype, {
                 this.state.columns = cols;
             }
         });
-    },
-    _saleShareOn(list) {
-        list = list || this.props.list;
-        const order = list.orderBy || [];
-        if (!order.length || order[0].name !== "price_subtotal") {
-            return false;
-        }
-        if (list.resModel !== "sale.order.line") {
-            return false;
-        }
-        return (this.allColumns || []).some((col) => col.name === "amount_cert_origin");
-    },
-    getActiveColumns(list) {
-        const columns = super.getActiveColumns(list);
-        if (!this._saleShareOn(list) || columns.some((col) => col.id === "sale_share")) {
-            return columns;
-        }
-        const idx = columns.findIndex((col) => col.name === "amount_cert_origin");
-        if (idx < 0) {
-            return columns;
-        }
-        const share = {
-            id: "sale_share",
-            type: "field",
-            name: "display_type",
-            label: "Acum. %",
-            hasLabel: true,
-            attrs: {},
-            options: {},
-            invisible: "0",
-        };
-        const out = columns.slice();
-        out.splice(idx + 1, 0, share);
-        return out;
-    },
-    isSortable(column) {
-        if (column.id === "sale_share") {
-            return false;
-        }
-        return super.isSortable(column);
-    },
-    isNumericColumn(column) {
-        if (column.id === "sale_share") {
-            return true;
-        }
-        return super.isNumericColumn(column);
     },
     _foldSearchActive() {
         return Boolean(
@@ -372,7 +261,7 @@ patch(SectionAndNoteListRenderer.prototype, {
     },
     // Fake total has no field descriptor; Field() would throw in fieldVisualFeedback.
     canUseFormatter(column, record) {
-        if (column.id === "sale_share" || this._foldCell(column)) {
+        if (this._foldCell(column)) {
             return true;
         }
         return super.canUseFormatter(column, record);
@@ -388,9 +277,6 @@ patch(SectionAndNoteListRenderer.prototype, {
         return null;
     },
     getCellClass(column, record) {
-        if (column.id === "sale_share") {
-            return "o_data_cell text-end";
-        }
         if (this._foldCell(column) === "total") {
             return "o_data_cell o_section_fold_total text-end";
         }
@@ -399,18 +285,7 @@ patch(SectionAndNoteListRenderer.prototype, {
         }
         return super.getCellClass(column, record);
     },
-    _saleShares() {
-        const records = this.props.list.records;
-        if (this._saleShareRecords !== records) {
-            this._saleShareRecords = records;
-            this._saleShareMap = cumulativeSalePercent(records);
-        }
-        return this._saleShareMap;
-    },
     getFormattedValue(column, record) {
-        if (column.id === "sale_share") {
-            return formatShare(this._saleShares().get(record.id));
-        }
         if (this._foldCell(column) === "pad") {
             return "";
         }

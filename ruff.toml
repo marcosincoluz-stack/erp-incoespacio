@@ -1,0 +1,5 @@
+line-length = 88
+target-version = "py310"
+
+[lint]
+extend-exclude = ["**/bc3_importer/**"]

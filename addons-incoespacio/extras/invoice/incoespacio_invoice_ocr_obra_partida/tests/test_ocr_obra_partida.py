@@ -120,7 +120,7 @@ class TestOcrObraPartida(TransactionCase):
 
     def test_split_two_partidas(self):
         bill, line = self._draft_bill(price=100)
-        wiz = self.env["ocr.obra.split.wizard"].create(
+        wiz = self.env["construction.cost.split.wizard"].create(
             {
                 "line_id": line.id,
                 "split_line_ids": [
@@ -139,7 +139,7 @@ class TestOcrObraPartida(TransactionCase):
 
     def test_split_must_sum(self):
         bill, line = self._draft_bill(price=100)
-        wiz = self.env["ocr.obra.split.wizard"].create(
+        wiz = self.env["construction.cost.split.wizard"].create(
             {
                 "line_id": line.id,
                 "split_line_ids": [
@@ -243,17 +243,17 @@ class TestOcrObraPartida(TransactionCase):
     def test_split_default_remaining_is_subtotal(self):
         bill, line = self._draft_bill(price=100)
         vals = (
-            self.env["ocr.obra.split.wizard"]
+            self.env["construction.cost.split.wizard"]
             .with_context(default_line_id=line.id)
             .default_get(["line_id", "split_line_ids"])
         )
-        wiz = self.env["ocr.obra.split.wizard"].new(vals)
+        wiz = self.env["construction.cost.split.wizard"].new(vals)
         self.assertAlmostEqual(wiz.split_line_ids.amount, 0.0)
         self.assertAlmostEqual(wiz.amount_remaining, 100.0)
 
     def test_split_onchange_fills_empty_line(self):
         bill, line = self._draft_bill(price=100)
-        wiz = self.env["ocr.obra.split.wizard"].new(
+        wiz = self.env["construction.cost.split.wizard"].new(
             {
                 "line_id": line.id,
                 "split_line_ids": [
@@ -283,7 +283,7 @@ class TestOcrObraPartida(TransactionCase):
                 "move_type": "in_invoice",
                 "partner_id": self.partner.id,
                 "invoice_date": self.order.date_order,
-                "ocr_obra_state": "skipped",
+                "construction_not_job": True,
                 "invoice_line_ids": [
                     (
                         0,
@@ -327,7 +327,7 @@ class TestOcrObraPartida(TransactionCase):
 
         type(line).copy = _spy_copy
         try:
-            wiz = self.env["ocr.obra.assign.wizard"].create(
+            wiz = self.env["construction.cost.assign.wizard"].create(
                 {
                     "move_id": bill.id,
                     "line_ids": [

@@ -1,0 +1,56 @@
+# Plantilla OCA (ruff, prettier, pylint-odoo) recortada a addons-incoespacio.
+# bc3_importer es un port OCA: no se reformatea.
+files: ^addons-incoespacio/
+exclude: ^addons-incoespacio/extras/sales/bc3_importer/
+default_language_version:
+  python: python3
+repos:
+  - repo: local
+    hooks:
+      - id: module-size
+        name: tope Python+JS por modulo
+        entry: python scripts/check_module_size.py
+        language: system
+        pass_filenames: false
+      - id: mojibake
+        name: mojibake UTF-8
+        entry: python scripts/check_mojibake.py
+        language: system
+        pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-xml
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.9
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier (xml, js, scss)
+        entry: prettier
+        args: [--write, --ignore-unknown]
+        language: node
+        types: [text]
+        files: \.(xml|js|scss|css)$
+        additional_dependencies:
+          - "prettier@2.7.1"
+          - "@prettier/plugin-xml@2.2.0"
+  - repo: https://github.com/OCA/pylint-odoo
+    rev: v9.0.4
+    hooks:
+      - id: pylint_odoo
+        args: [--rcfile=.pylintrc]

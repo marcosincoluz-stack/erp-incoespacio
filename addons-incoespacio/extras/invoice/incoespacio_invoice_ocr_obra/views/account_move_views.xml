@@ -26,17 +26,6 @@
                         class="btn-primary"
                         invisible="not project_id or ocr_obra_not_job"/>
             </xpath>
-            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
-                <attribute name="mode">tree</attribute>
-            </xpath>
-            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='product_id']" position="after">
-                <field name="construction_section_id"
-                       string="Capítulo"
-                       optional="show"
-                       options="{'no_create': True, 'no_quick_create': True}"
-                       domain="[('display_type', '=', 'line_section'), ('order_id.project_id', '=', parent.project_id)]"
-                       column_invisible="parent.move_type not in ('in_invoice', 'in_refund')"/>
-            </xpath>
         </field>
     </record>
 
@@ -60,16 +49,4 @@
         </field>
     </record>
 
-    <record id="view_account_invoice_filter_ocr_obra" model="ir.ui.view">
-        <field name="name">account.move.search.inherit.ocr.obra</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
-                <separator/>
-                <filter string="Gastos sin obra" name="gastos_sin_obra"
-                        domain="[('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '=', 'posted'), ('project_id', '=', False), ('ocr_obra_state', '!=', 'skipped')]"/>
-            </xpath>
-        </field>
-    </record>
 </odoo>
