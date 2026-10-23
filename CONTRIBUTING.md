@@ -9,6 +9,7 @@ Odoo solo lee el primer nivel de cada entrada de `addons_path` (`config/odoo.con
 - Transversales en `addons-incoespacio/`: `theme`, `security`, `support`, `reports`, `ai_core`, y los de chrome (`app_filters`, `chatter_fold`, `section_fold`, `it`).
 - Dominio en `addons-incoespacio/extras/<dominio>/`: `construction`, `invoice`, `partner`, `purchases`, `sales`. Cada carpeta de dominio va en `addons_path`.
 - OCA fijada en `addons/`. No se reformatea ni se le aplica el tope de líneas.
+- Odoo 14 está en [odoo14](https://github.com/marcosincoluz-stack/odoo14). No vive en este repositorio.
 
 ## Módulos
 
