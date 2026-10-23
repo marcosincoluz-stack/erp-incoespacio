@@ -6,188 +6,196 @@
 
 /* Soporte Bootstrap 5 para Wkhtmltopdf */
 .text-start {
-    text-align: left;
+  text-align: left;
 }
 .text-end {
-    text-align: right;
+  text-align: right;
 }
 .float-end {
-    float: right;
+  float: right;
 }
 .float-start {
-    float: left;
+  float: left;
 }
 
 /* Tarjetas y Contenedores */
 .inco-card {
-    background-color: #fafbfc;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    padding: 12px 14px;
-    line-height: 1.45;
+  background-color: #fafbfc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 12px 14px;
+  line-height: 1.45;
 }
 .inco-card-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #e72228;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-    border-bottom: 1px solid #edf2f7;
-    padding-bottom: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #e72228;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 3px;
 }
 
 /* Tabla de Partidas */
 .o_main_table {
-    -webkit-print-color-adjust: exact;
-    width: 100%;
-    margin-top: 20px;
-    margin-bottom: 25px;
-    /* ponytail: collapse + gray cells makes Adobe draw vertical hairlines. */
-    border-collapse: separate;
-    border-spacing: 0;
+  -webkit-print-color-adjust: exact;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 25px;
+  /* ponytail: collapse + gray cells makes Adobe draw vertical hairlines. */
+  border-collapse: separate;
+  border-spacing: 0;
 }
 .table.o_main_table > :not(caption) > * > * {
-    background-color: transparent;
-    box-shadow: none;
-    border-left: 0;
-    border-right: 0;
+  background-color: transparent;
+  box-shadow: none;
+  border-left: 0;
+  border-right: 0;
 }
 .table.o_main_table > thead > tr > th,
 .table.o_main_table > tbody > tr.o_line_section > td,
 .incoespacio-totals-table tr.o_total td {
-    position: relative;
-    background-color: #f1f5f9;
+  position: relative;
+  background-color: #f1f5f9;
 }
 .table.o_main_table > thead > tr > th + th,
 .table.o_main_table > tbody > tr.o_line_section > td + td,
 .incoespacio-totals-table tr.o_total td + td {
-    left: -1px;
+  left: -1px;
 }
 .o_main_table thead tr th {
-    background-color: #f1f5f9;
-    border-top: 1px solid #cbd5e1;
-    border-bottom: 2px solid #94a3b8;
-    padding: 8px 10px;
-    font-size: 0.85rem;
-    color: #0f172a;
-    font-weight: 700;
+  background-color: #f1f5f9;
+  border-top: 1px solid #cbd5e1;
+  border-bottom: 2px solid #94a3b8;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: #0f172a;
+  font-weight: 700;
 }
 .o_main_table thead tr th[name="th_description"] {
-    text-align: left;
-    width: 52%;
+  text-align: left;
+  width: 52%;
 }
 .o_main_table thead tr th.text-end,
 .o_main_table thead tr th[name="th_quantity"],
 .o_main_table thead tr th[name="th_priceunit"],
 .o_main_table thead tr th[name="th_discount"],
 .o_main_table thead tr th[name="th_subtotal"] {
-    text-align: right;
+  text-align: right;
 }
 .o_main_table thead tr th[name="th_quantity"] {
-    width: 14%;
+  width: 14%;
 }
 .o_main_table thead tr th[name="th_priceunit"] {
-    width: 16%;
+  width: 16%;
 }
 .o_main_table thead tr th[name="th_discount"] {
-    width: 10%;
+  width: 10%;
 }
 .o_main_table thead tr th[name="th_subtotal"] {
-    width: 18%;
+  width: 18%;
 }
 .o_main_table tbody tr td {
-    padding: 9px 10px;
-    font-size: 0.82rem;
-    border-bottom: 1px solid #e2e8f0;
-    vertical-align: middle;
-    color: #334155;
+  padding: 9px 10px;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  color: #334155;
 }
 .o_main_table tbody tr td[name="td_name"],
 .o_main_table tbody tr td[name="account_invoice_line_name"] {
-    text-align: left;
+  text-align: left;
 }
 .o_main_table tbody tr td.text-end,
 .o_main_table tbody tr td[name="td_quantity"],
 .o_main_table tbody tr td[name="td_priceunit"],
 .o_main_table tbody tr td[name="td_discount"],
 .o_main_table tbody tr td[name="td_subtotal"] {
-    text-align: right;
+  text-align: right;
 }
 .o_main_table tbody tr.o_line_section td {
-    background-color: #f1f5f9;
-    font-weight: 700;
-    color: #0f172a;
-    border-top: 1px solid #cbd5e1;
-    border-bottom: 1px solid #cbd5e1;
+  background-color: #f1f5f9;
+  font-weight: 700;
+  color: #0f172a;
+  border-top: 1px solid #cbd5e1;
+  border-bottom: 1px solid #cbd5e1;
 }
 .o_main_table tbody tr.o_line_note td {
-    font-style: italic;
-    color: #64748b;
-    padding: 6px 8px;
+  font-style: italic;
+  color: #64748b;
+  padding: 6px 8px;
 }
 
 /* Tabla de Totales */
 .incoespacio-totals-table {
-    -webkit-print-color-adjust: exact;
-    float: right;
-    width: 44%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 0.85rem;
-    margin-bottom: 20px;
-    background-color: #fafbfc;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
+  -webkit-print-color-adjust: exact;
+  float: right;
+  width: 44%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  background-color: #fafbfc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
 }
 .incoespacio-totals-table tr td {
-    padding: 6px 12px;
+  padding: 6px 12px;
 }
 .incoespacio-totals-table tr td:first-child {
-    text-align: left;
-    color: #475569;
-    font-weight: 500;
+  text-align: left;
+  color: #475569;
+  font-weight: 500;
 }
 .incoespacio-totals-table tr td:last-child,
 .incoespacio-totals-table tr td.text-end {
-    text-align: right;
-    color: #0f172a;
-    font-weight: 600;
+  text-align: right;
+  color: #0f172a;
+  font-weight: 600;
 }
 .incoespacio-totals-table tr.border-black td {
-    border-top: 1px solid #cbd5e1;
+  border-top: 1px solid #cbd5e1;
 }
 .incoespacio-totals-table tr.o_total td {
-    border-top: 2px solid #0f172a;
-    background-color: #f1f5f9;
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: #0f172a;
-    padding-top: 8px;
-    padding-bottom: 8px;
+  border-top: 2px solid #0f172a;
+  background-color: #f1f5f9;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 /* Eliminación estricta de bordes en cabecera y pie de página para evitar marcos no deseados al imprimir */
-.header table, .header table tr, .header table td, .header table th, .header div,
-.footer table, .footer table tr, .footer table td, .footer table th, .footer div {
-    border: none;
-    border-color: transparent;
-    outline: none;
-    box-shadow: none;
+.header table,
+.header table tr,
+.header table td,
+.header table th,
+.header div,
+.footer table,
+.footer table tr,
+.footer table td,
+.footer table th,
+.footer div {
+  border: none;
+  border-color: transparent;
+  outline: none;
+  box-shadow: none;
 }
 .footer {
-    border-top: 2px solid #e72228;
+  border-top: 2px solid #e72228;
 }
 
 /* Factura: menos aire vertical para que pago y fiscal quepan en la misma hoja. */
 .article[data-oe-model="account.move"] .o_main_table {
-    margin-top: 6px;
-    margin-bottom: 4px;
+  margin-top: 6px;
+  margin-bottom: 4px;
 }
 .article[data-oe-model="account.move"] .inco-card {
-    padding: 8px 10px;
-    line-height: 1.35;
+  padding: 8px 10px;
+  line-height: 1.35;
 }
 .article[data-oe-model="account.move"] .incoespacio-totals-table {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }

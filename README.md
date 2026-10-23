@@ -56,6 +56,8 @@ docker compose logs -f web
 
 ## Github Workflow
 
+Normas de módulos, commits y tests: [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ### Estructura de Ramas
 
 - **`main`**: Rama principal, contiene la última versión estable en producción.

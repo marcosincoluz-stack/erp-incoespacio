@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <record id="bc3_price_import_wizard_form" model="ir.ui.view">
         <field name="name">bc3.price.import.wizard.form</field>
@@ -9,12 +9,17 @@
                     Un fichero grande se importa por tandas. No cierres la ventana hasta que se abra la lista.
                 </div>
                 <group>
-                    <field name="bc3_file" widget="binary" filename="bc3_file_name" options="{'accepted_file_extensions': '.bc3'}"/>
-                    <field name="batch_ready" invisible="1"/>
+                    <field
+            name="bc3_file"
+            widget="binary"
+            filename="bc3_file_name"
+            options="{'accepted_file_extensions': '.bc3'}"
+          />
+                    <field name="batch_ready" invisible="1" />
                 </group>
                 <footer>
-                    <button string="Importar" name="action_import" type="object" class="oe_highlight"/>
-                    <button string="Cancelar" class="btn btn-secondary" special="cancel"/>
+                    <button string="Importar" name="action_import" type="object" class="oe_highlight" />
+                    <button string="Cancelar" class="btn btn-secondary" special="cancel" />
                 </footer>
             </form>
         </field>
@@ -32,11 +37,11 @@
         <field name="model">product.template</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
-                <field name="default_code" string="Código"/>
-                <field name="uom_id" string="Unidad de obra"/>
-                <field name="name" string="Título"/>
-                <field name="list_price" string="Precio"/>
-                <button name="action_open_price_text" type="object" icon="fa-align-left" title="Descripción"/>
+                <field name="default_code" string="Código" />
+                <field name="uom_id" string="Unidad de obra" />
+                <field name="name" string="Título" />
+                <field name="list_price" string="Precio" />
+                <button name="action_open_price_text" type="object" icon="fa-align-left" title="Descripción" />
             </tree>
         </field>
     </record>
@@ -48,13 +53,13 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="default_code" string="Código"/>
-                        <field name="uom_id" string="Unidad de obra"/>
-                        <field name="name" string="Título"/>
-                        <field name="list_price" string="Precio"/>
+                        <field name="default_code" string="Código" />
+                        <field name="uom_id" string="Unidad de obra" />
+                        <field name="name" string="Título" />
+                        <field name="list_price" string="Precio" />
                     </group>
-                    <separator string="Descripción"/>
-                    <field name="description_sale" nolabel="1" placeholder="Texto largo de la partida"/>
+                    <separator string="Descripción" />
+                    <field name="description_sale" nolabel="1" placeholder="Texto largo de la partida" />
                 </sheet>
             </form>
         </field>
@@ -64,47 +69,44 @@
         <field name="name">Base de precios</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain" eval="[('categ_id', '=', ref('price_db_category'))]"/>
-        <field name="context" eval="{
+        <field name="domain" eval="[('categ_id', '=', ref('price_db_category'))]" />
+        <field
+      name="context"
+      eval="{
             'default_categ_id': ref('price_db_category'),
             'default_detailed_type': 'service',
             'default_sale_ok': True,
             'default_purchase_ok': False,
-        }"/>
+        }"
+    />
     </record>
 
     <record id="action_price_db_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="1"/>
+        <field name="sequence" eval="1" />
         <field name="view_mode">tree</field>
-        <field name="view_id" ref="product_template_price_db_tree"/>
-        <field name="act_window_id" ref="action_price_db"/>
+        <field name="view_id" ref="product_template_price_db_tree" />
+        <field name="act_window_id" ref="action_price_db" />
     </record>
     <record id="action_price_db_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
+        <field name="sequence" eval="2" />
         <field name="view_mode">form</field>
-        <field name="view_id" ref="product_template_price_db_form"/>
-        <field name="act_window_id" ref="action_price_db"/>
+        <field name="view_id" ref="product_template_price_db_form" />
+        <field name="act_window_id" ref="action_price_db" />
     </record>
 
     <menuitem
-        id="menu_price_db_root"
-        name="Base de precios"
-        groups="bc3_importer.group_bc3_user"
-        web_icon="incoespacio_bc3_price_db,static/description/icon.png"
-        sequence="25"
-    />
+    id="menu_price_db_root"
+    name="Base de precios"
+    groups="bc3_importer.group_bc3_user"
+    web_icon="incoespacio_bc3_price_db,static/description/icon.png"
+    sequence="25"
+  />
+    <menuitem id="menu_price_db" name="Partidas" parent="menu_price_db_root" action="action_price_db" sequence="1" />
     <menuitem
-        id="menu_price_db"
-        name="Partidas"
-        parent="menu_price_db_root"
-        action="action_price_db"
-        sequence="1"
-    />
-    <menuitem
-        id="menu_price_db_import"
-        name="Importar"
-        parent="menu_price_db_root"
-        action="bc3_price_import_wizard_action"
-        sequence="2"
-    />
+    id="menu_price_db_import"
+    name="Importar"
+    parent="menu_price_db_root"
+    action="bc3_price_import_wizard_action"
+    sequence="2"
+  />
 </odoo>

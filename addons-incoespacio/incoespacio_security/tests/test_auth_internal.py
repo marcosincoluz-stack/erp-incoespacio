@@ -7,7 +7,11 @@ class TestAuthInternal(TransactionCase):
         self.assertEqual(self.env["res.users"]._get_signup_invitation_scope(), "b2b")
         with self.assertRaises(SignupError):
             self.env["res.users"].signup(
-                {"login": "publico@example.com", "name": "Publico", "password": "secret"}
+                {
+                    "login": "publico@example.com",
+                    "name": "Publico",
+                    "password": "secret",
+                }
             )
         user = self.env["res.users"].create(
             {

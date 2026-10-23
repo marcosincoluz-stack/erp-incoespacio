@@ -1,57 +1,51 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Script de Actualización Rápida de Módulos para Incoespacio ERP (Odoo 17)
-Permite actualizar uno, varios o todos los módulos custom sin recrear contenedores.
-Uso:
-  python update_modules.py                      (actualiza todos los módulos incoespacio_*)
-  python update_modules.py incoespacio_theme    (actualiza un módulo específico)
-"""
+"""Actualiza módulos de addons-incoespacio sin recrear contenedores.
 
-import sys
+  python scripts/update_modules.py
+  python scripts/update_modules.py incoespacio_theme otro_modulo
+"""
 import os
+import re
 import subprocess
+import sys
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ENV_FILE = os.path.join(BASE_DIR, '.env')
+from custom_modules import custom_modules
 
-DB_NAME = "incoespacio"
-WEB_CONTAINER = "incoespacio_web"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ENV_FILE = os.path.join(BASE_DIR, ".env")
 
-if os.path.isfile(ENV_FILE):
-    with open(ENV_FILE, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.startswith('POSTGRES_DB='):
-                DB_NAME = line.split('=', 1)[1].strip().strip('"').strip("'")
-            elif line.startswith('WEB_CONTAINER='):
-                WEB_CONTAINER = line.split('=', 1)[1].strip().strip('"').strip("'")
 
-MODULES_DEFAULT = [
-    "incoespacio_security",
-    "incoespacio_theme",
-    "incoespacio_reports",
-    "incoespacio_invoice_date",
-    "incoespacio_invoice_notes",
-    "incoespacio_partner_is_customer_or_supplier",
-    "incoespacio_purchase_bot_alert",
-    "incoespacio_support"
-]
+def _env(key, default):
+    if os.path.isfile(ENV_FILE):
+        with open(ENV_FILE, encoding="utf-8") as handle:
+            for line in handle:
+                if line.startswith(key + "="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return default
 
-if len(sys.argv) > 1:
-    modules_to_update = ",".join(sys.argv[1:])
-else:
-    modules_to_update = ",".join(MODULES_DEFAULT)
 
-print("=" * 70)
-print(f"ACTUALIZANDO MÓDULOS EN ODOO 17 ({DB_NAME})")
-print(f"Módulos: {modules_to_update}")
-print("=" * 70)
+def main():
+    known = custom_modules()
+    mods = sys.argv[1:] or known
+    bad = [name for name in mods if not re.fullmatch(r"[A-Za-z0-9_]+", name)]
+    missing = [name for name in mods if name not in known]
+    if bad or missing:
+        sys.exit(
+            "Modulo no valido o fuera de addons-incoespacio: "
+            + ", ".join(bad + missing)
+        )
+    db = _env("POSTGRES_DB", "incoespacio")
+    web = _env("WEB_CONTAINER", "incoespacio_web")
+    listed = ",".join(mods)
+    print(f"Actualizando en {db}: {listed}")
+    # workers 0 y otro puerto: el contenedor ya tiene el Odoo de produccion en el 8069.
+    cmd = (
+        f"docker exec {web} odoo -u {listed} -d {db} --stop-after-init "
+        "--workers=0 --max-cron-threads=0 --http-port=8098"
+    )
+    return subprocess.run(cmd, shell=True).returncode
 
-cmd = f'docker exec {WEB_CONTAINER} odoo -u {modules_to_update} -d {DB_NAME} --stop-after-init'
-res = subprocess.run(cmd, shell=True)
 
-if res.returncode == 0:
-    print("\nActualización completada con éxito.")
-else:
-    print(f"\nError al actualizar módulos (código {res.returncode}).")
-    sys.exit(res.returncode)
+if __name__ == "__main__":
+    sys.exit(main())

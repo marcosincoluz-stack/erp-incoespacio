@@ -1,0 +1,76 @@
+.o_construction_margins_kpis {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  .o_margin_kpi {
+    flex: 1;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: #f8f9fa;
+
+    .o_margin_kpi_title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #6c757d;
+      margin-bottom: 0.15rem;
+    }
+
+    > .o_field_widget {
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+
+    .o_margin_kpi_sub {
+      font-size: 0.8rem;
+      margin-top: 0.35rem;
+      line-height: 1.35;
+
+      .o_field_widget {
+        display: inline;
+        font-size: inherit;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.o_lens_table {
+  th,
+  td {
+    text-align: end;
+    vertical-align: middle;
+  }
+
+  th:first-child,
+  td:first-child {
+    text-align: start;
+  }
+
+  .o_lens_cert {
+    background: #f8f9fa;
+    font-weight: 600;
+  }
+
+  .o_lens_cert input {
+    font-size: 1.25rem;
+    font-weight: 700;
+    max-width: 8rem;
+    margin-left: auto;
+  }
+
+  .o_lens_shortcuts {
+    font-size: 0.8rem;
+    font-weight: 400;
+    margin-top: 0.25rem;
+    text-align: end;
+
+    .o_field_widget {
+      display: inline;
+    }
+  }
+}

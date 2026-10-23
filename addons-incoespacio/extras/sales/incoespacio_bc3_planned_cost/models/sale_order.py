@@ -105,9 +105,7 @@ class SaleOrderLine(models.Model):
                 )
                 continue
             pct = line.order_id.planned_percent or 0.0
-            line.price_planned = (
-                line.price_unit * (100.0 - pct) / 100.0 if pct else 0.0
-            )
+            line.price_planned = line.price_unit * (100.0 - pct) / 100.0 if pct else 0.0
             line.amount_planned = line.price_planned * line.qty_planned
 
     def _inverse_price_planned(self):
@@ -115,7 +113,9 @@ class SaleOrderLine(models.Model):
             if line.display_type:
                 continue
             line.price_planned_manual = True
-            line.amount_planned = (line.price_planned or 0.0) * (line.qty_planned or 0.0)
+            line.amount_planned = (line.price_planned or 0.0) * (
+                line.qty_planned or 0.0
+            )
 
     def action_reset_price_planned(self):
         self.price_planned_manual = False

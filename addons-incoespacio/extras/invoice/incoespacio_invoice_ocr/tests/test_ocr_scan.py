@@ -48,8 +48,10 @@ class TestOcrScan(TransactionCase):
         )
         move.message_post(attachment_ids=[attach.id])
         atts = move._ocr_attachments().filtered(
-            lambda a: a.mimetype == "application/pdf"
-            or (a.name and a.name.lower().endswith(".pdf"))
+            lambda a: (
+                a.mimetype == "application/pdf"
+                or (a.name and a.name.lower().endswith(".pdf"))
+            )
         )
         self.assertTrue(atts)
 
@@ -108,7 +110,9 @@ class TestOcrScan(TransactionCase):
         )
         self.assertEqual(move.ocr_status, "mismatch")
         self.assertTrue(move.ocr_company_mismatch)
-        self.assertFalse(move.invoice_line_ids.filtered(lambda l: l.display_type == "product"))
+        self.assertFalse(
+            move.invoice_line_ids.filtered(lambda l: l.display_type == "product")
+        )
 
     def test_header_irpf_skipped_on_many_lines(self):
         move = self._bill()
@@ -148,9 +152,7 @@ class TestOcrScan(TransactionCase):
         move._process_iban_verification(self.partner, "ES91 2100 0418 4502 0005 1332")
         self.assertEqual(move.ocr_iban_status, "new")
         self.assertFalse(
-            self.env["res.partner.bank"].search(
-                [("partner_id", "=", self.partner.id)]
-            )
+            self.env["res.partner.bank"].search([("partner_id", "=", self.partner.id)])
         )
 
     def test_ocr_attachments_prefers_parte(self):
@@ -214,13 +216,17 @@ class TestOcrScan(TransactionCase):
             move.action_post()
         move.action_confirm_ocr_partner()
         self.assertFalse(partner.ocr_pending_review)
-        move.invoice_line_ids = [(
-            0, 0, {
-                "name": "Linea",
-                "quantity": 1,
-                "price_unit": 10,
-                "tax_ids": [(6, 0, [])],
-            },
-        )]
+        move.invoice_line_ids = [
+            (
+                0,
+                0,
+                {
+                    "name": "Linea",
+                    "quantity": 1,
+                    "price_unit": 10,
+                    "tax_ids": [(6, 0, [])],
+                },
+            )
+        ]
         move.action_post()
         self.assertEqual(move.state, "posted")

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data noupdate="1">
 
@@ -38,8 +38,5 @@
             <field name="sequence">3</field>
         </record>
 
-    </data>
-    <data noupdate="0">
-        <function model="incoespacio_support.ticket" name="_fix_seed_mojibake"/>
     </data>
 </odoo>

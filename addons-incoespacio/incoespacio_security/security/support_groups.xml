@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
 
@@ -7,19 +7,19 @@
         </record>
         <record id="support_group_manager" model="res.groups">
             <field name="name">Centro de ayuda: Usuario</field>
-            <field name="implied_ids" eval="[(4, ref('support_group_user'))]"/>
+            <field name="implied_ids" eval="[(4, ref('support_group_user'))]" />
         </record>
         <record id="support_group_admin" model="res.groups">
             <field name="name">Centro de ayuda: Administrador</field>
-            <field name="implied_ids" eval="[(4, ref('support_group_manager'))]"/>
+            <field name="implied_ids" eval="[(4, ref('support_group_manager'))]" />
         </record>
 
         <!-- Asignar automáticamente a Administradores de Odoo y empleados -->
         <record id="base.group_system" model="res.groups">
-            <field name="implied_ids" eval="[(4, ref('support_group_admin'))]"/>
+            <field name="implied_ids" eval="[(4, ref('support_group_admin'))]" />
         </record>
         <record id="base.group_user" model="res.groups">
-            <field name="implied_ids" eval="[(4, ref('support_group_user'))]"/>
+            <field name="implied_ids" eval="[(4, ref('support_group_user'))]" />
         </record>
 
     </data>

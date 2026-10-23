@@ -4,7 +4,6 @@ import re
 
 from markupsafe import Markup
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
 from odoo.tools import config
 
 _logger = logging.getLogger(__name__)
@@ -51,10 +50,12 @@ class AccountMove(models.Model):
         for move in self:
             if move.ocr_obra_not_job:
                 move.ocr_obra_state = "skipped"
+                move.construction_not_job = True
                 move.project_id = False
                 move.ocr_obra_suggested_id = False
             elif move.ocr_obra_state == "skipped":
                 move.ocr_obra_state = "none"
+                move.construction_not_job = False
 
     def _open_obra_projects(self):
         cr = self.env.cr
@@ -112,7 +113,11 @@ class AccountMove(models.Model):
         return self.env["project.project"]
 
     def _obra_from_so_code(self, data):
-        blob = (json.dumps(data or {}, ensure_ascii=False) + " " + " ".join(self.invoice_line_ids.mapped("name") or [])).upper()
+        blob = (
+            json.dumps(data or {}, ensure_ascii=False)
+            + " "
+            + " ".join(self.invoice_line_ids.mapped("name") or [])
+        ).upper()
         codes = list({m.group(1).upper() for m in _SO_CODE.finditer(blob)})
         if not codes:
             return self.env["project.project"]
@@ -141,7 +146,13 @@ class AccountMove(models.Model):
         obras = []
         for project in candidates:
             so = by_project.get(project.id)
-            caps = so.order_line.filtered(lambda l: l.display_type == "line_section").mapped("name") if so else []
+            caps = (
+                so.order_line.filtered(
+                    lambda l: l.display_type == "line_section"
+                ).mapped("name")
+                if so
+                else []
+            )
             obras.append(
                 {
                     "id": project.id,
@@ -157,19 +168,19 @@ class AccountMove(models.Model):
         prompt = (
             "Elige la obra de esta factura de subcontrata. "
             "Casi nunca trae el número de pedido del ERP. "
-            "Devuelve {\"project_id\": <id o null>}.\n"
+            'Devuelve {"project_id": <id o null>}.\n'
             f"Conceptos: {lineas}\nProveedor: {self.partner_id.name}\n"
             f"Obras candidatas: {json.dumps(obras, ensure_ascii=False)}"
         )
         result = AiOcrService.complete_json(self.env, prompt)
         if not result:
             self.message_post(
-                body=Markup(
-                    "<div class='alert alert-warning'><b>%s</b> %s</div>"
-                )
+                body=Markup("<div class='alert alert-warning'><b>%s</b> %s</div>")
                 % (
                     _("Obra IA:"),
-                    _("no se pudo sugerir obra automáticamente. Elige el proyecto a mano."),
+                    _(
+                        "no se pudo sugerir obra automáticamente. Elige el proyecto a mano."
+                    ),
                 ),
                 subtype_xmlid="mail.mt_note",
             )
@@ -216,9 +227,7 @@ class AccountMove(models.Model):
             vals["project_id"] = project.id
         self.write(vals)
         self.message_post(
-            body=Markup(
-                "<div class='alert alert-info'><b>%s</b> %s (%s).</div>"
-            )
+            body=Markup("<div class='alert alert-info'><b>%s</b> %s (%s).</div>")
             % (_("Obra sugerida:"), project.display_name, reason),
             subtype_xmlid="mail.mt_note",
         )
@@ -230,13 +239,18 @@ class AccountMove(models.Model):
         if not self.project_id:
             return
         so = self.env["sale.order"].search(
-            [("project_id", "=", self.project_id.id), ("state", "in", ("sale", "done"))],
+            [
+                ("project_id", "=", self.project_id.id),
+                ("state", "in", ("sale", "done")),
+            ],
             limit=1,
         )
         sections = so.order_line.filtered(lambda l: l.display_type == "line_section")
         if not sections:
             return
-        for line in self.invoice_line_ids.filtered(lambda l: l.display_type == "product"):
+        for line in self.invoice_line_ids.filtered(
+            lambda l: l.display_type == "product"
+        ):
             if (
                 line.construction_section_id
                 and line.construction_section_id.order_id.project_id == self.project_id
@@ -269,7 +283,9 @@ class AccountMove(models.Model):
             vals["ocr_obra_state"] = "confirmed"
         res = super().write(vals)
         if vals.get("project_id"):
-            for move in self.filtered(lambda m: m.move_type in ("in_invoice", "in_refund")):
+            for move in self.filtered(
+                lambda m: m.move_type in ("in_invoice", "in_refund")
+            ):
                 move._suggest_chapters()
         return res
 
@@ -277,18 +293,6 @@ class AccountMove(models.Model):
     def _onchange_project_id_chapters(self):
         if self.project_id:
             self._suggest_chapters()
-
-    def action_post(self):
-        for move in self:
-            if (
-                move.move_type in ("in_invoice", "in_refund")
-                and not move.project_id
-                and move.ocr_obra_state != "skipped"
-            ):
-                raise UserError(
-                    _("Elige la obra o marca «No es de obra» antes de publicar.")
-                )
-        return super().action_post()
 
     @api.model
     def get_active_ocr_batch(self, move_ids=None):

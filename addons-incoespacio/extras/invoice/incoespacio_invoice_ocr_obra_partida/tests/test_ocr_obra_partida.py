@@ -38,7 +38,11 @@ class TestOcrObraPartida(TransactionCase):
                 "partner_id": cls.customer.id,
                 "bc3": True,
                 "order_line": [
-                    (0, 0, {"display_type": "line_section", "name": "[C01] Albañilería"}),
+                    (
+                        0,
+                        0,
+                        {"display_type": "line_section", "name": "[C01] Albañilería"},
+                    ),
                     (
                         0,
                         0,
@@ -50,7 +54,14 @@ class TestOcrObraPartida(TransactionCase):
                             "tax_id": [(6, 0, [])],
                         },
                     ),
-                    (0, 0, {"display_type": "line_section", "name": "[C04] Tabiqueria y pladur"}),
+                    (
+                        0,
+                        0,
+                        {
+                            "display_type": "line_section",
+                            "name": "[C04] Tabiqueria y pladur",
+                        },
+                    ),
                     (
                         0,
                         0,
@@ -77,13 +88,21 @@ class TestOcrObraPartida(TransactionCase):
             }
         )
         cls.order.action_confirm()
-        cls.albanileria = cls.order.order_line.filtered(lambda l: "C01" in (l.name or "") and l.display_type == "line_section")
-        cls.section = cls.order.order_line.filtered(lambda l: "C04" in (l.name or "") and l.display_type == "line_section")
-        cls.ladrillo = cls.order.order_line.filtered(lambda l: "D07DA101" in (l.name or ""))
+        cls.albanileria = cls.order.order_line.filtered(
+            lambda l: "C01" in (l.name or "") and l.display_type == "line_section"
+        )
+        cls.section = cls.order.order_line.filtered(
+            lambda l: "C04" in (l.name or "") and l.display_type == "line_section"
+        )
+        cls.ladrillo = cls.order.order_line.filtered(
+            lambda l: "D07DA101" in (l.name or "")
+        )
         cls.uo1 = cls.order.order_line.filtered(lambda l: "UO0401" in (l.name or ""))
         cls.uo2 = cls.order.order_line.filtered(lambda l: "UO0402" in (l.name or ""))
 
-    def _draft_bill(self, name="Tabique autoportante de pladur 15+15 sobre estructura", price=100):
+    def _draft_bill(
+        self, name="Tabique autoportante de pladur 15+15 sobre estructura", price=100
+    ):
         bill = self.env["account.move"].create(
             {
                 "move_type": "in_invoice",
@@ -105,7 +124,9 @@ class TestOcrObraPartida(TransactionCase):
                 ],
             }
         )
-        return bill, bill.invoice_line_ids.filtered(lambda l: l.display_type == "product")
+        return bill, bill.invoice_line_ids.filtered(
+            lambda l: l.display_type == "product"
+        )
 
     def test_partida_fills_chapter(self):
         bill, line = self._draft_bill()
@@ -120,7 +141,7 @@ class TestOcrObraPartida(TransactionCase):
 
     def test_split_two_partidas(self):
         bill, line = self._draft_bill(price=100)
-        wiz = self.env["ocr.obra.split.wizard"].create(
+        wiz = self.env["construction.cost.split.wizard"].create(
             {
                 "line_id": line.id,
                 "split_line_ids": [
@@ -139,7 +160,7 @@ class TestOcrObraPartida(TransactionCase):
 
     def test_split_must_sum(self):
         bill, line = self._draft_bill(price=100)
-        wiz = self.env["ocr.obra.split.wizard"].create(
+        wiz = self.env["construction.cost.split.wizard"].create(
             {
                 "line_id": line.id,
                 "split_line_ids": [
@@ -158,11 +179,16 @@ class TestOcrObraPartida(TransactionCase):
             "Tendido de yeso manual de fraguado controlado sobre paramentos verticales y un montón de texto técnico"
         )
         self.uo1.bc3_code = "D13ACH001"
-        label = self.uo1.with_context(short_construction_line=True)._short_construction_label()
+        label = self.uo1.with_context(
+            short_construction_line=True
+        )._short_construction_label()
         self.assertIn("D13ACH001", label)
         self.assertIn("TENDIDO YESO", label)
         self.assertNotIn("paramentos", label)
-        self.assertNotIn(self.order.name, self.uo1.with_context(short_construction_line=True).display_name)
+        self.assertNotIn(
+            self.order.name,
+            self.uo1.with_context(short_construction_line=True).display_name,
+        )
 
     def test_partida_domain_follows_chapter(self):
         self.assertEqual(self.uo1.bc3_section_id, self.section)
@@ -243,17 +269,17 @@ class TestOcrObraPartida(TransactionCase):
     def test_split_default_remaining_is_subtotal(self):
         bill, line = self._draft_bill(price=100)
         vals = (
-            self.env["ocr.obra.split.wizard"]
+            self.env["construction.cost.split.wizard"]
             .with_context(default_line_id=line.id)
             .default_get(["line_id", "split_line_ids"])
         )
-        wiz = self.env["ocr.obra.split.wizard"].new(vals)
+        wiz = self.env["construction.cost.split.wizard"].new(vals)
         self.assertAlmostEqual(wiz.split_line_ids.amount, 0.0)
         self.assertAlmostEqual(wiz.amount_remaining, 100.0)
 
     def test_split_onchange_fills_empty_line(self):
         bill, line = self._draft_bill(price=100)
-        wiz = self.env["ocr.obra.split.wizard"].new(
+        wiz = self.env["construction.cost.split.wizard"].new(
             {
                 "line_id": line.id,
                 "split_line_ids": [
@@ -263,7 +289,9 @@ class TestOcrObraPartida(TransactionCase):
             }
         )
         wiz._onchange_fill_remaining()
-        filled = wiz.split_line_ids.filtered(lambda l: l.construction_line_id == self.uo2)
+        filled = wiz.split_line_ids.filtered(
+            lambda l: l.construction_line_id == self.uo2
+        )
         self.assertAlmostEqual(filled.amount, 60)
 
     def test_gastos_sin_partida_filter(self):
@@ -283,7 +311,7 @@ class TestOcrObraPartida(TransactionCase):
                 "move_type": "in_invoice",
                 "partner_id": self.partner.id,
                 "invoice_date": self.order.date_order,
-                "ocr_obra_state": "skipped",
+                "construction_not_job": True,
                 "invoice_line_ids": [
                     (
                         0,
@@ -327,7 +355,7 @@ class TestOcrObraPartida(TransactionCase):
 
         type(line).copy = _spy_copy
         try:
-            wiz = self.env["ocr.obra.assign.wizard"].create(
+            wiz = self.env["construction.cost.assign.wizard"].create(
                 {
                     "move_id": bill.id,
                     "line_ids": [

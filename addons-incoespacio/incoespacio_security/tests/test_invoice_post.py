@@ -5,22 +5,26 @@ from odoo.tests.common import TransactionCase
 class TestInvoicePost(TransactionCase):
     def test_post_requires_validator(self):
         partner = self.env["res.partner"].create({"name": "Prov validador"})
-        user = self.env["res.users"].with_context(no_reset_password=True).create(
-            {
-                "name": "Contable sin validar",
-                "login": "novalidator_s1",
-                "email": "novalidator_s1@example.com",
-                "groups_id": [
-                    (
-                        6,
-                        0,
-                        [
-                            self.env.ref("base.group_user").id,
-                            self.env.ref("account.group_account_invoice").id,
-                        ],
-                    )
-                ],
-            }
+        user = (
+            self.env["res.users"]
+            .with_context(no_reset_password=True)
+            .create(
+                {
+                    "name": "Contable sin validar",
+                    "login": "novalidator_s1",
+                    "email": "novalidator_s1@example.com",
+                    "groups_id": [
+                        (
+                            6,
+                            0,
+                            [
+                                self.env.ref("base.group_user").id,
+                                self.env.ref("account.group_account_invoice").id,
+                            ],
+                        )
+                    ],
+                }
+            )
         )
         move = (
             self.env["account.move"]

@@ -111,7 +111,15 @@ class Bc3PriceImportWizard(models.TransientModel):
                 {
                     "product_id": existing.get(code) or 0,
                     "vals": self._partida_vals(
-                        parser, code, concept, concepts, tree, prices, texts, categ, uoms
+                        parser,
+                        code,
+                        concept,
+                        concepts,
+                        tree,
+                        prices,
+                        texts,
+                        categ,
+                        uoms,
                     ),
                 }
             )

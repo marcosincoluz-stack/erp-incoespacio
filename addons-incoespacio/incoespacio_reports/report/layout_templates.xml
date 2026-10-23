@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
 
@@ -13,13 +13,25 @@
                     <tr>
                         <td style="width: 48%; vertical-align: middle; padding: 0;">
                             <div style="height: 14mm; overflow: hidden; line-height: 14mm;">
-                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" height="42" alt="Logo Empresa"/>
-                                <img t-else="" src="/incoespacio_reports/static/src/img/logo_fallback.png" height="42" alt="Logo Incoespacio"/>
+                                <img
+                  t-if="company.logo"
+                  t-att-src="image_data_uri(company.logo)"
+                  height="42"
+                  alt="Logo Empresa"
+                />
+                                <img
+                  t-else=""
+                  src="/incoespacio_reports/static/src/img/logo_fallback.png"
+                  height="42"
+                  alt="Logo Incoespacio"
+                />
                             </div>
                         </td>
                         <td style="width: 52%; text-align: right; vertical-align: middle; padding: 0;">
-                            <div style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px; line-height: 1.2;">
-                                <t t-if="report_title"><t t-out="report_title"/></t>
+                            <div
+                style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #212529; letter-spacing: -0.5px; line-height: 1.2;"
+              >
+                                <t t-if="report_title"><t t-out="report_title" /></t>
                                 <t t-elif="o and o._name == 'account.move'">
                                     <t t-if="o.move_type in ('out_refund','in_refund')">ABONO</t>
                                     <t t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">BORRADOR FACTURA</t>
@@ -36,36 +48,41 @@
                                 <t t-elif="o and o._name == 'construction.certification'">CERTIFICACIÓN A ORIGEN</t>
                                 <t t-else="">DOCUMENTO</t>
                             </div>
-                            <div style="font-size: 0.95rem; margin-top: 2px; color: #212529; font-weight: 500; line-height: 1.2;">
+                            <div
+                style="font-size: 0.95rem; margin-top: 2px; color: #212529; font-weight: 500; line-height: 1.2;"
+              >
                                 <t t-if="o and o._name == 'construction.certification'">
                                     <span>Nº </span>
-                                    <span t-field="o.number" style="font-weight: 700;"/>
-                                    <span t-if="o.name" style="margin-left: 8px;" t-field="o.name"/>
+                                    <span t-field="o.number" style="font-weight: 700;" />
+                                    <span t-if="o.name" style="margin-left: 8px;" t-field="o.name" />
                                 </t>
                                 <t t-else="">
                                     <span>Nº </span>
-                                    <span t-if="o and o.name" t-field="o.name" style="font-weight: 700;"/>
-                                    <span t-elif="doc and doc.name" t-field="doc.name" style="font-weight: 700;"/>
+                                    <span t-if="o and o.name" t-field="o.name" style="font-weight: 700;" />
+                                    <span t-elif="doc and doc.name" t-field="doc.name" style="font-weight: 700;" />
                                 </t>
                                 <span style="margin-left: 10px; color: #495057;">
                                     <t t-if="o and o._name == 'account.move' and o.invoice_date">
-                                        <span t-field="o.invoice_date" t-options='{"widget": "date"}'/>
+                                        <span t-field="o.invoice_date" t-options='{"widget": "date"}' />
                                     </t>
                                     <t t-elif="doc and doc._name == 'sale.order' and doc.date_order">
-                                        <span t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                                        <span t-field="doc.date_order" t-options='{"widget": "date"}' />
                                     </t>
                                     <t t-elif="o and o._name == 'sale.order' and o.date_order">
-                                        <span t-field="o.date_order" t-options='{"widget": "date"}'/>
+                                        <span t-field="o.date_order" t-options='{"widget": "date"}' />
                                     </t>
                                     <t t-elif="o and o._name == 'construction.certification' and o.date">
-                                        <span t-field="o.date" t-options='{"widget": "date"}'/>
+                                        <span t-field="o.date" t-options='{"widget": "date"}' />
                                     </t>
                                 </span>
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2" style="height: 3mm; background-color: #e72228; font-size: 0; line-height: 0; padding: 0;">&#160;</td>
+                        <td
+              colspan="2"
+              style="height: 3mm; background-color: #e72228; font-size: 0; line-height: 0; padding: 0;"
+            >&#160;</td>
                     </tr>
                 </table>
             </div>
@@ -73,36 +90,44 @@
 
         <!-- Pie de Pagina Corporativo (Banda Roja 2px, Paginacion y Datos Fiscales) -->
         <template id="incoespacio_footer_layout">
-            <div class="footer" style="border-top: 2px solid #e72228; font-size: 0.78rem; padding-top: 0.6rem; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+            <div
+        class="footer"
+        style="border-top: 2px solid #e72228; font-size: 0.78rem; padding-top: 0.6rem; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;"
+      >
                 <div style="width: 100%; overflow: hidden;">
                     <div style="float: left; width: 25%; text-align: left; padding-top: 10px;">
                             <div t-if="report_type == 'pdf'" style="color: #6c757d; font-weight: 500;">
-                                Página: <span class="page"/> / <span class="topage"/>
+                                Página: <span class="page" /> / <span class="topage" />
                             </div>
                     </div>
 
                     <div style="float: left; width: 50%; text-align: center;">
                             <div style="font-size: 0.72rem; line-height: 1.35; color: #495057;">
                                 <div>
-                                    <strong t-if="company.name" style="color: #212529;"><span t-field="company.name"/></strong>
+                                    <strong t-if="company.name" style="color: #212529;"><span
+                    t-field="company.name"
+                  /></strong>
                                 </div>
-                                <div t-if="company.vat"><span t-field="company.vat"/></div>
+                                <div t-if="company.vat"><span t-field="company.vat" /></div>
                                 <div>
-                                    <span t-if="company.street" t-field="company.street"/>
-                                    <span t-if="company.street2">, <span t-field="company.street2"/></span>
+                                    <span t-if="company.street" t-field="company.street" />
+                                    <span t-if="company.street2">, <span t-field="company.street2" /></span>
                                 </div>
                                 <div>
-                                    <span t-if="company.zip" t-field="company.zip"/>
-                                    <span t-if="company.city"> <span t-field="company.city"/></span>
-                                    <span t-if="company.state_id"> (<span t-out="company.state_id.name"/>)</span>
+                                    <span t-if="company.zip" t-field="company.zip" />
+                                    <span t-if="company.city"> <span t-field="company.city" /></span>
+                                    <span t-if="company.state_id"> (<span t-out="company.state_id.name" />)</span>
                                 </div>
-                                <div t-if="company.phone">Tel: <span class="o_force_ltr" t-field="company.phone"/></div>
-                                <div t-if="company.website"><span t-field="company.website"/></div>
+                                <div t-if="company.phone">Tel: <span
+                  class="o_force_ltr"
+                  t-field="company.phone"
+                /></div>
+                                <div t-if="company.website"><span t-field="company.website" /></div>
                             </div>
                     </div>
 
-                    <div style="float: right; width: 25%;"/>
-                    <div style="clear: both;"/>
+                    <div style="float: right; width: 25%;" />
+                    <div style="clear: both;" />
                 </div>
             </div>
         </template>
@@ -110,26 +135,30 @@
         <!-- Template Principal de Layout Registrado en Odoo -->
         <template id="external_layout_incoespacio">
             <t t-if="not o and doc">
-                <t t-set="o" t-value="doc"/>
+                <t t-set="o" t-value="doc" />
             </t>
             <t t-if="o and 'company_id' in o and o.company_id">
-                <t t-set="company" t-value="o.company_id"/>
+                <t t-set="company" t-value="o.company_id" />
             </t>
             <t t-elif="doc and 'company_id' in doc and doc.company_id">
-                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="company" t-value="doc.company_id" />
             </t>
             <t t-else="">
-                <t t-set="company" t-value="res_company"/>
+                <t t-set="company" t-value="res_company" />
             </t>
 
-            <t t-call="incoespacio_reports.incoespacio_header_layout"/>
-            <div class="article o_report_layout_standard" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id">
-                <t t-call="incoespacio_reports.incoespacio_heading_block"/>
+            <t t-call="incoespacio_reports.incoespacio_header_layout" />
+            <div
+        class="article o_report_layout_standard"
+        t-att-data-oe-model="o and o._name"
+        t-att-data-oe-id="o and o.id"
+      >
+                <t t-call="incoespacio_reports.incoespacio_heading_block" />
                 <div>
-                    <t t-out="0"/>
+                    <t t-out="0" />
                 </div>
             </div>
-            <t t-call="incoespacio_reports.incoespacio_footer_layout"/>
+            <t t-call="incoespacio_reports.incoespacio_footer_layout" />
         </template>
 
     </data>

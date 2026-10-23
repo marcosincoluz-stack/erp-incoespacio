@@ -5,7 +5,16 @@ class Bc3ImportWizard(models.TransientModel):
     _inherit = "bc3.import.wizard"
 
     def _create_partida(
-        self, code, concept, qty, concepts, tree, prices, level=0, parent="", detail=None
+        self,
+        code,
+        concept,
+        qty,
+        concepts,
+        tree,
+        prices,
+        level=0,
+        parent="",
+        detail=None,
     ):
         super()._create_partida(
             code,

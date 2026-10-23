@@ -40,5 +40,7 @@ class Device(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get("name", _("Nuevo")) == _("Nuevo"):
-                vals["name"] = self.env["ir.sequence"].next_by_code("seq.device.id") or _("Nuevo")
+                vals["name"] = self.env["ir.sequence"].next_by_code(
+                    "seq.device.id"
+                ) or _("Nuevo")
         return super().create(vals_list)

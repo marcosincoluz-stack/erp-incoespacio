@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_order_form_inherit_obra_path" model="ir.ui.view">
+        <field name="name">sale.order.form.obra.path</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="o_obra_path" invisible="not project_id">
+                    <field name="project_id" readonly="1" nolabel="1" options="{'no_open': True}" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_certification_form_inherit_obra_path" model="ir.ui.view">
+        <field name="name">construction.certification.form.obra.path</field>
+        <field name="model">construction.certification</field>
+        <field name="inherit_id" ref="incoespacio_construction_certification.view_construction_certification_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="o_obra_path">
+                    <field
+            name="project_id"
+            readonly="1"
+            nolabel="1"
+            invisible="not project_id"
+            context="{'open_construction_order': 1}"
+          />
+                    <field name="order_id" readonly="1" nolabel="1" />
+                    <field name="name" readonly="1" nolabel="1" />
+                    <field name="invoice_id" readonly="1" nolabel="1" invisible="not invoice_id" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_form_inherit_obra_path" model="ir.ui.view">
+        <field name="name">account.move.form.obra.path</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="o_obra_path" invisible="not construction_order_id">
+                    <field
+            name="project_id"
+            readonly="1"
+            nolabel="1"
+            invisible="not project_id"
+            options="{'no_open': True}"
+          />
+                    <field name="construction_order_id" readonly="1" nolabel="1" />
+                    <field
+            name="invoice_certification_id"
+            readonly="1"
+            nolabel="1"
+            invisible="not invoice_certification_id"
+          />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

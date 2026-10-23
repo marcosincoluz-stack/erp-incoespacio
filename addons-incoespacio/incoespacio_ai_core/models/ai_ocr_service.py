@@ -12,7 +12,9 @@ from odoo.tools.mimetypes import guess_mimetype
 
 _logger = logging.getLogger(__name__)
 
-GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+GEMINI_API_BASE_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+)
 
 INVOICE_PROMPT_SYSTEM = """
 Eres un asistente contable experto en fiscalidad española y procesamiento de facturas para ERP Odoo.
@@ -102,13 +104,18 @@ class AiOcrService:
     @staticmethod
     def _new_session():
         session = requests.Session()
-        session.mount("https://", HTTPAdapter(max_retries=Retry(
-            total=3,
-            backoff_factor=2,
-            status_forcelist=(429, 500, 502, 503, 504),
-            allowed_methods=["POST"],
-            raise_on_status=False,
-        )))
+        session.mount(
+            "https://",
+            HTTPAdapter(
+                max_retries=Retry(
+                    total=3,
+                    backoff_factor=2,
+                    status_forcelist=(429, 500, 502, 503, 504),
+                    allowed_methods=["POST"],
+                    raise_on_status=False,
+                )
+            ),
+        )
         return session
 
     @staticmethod
@@ -118,7 +125,7 @@ class AiOcrService:
             return False
         try:
             reader = PyPDF2.PdfFileReader(io.BytesIO(file_bytes), strict=False)
-            return bool(getattr(reader, 'isEncrypted', False))
+            return bool(getattr(reader, "isEncrypted", False))
         except Exception as e:
             _logger.warning("No se pudo inspeccionar el cifrado del PDF: %s", e)
             return False
@@ -126,7 +133,7 @@ class AiOcrService:
     @staticmethod
     def split_pdf_pages(file_bytes, page_numbers):
         """Extrae un subconjunto de páginas (1-indexadas) de un PDF binario.
-        
+
         :param file_bytes: Bytes del PDF original
         :param page_numbers: lista de enteros [1, 2, ...]
         :return: bytes del nuevo PDF particionado
@@ -151,13 +158,15 @@ class AiOcrService:
             writer.write(out_stream)
             return out_stream.getvalue()
         except Exception as e:
-            _logger.exception("Error extrayendo páginas %s del PDF: %s", page_numbers, e)
+            _logger.exception(
+                "Error extrayendo páginas %s del PDF: %s", page_numbers, e
+            )
             return file_bytes
 
     @classmethod
     def analyze_invoice_document(cls, env, file_bytes, filename=""):
         """Envía el documento a la API de Gemini Flash y retorna los datos extraídos en JSON.
-        
+
         :param env: Odoo Environment
         :param file_bytes: Bytes del archivo PDF o imagen
         :param filename: Nombre original del archivo
@@ -165,8 +174,10 @@ class AiOcrService:
         """
         # sudo justificado: ir.config_parameter es lectura admin-only y la clave
         # Gemini no debe exponerse vía ACL al usuario que sube la factura
-        icp = env['ir.config_parameter'].sudo()
-        api_key = icp.get_param('incoespacio_invoice_ocr.gemini_api_key', default='').strip()
+        icp = env["ir.config_parameter"].sudo()
+        api_key = icp.get_param(
+            "incoespacio_invoice_ocr.gemini_api_key", default=""
+        ).strip()
         if not api_key:
             raise UserError(
                 "No se ha configurado la clave API de Gemini.\n\n"
@@ -176,11 +187,18 @@ class AiOcrService:
 
         # Validación temprana de documento protegido con contraseña
         if cls.is_pdf_encrypted(file_bytes):
-            raise UserError("El archivo PDF está protegido con contraseña. Debe desprotegerse antes de ser procesado por la IA.")
+            raise UserError(
+                "El archivo PDF está protegido con contraseña. Debe desprotegerse antes de ser procesado por la IA."
+            )
 
-        model = icp.get_param('incoespacio_invoice_ocr.gemini_model', default='gemini-2.5-flash').strip() or 'gemini-2.5-flash'
+        model = (
+            icp.get_param(
+                "incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash"
+            ).strip()
+            or "gemini-2.5-flash"
+        )
         mimetype = guess_mimetype(file_bytes, default="application/pdf")
-        b64_data = base64.b64encode(file_bytes).decode('utf-8')
+        b64_data = base64.b64encode(file_bytes).decode("utf-8")
 
         url = GEMINI_API_BASE_URL.format(model=model)
         headers = {
@@ -199,33 +217,35 @@ class AiOcrService:
 
         # 2. Utilizar systemInstruction nativo de Google para aprovechar la caché de atención
         payload = {
-            "systemInstruction": {
-                "parts": [{"text": INVOICE_PROMPT_SYSTEM}]
-            },
+            "systemInstruction": {"parts": [{"text": INVOICE_PROMPT_SYSTEM}]},
             "contents": [
                 {
                     "parts": [
-                        {
-                            "inline_data": {
-                                "mime_type": mimetype,
-                                "data": b64_data
-                            }
-                        },
+                        {"inline_data": {"mime_type": mimetype, "data": b64_data}},
                         {
                             "text": "Analiza minuciosamente el documento adjunto y extrae todos los datos fiscales en JSON."
-                        }
+                        },
                     ]
                 }
             ],
-            "generationConfig": gen_config
+            "generationConfig": gen_config,
         }
 
         try:
-            _logger.info("Enviando documento %s (%s) a Gemini Flash (%s)...", filename, mimetype, model)
-            response = cls._new_session().post(url, json=payload, headers=headers, timeout=45)
+            _logger.info(
+                "Enviando documento %s (%s) a Gemini Flash (%s)...",
+                filename,
+                mimetype,
+                model,
+            )
+            response = cls._new_session().post(
+                url, json=payload, headers=headers, timeout=45
+            )
         except requests.exceptions.RequestException as e:
             _logger.exception("Error de conexión con Gemini API tras reintentos: %s", e)
-            raise UserError(f"Error de conexión con la IA de Google tras reintentos: {str(e)}")
+            raise UserError(
+                f"Error de conexión con la IA de Google tras reintentos: {str(e)}"
+            )
 
         if response is None or response.status_code != 200:
             status = response.status_code if response is not None else "Sin respuesta"
@@ -246,26 +266,47 @@ class AiOcrService:
             if not candidates:
                 raise ValueError("La respuesta de Gemini no contiene candidatos.")
 
-            text_content = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            text_content = (
+                candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            )
             # Limpiar posibles bloques de markdown si vinieran
-            clean_text = text_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+            clean_text = (
+                text_content.strip()
+                .removeprefix("```json")
+                .removeprefix("```")
+                .removesuffix("```")
+                .strip()
+            )
 
             parsed_data = json.loads(clean_text.strip())
-            _logger.info("Datos extraídos exitosamente por Gemini para %s: %s", filename, parsed_data.get('factura', {}).get('numero'))
+            _logger.info(
+                "Datos extraídos exitosamente por Gemini para %s: %s",
+                filename,
+                parsed_data.get("factura", {}).get("numero"),
+            )
             return parsed_data
         except Exception as e:
             _logger.exception("Error parseando el JSON devuelto por Gemini: %s", e)
             raise UserError(f"No se pudo interpretar el resultado de la IA: {str(e)}")
 
     @classmethod
-    def complete_json(cls, env, user_prompt, system_prompt="Responde únicamente un objeto JSON válido."):
+    def complete_json(
+        cls,
+        env,
+        user_prompt,
+        system_prompt="Responde únicamente un objeto JSON válido.",
+    ):
         """Llamada de texto a Gemini (sin PDF). Devuelve dict o {} si falla."""
         icp = env["ir.config_parameter"].sudo()
-        api_key = icp.get_param("incoespacio_invoice_ocr.gemini_api_key", default="").strip()
+        api_key = icp.get_param(
+            "incoespacio_invoice_ocr.gemini_api_key", default=""
+        ).strip()
         if not api_key:
             return {}
         model = (
-            icp.get_param("incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash").strip()
+            icp.get_param(
+                "incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash"
+            ).strip()
             or "gemini-2.5-flash"
         )
         url = GEMINI_API_BASE_URL.format(model=model)
@@ -285,10 +326,20 @@ class AiOcrService:
                 timeout=20,
             )
             if response.status_code != 200:
-                _logger.warning("complete_json Gemini %s: %s", response.status_code, response.text[:200])
+                _logger.warning(
+                    "complete_json Gemini %s: %s",
+                    response.status_code,
+                    response.text[:200],
+                )
                 return {}
             text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
-            clean = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+            clean = (
+                text.strip()
+                .removeprefix("```json")
+                .removeprefix("```")
+                .removesuffix("```")
+                .strip()
+            )
             return json.loads(clean)
         except Exception as e:
             _logger.warning("complete_json falló: %s", e)
