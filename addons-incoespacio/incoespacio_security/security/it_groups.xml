@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
+    <record id="module_category_it" model="ir.module.category">
+        <field name="name">Gestión IT</field>
+    </record>
     <record id="it_group_user" model="res.groups">
         <field name="name">Gestión IT: Usuario</field>
+        <field name="category_id" ref="module_category_it" />
     </record>
     <record id="it_group_admin" model="res.groups">
         <field name="name">Gestión IT: Administrador</field>
+        <field name="category_id" ref="module_category_it" />
         <field name="implied_ids" eval="[(4, ref('it_group_user'))]" />
     </record>
     <record id="base.group_system" model="res.groups">

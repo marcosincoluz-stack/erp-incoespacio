@@ -2,15 +2,21 @@
 <odoo>
     <data>
 
+        <record id="module_category_support" model="ir.module.category">
+            <field name="name">Centro de ayuda</field>
+        </record>
         <record id="support_group_user" model="res.groups">
             <field name="name">Centro de ayuda: Lectura</field>
+            <field name="category_id" ref="module_category_support" />
         </record>
         <record id="support_group_manager" model="res.groups">
             <field name="name">Centro de ayuda: Usuario</field>
+            <field name="category_id" ref="module_category_support" />
             <field name="implied_ids" eval="[(4, ref('support_group_user'))]" />
         </record>
         <record id="support_group_admin" model="res.groups">
             <field name="name">Centro de ayuda: Administrador</field>
+            <field name="category_id" ref="module_category_support" />
             <field name="implied_ids" eval="[(4, ref('support_group_manager'))]" />
         </record>
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Incoespacio: Seguridad",
-    "version": "17.0.1.0.1",
+    "version": "17.0.1.0.2",
     "author": "Incoespacio",
     "category": "Incoespacio",
     "website": "https://incoespacio.com",
