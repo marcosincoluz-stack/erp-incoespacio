@@ -43,3 +43,11 @@ class TestPurchaseBotAlert(TransactionCase):
         order = self.env["purchase.order"].create({"partner_id": partner.id})
         self.assertNotIn("IncoBot", order.message_ids[:1].body or "")
         self.assertFalse(order.activity_ids)
+
+    def test_purchase_rights_are_a_dropdown(self):
+        category = self.env.ref("base.module_category_inventory_purchase")
+        kinds = {
+            app: kind
+            for app, kind, _gs, _cat in self.env["res.groups"].get_groups_by_application()
+        }
+        self.assertEqual(kinds[category], "selection")
