@@ -46,8 +46,6 @@ class TestPurchaseBotAlert(TransactionCase):
 
     def test_purchase_rights_are_a_dropdown(self):
         category = self.env.ref("base.module_category_inventory_purchase")
-        kinds = {
-            app: kind
-            for app, kind, _gs, _cat in self.env["res.groups"].get_groups_by_application()
-        }
+        classified = self.env["res.groups"].get_groups_by_application()
+        kinds = {app: kind for app, kind, _gs, _cat in classified}
         self.assertEqual(kinds[category], "selection")
