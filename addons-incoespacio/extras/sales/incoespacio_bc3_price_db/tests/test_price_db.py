@@ -145,6 +145,74 @@ class TestPriceDb(TransactionCase):
         ).name_create("Tabique 15x15")
         self.assertEqual(Product.browse(created_id).default_code, "plymnt202")
 
+    def test_abbreviation_matches_long_text(self):
+        categ = self.env.ref("incoespacio_bc3_price_db.price_db_category")
+        Product = self.env["product.product"]
+
+        def make(name, text, code):
+            return Product.create(
+                {
+                    "name": name,
+                    "description_sale": text,
+                    "default_code": code,
+                    "categ_id": categ.id,
+                    "detailed_type": "service",
+                    "sale_ok": True,
+                    "purchase_ok": False,
+                }
+            )
+
+        tabique = make(
+            "TAB. L.H.D/7 cm.", "Tabique de ladrillo hueco doble.", "ZZABTAB"
+        )
+        tablero = make(
+            "TAB. MAD. 2.5 cm.", "Tableros de madera machihembrada.", "ZZABMAD"
+        )
+        acometida = make(
+            "ACOM. CONEX. RED", "Acometida desde el domicilio.", "ZZABACOM"
+        )
+        solo = make("SOLERA HA", "Solera de hormigon en masa.", "ZZABSOL")
+        full = make("Zambomba completa", "Texto.", "ZZABZ1")
+        short = make("ZAMB. DE OBRA", "Zambomba de prueba.", "ZZABZ2")
+        hits = set(
+            Product.with_context(price_db_only=True)._name_search(
+                "tabique", [], "ilike"
+            )
+        )
+        self.assertIn(tabique.id, hits)
+        self.assertNotIn(tablero.id, hits)
+        board = set(
+            Product.with_context(price_db_only=True)._name_search(
+                "tablero", [], "ilike"
+            )
+        )
+        self.assertIn(tablero.id, board)
+        self.assertNotIn(tabique.id, board)
+        acom = set(
+            Product.with_context(price_db_only=True)._name_search(
+                "acometida", [], "ilike"
+            )
+        )
+        self.assertIn(acometida.id, acom)
+        hormigon = set(
+            Product.with_context(price_db_only=True)._name_search(
+                "hormigon", [], "ilike"
+            )
+        )
+        self.assertNotIn(solo.id, hormigon)
+        menu = [
+            row[0]
+            for row in Product.with_context(price_db_only=True).name_search(
+                "zambomba", limit=2
+            )
+        ]
+        self.assertEqual(set(menu), {full.id, short.id})
+        listed = self.env["product.template"].search(
+            [("categ_id", "=", categ.id), ("name", "ilike", "zambomba")]
+        )
+        self.assertIn(short.product_tmpl_id, listed)
+        self.assertIn(full.product_tmpl_id, listed)
+
     def test_many_partidas_search(self):
         lines = [b"~C|C01#||Cap|0||0|"]
         children = []

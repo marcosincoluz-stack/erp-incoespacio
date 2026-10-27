@@ -197,18 +197,12 @@ export class PriceDbSuggest extends Component {
     const context = await this.priceContext(term);
     let dynamicFilters = [];
     if (term) {
-      const rows = await this.orm.call("product.product", "name_search", [], {
-        name: term,
-        args: domain,
-        operator: "ilike",
-        limit: 80,
-        context: { price_db_only: true },
-      });
-      if (rows.length) {
+      const ids = await this.orm.call("product.product", "price_db_search_ids", [term]);
+      if (ids.length) {
         dynamicFilters = [
           {
             description: term,
-            domain: [["id", "in", rows.map((row) => row[0])]],
+            domain: [["id", "in", ids]],
           },
         ];
       }
