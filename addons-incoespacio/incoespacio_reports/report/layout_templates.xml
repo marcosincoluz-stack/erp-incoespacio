@@ -153,7 +153,7 @@
         t-att-data-oe-model="o and o._name"
         t-att-data-oe-id="o and o.id"
       >
-                <t t-call="incoespacio_reports.incoespacio_heading_block" />
+                <t t-if="not hide_heading" t-call="incoespacio_reports.incoespacio_heading_block" />
                 <div>
                     <t t-out="0" />
                 </div>

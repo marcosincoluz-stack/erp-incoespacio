@@ -36,6 +36,8 @@ class SaleOrder(models.Model):
     print_page_break = fields.Boolean(string="Salto de página por capítulo")
     print_only_chapters = fields.Boolean(string="Solo capítulos")
     print_cover = fields.Boolean(string="Portada")
+    print_cover_plan = fields.Image(string="Plano", max_width=1920, max_height=1920)
+    print_cover_plan_filename = fields.Char(string="Nombre del plano")
     print_signature = fields.Boolean(string="Firma", default=True)
     print_gg_bi = fields.Boolean(string="Gastos generales y beneficio industrial")
     print_gg_pct = fields.Float(string="Gastos generales %", default=13.0)

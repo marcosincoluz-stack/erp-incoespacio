@@ -156,32 +156,59 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
                 <t t-set="report_title" t-value="doc._print_title()" />
+                <t t-set="hide_heading" t-value="doc.print_cover" />
                 <t t-set="chapters" t-value="doc._get_chapter_summary(doc._get_custom_report_lines())" />
                 <t t-call="incoespacio_reports.external_layout_incoespacio" t-lang="doc.partner_id.lang">
-                    <div class="page">
-                        <div t-if="doc.print_cover" class="inco-cover">
-                            <div class="inco-cover-title" t-out="report_title" />
-                            <div class="inco-cover-ref">Nº <span t-field="doc.name" /></div>
-                            <table class="inco-cover-meta">
-                                <tr t-if="doc.project_id">
-                                    <td>Obra</td>
-                                    <td><span t-field="doc.project_id.name" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Cliente</td>
-                                    <td><span t-field="doc.partner_id.name" /></td>
-                                </tr>
-                                <tr t-if="doc.client_order_ref">
-                                    <td>Referencia</td>
-                                    <td><span t-field="doc.client_order_ref" /></td>
-                                </tr>
-                                <tr t-if="doc.date_order">
-                                    <td>Fecha</td>
-                                    <td><span t-field="doc.date_order" t-options='{"widget": "date"}' /></td>
-                                </tr>
-                            </table>
+                    <div t-if="doc.print_cover" class="inco-cover">
+                        <img
+              t-if="doc.print_cover_plan"
+              class="inco-cover-plan"
+              t-att-src="image_data_uri(doc.print_cover_plan)"
+              alt=""
+            />
+                        <div class="inco-cover-body">
+                            <div class="inco-cover-bar">&#160;</div>
+                            <div class="inco-cover-logo">
+                                <img
+                  t-if="doc.company_id.logo"
+                  t-att-src="image_data_uri(doc.company_id.logo)"
+                  height="42"
+                  alt="Logo"
+                />
+                                <img
+                  t-else=""
+                  src="/incoespacio_reports/static/src/img/logo_fallback.png"
+                  height="42"
+                  alt="Logo"
+                />
+                            </div>
+                            <div class="inco-cover-rule">&#160;</div>
+                            <div class="inco-cover-kicker" t-out="report_title" />
+                            <t t-set="cover_title" t-value="doc.project_id.name or doc.partner_id.name" />
+                            <div class="inco-cover-title" t-out="cover_title" />
+                            <div class="inco-cover-accent">&#160;</div>
+                            <div t-if="doc.partner_id.street" class="inco-cover-address">
+                                <span t-field="doc.partner_id.street" /><t t-if="doc.partner_id.street2"> <span
+                    t-field="doc.partner_id.street2"
+                  /></t>
+                            </div>
+                            <div
+                t-if="doc.project_id and doc.project_id.name != doc.partner_id.name"
+                class="inco-cover-client"
+              >
+                                <div class="inco-cover-client-label">CLIENTE</div>
+                                <div t-field="doc.partner_id.name" />
+                            </div>
+                            <div t-if="doc.date_order" class="inco-cover-date">
+                                <span t-field="doc.date_order" t-options='{"widget": "date", "format": "long"}' />
+                            </div>
                         </div>
-
+                    </div>
+                    <t t-if="doc.print_cover">
+                        <t t-set="company" t-value="doc.company_id" />
+                        <t t-call="incoespacio_reports.incoespacio_heading_block" />
+                    </t>
+                    <div class="page">
                         <t t-call="incoespacio_reports.sale_address_cards" />
 
                         <t t-set="blocks" t-value="doc._get_print_blocks()" />
