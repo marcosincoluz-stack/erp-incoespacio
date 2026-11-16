@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_move_form_inherit_ocr_mail" model="ir.ui.view">
+        <field name="name">account.move.form.ocr.mail</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <field name="ocr_status" invisible="1" />
+                <field name="ocr_from_mail" invisible="1" />
+                <field name="ocr_review_reason" invisible="1" />
+                <div class="alert alert-warning mb-2" role="alert" invisible="ocr_status != 'review'">
+                    <strong>Factura por revisar.</strong>
+                    <span invisible="ocr_review_reason != 'no_attachment'">
+                        El PDF no es válido o no se pudo leer.
+                    </span>
+                    <span invisible="ocr_review_reason != 'duplicate_file'">
+                        Este PDF ya está en otra factura.
+                    </span>
+                    <span invisible="ocr_review_reason != 'unknown_type'">
+                        No se sabe si es de cliente o de proveedor.
+                    </span>
+                    <span invisible="ocr_review_reason != 'not_invoice'">
+                        El documento no es una factura.
+                    </span>
+                    <div class="mt-2">
+                        <button
+              name="action_ocr_mail_as_supplier"
+              type="object"
+              string="Es de proveedor"
+              class="btn btn-sm btn-primary me-2"
+              invisible="ocr_review_reason not in ('unknown_type', 'no_attachment')"
+            />
+                        <button
+              name="action_ocr_mail_as_customer"
+              type="object"
+              string="Es de cliente"
+              class="btn btn-sm btn-primary me-2"
+              invisible="ocr_review_reason not in ('unknown_type', 'no_attachment')"
+            />
+                        <button
+              name="action_ocr_mail_process_anyway"
+              type="object"
+              string="Procesar igualmente"
+              class="btn btn-sm btn-primary"
+              invisible="ocr_review_reason != 'duplicate_file'"
+            />
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ocr_review_tree" model="ir.ui.view">
+        <field name="name">account.move.ocr.review.tree</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="invoice_date" />
+                <field name="invoice_source_email" />
+                <field name="partner_id" />
+                <field name="move_type" />
+                <field name="ocr_review_reason" />
+                <field name="ocr_status" />
+                <field name="is_duplicate_detected" />
+                <field name="amount_total" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_ocr_review_search" model="ir.ui.view">
+        <field name="name">account.move.ocr.review.search</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id" />
+                <field name="invoice_source_email" />
+                <field name="ref" />
+                <filter
+          string="Sin PDF válido"
+          name="reason_no_attachment"
+          domain="[('ocr_review_reason', '=', 'no_attachment')]"
+        />
+                <filter
+          string="PDF duplicado"
+          name="reason_duplicate_file"
+          domain="[('ocr_review_reason', '=', 'duplicate_file')]"
+        />
+                <filter
+          string="Tipo desconocido"
+          name="reason_unknown_type"
+          domain="[('ocr_review_reason', '=', 'unknown_type')]"
+        />
+                <filter
+          string="No es una factura"
+          name="reason_not_invoice"
+          domain="[('ocr_review_reason', '=', 'not_invoice')]"
+        />
+                <filter string="Solo correo" name="from_mail" domain="[('ocr_from_mail', '=', True)]" />
+                <group expand="0" string="Agrupar por">
+                    <filter string="Motivo" name="group_reason" context="{'group_by': 'ocr_review_reason'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ocr_review_inbox" model="ir.actions.act_window">
+        <field name="name">Facturas por revisar</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field
+      name="domain"
+    >[('state', '=', 'draft'), '|', ('ocr_status', 'in', ('review', 'mismatch', 'error')), ('is_duplicate_detected', '=', True)]</field>
+        <field name="search_view_id" ref="view_ocr_review_search" />
+        <field name="view_id" ref="view_ocr_review_tree" />
+    </record>
+
+    <menuitem
+    id="menu_ocr_review_inbox"
+    name="Facturas por revisar"
+    parent="account.menu_finance"
+    action="action_ocr_review_inbox"
+    groups="account.group_account_invoice"
+    sequence="25"
+  />
+</odoo>

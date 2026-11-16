@@ -1,0 +1,71 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Length 1942 >>
+stream
+BT
+1 0 0 1 40 800 Tm /F1 9 Tf (DOCUMENTO DE PRUEBA. No es una factura real.) Tj
+1 0 0 1 40 778 Tm /F1 14 Tf (CLIMA Y FONTANERIA DEMO SL) Tj
+1 0 0 1 40 762 Tm /F1 10 Tf (CIF B55670128) Tj
+1 0 0 1 40 748 Tm /F1 10 Tf (Avenida del Puerto 40, Valencia) Tj
+1 0 0 1 360 778 Tm /F1 14 Tf (FACTURA) Tj
+1 0 0 1 360 760 Tm /F1 10 Tf (F-2026-01-03) Tj
+1 0 0 1 360 746 Tm /F1 10 Tf (13/03/2026) Tj
+1 0 0 1 40 710 Tm /F1 11 Tf (Cliente: INCOESPACIO) Tj
+1 0 0 1 40 694 Tm /F1 10 Tf (Obra: REFORMA CONSULTA DE FISIOTERAPIA) Tj
+1 0 0 1 40 680 Tm /F1 10 Tf (Avda. Colon 34 bajo) Tj
+1 0 0 1 40 650 Tm /F1 10 Tf (Descripcion) Tj
+1 0 0 1 360 650 Tm /F1 10 Tf (Cant.) Tj
+1 0 0 1 410 650 Tm /F1 10 Tf (Precio) Tj
+1 0 0 1 480 650 Tm /F1 10 Tf (Importe) Tj
+1 0 0 1 40 628 Tm /F1 9 Tf (Formacion de rozas para instalaciones) Tj
+1 0 0 1 360 628 Tm /F1 9 Tf (11.2) Tj
+1 0 0 1 410 628 Tm /F1 9 Tf (10.23 EUR) Tj
+1 0 0 1 480 628 Tm /F1 9 Tf (114.58 EUR) Tj
+1 0 0 1 40 610 Tm /F1 9 Tf (Cuadro electrico de consulta con protecciones) Tj
+1 0 0 1 360 610 Tm /F1 9 Tf (1) Tj
+1 0 0 1 410 610 Tm /F1 9 Tf (396.80 EUR) Tj
+1 0 0 1 480 610 Tm /F1 9 Tf (396.80 EUR) Tj
+1 0 0 1 40 592 Tm /F1 9 Tf (Linea de alimentacion bajo tubo corrugado) Tj
+1 0 0 1 360 592 Tm /F1 9 Tf (18.4) Tj
+1 0 0 1 410 592 Tm /F1 9 Tf (6.08 EUR) Tj
+1 0 0 1 480 592 Tm /F1 9 Tf (111.87 EUR) Tj
+1 0 0 1 40 574 Tm /F1 9 Tf (Punto de luz empotrado LED 20 W) Tj
+1 0 0 1 360 574 Tm /F1 9 Tf (4.4) Tj
+1 0 0 1 410 574 Tm /F1 9 Tf (29.76 EUR) Tj
+1 0 0 1 480 574 Tm /F1 9 Tf (130.94 EUR) Tj
+1 0 0 1 360 546 Tm /F1 10 Tf (Base imponible) Tj
+1 0 0 1 480 546 Tm /F1 10 Tf (754.19 EUR) Tj
+1 0 0 1 360 530 Tm /F1 10 Tf (IVA 21%) Tj
+1 0 0 1 480 530 Tm /F1 10 Tf (158.38 EUR) Tj
+1 0 0 1 360 514 Tm /F1 11 Tf (Total factura) Tj
+1 0 0 1 480 514 Tm /F1 11 Tf (912.57 EUR) Tj
+1 0 0 1 40 486 Tm /F1 10 Tf (IBAN de prueba: ES12 2100 0000 1100 0000 0000) Tj
+1 0 0 1 40 470 Tm /F1 9 Tf (Forma de pago: transferencia a 30 dias.) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+5 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000106 00000 n 
+0000002100 00000 n 
+0000002226 00000 n 
+0000002283 00000 n 
+trailer
+<< /Size 6 /Root 5 0 R >>
+startxref
+2332
+%%EOF

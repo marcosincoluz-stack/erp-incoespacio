@@ -1,0 +1,58 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Length 1283 >>
+stream
+BT
+1 0 0 1 40 800 Tm /F1 9 Tf (DOCUMENTO DE PRUEBA. No es una factura real.) Tj
+1 0 0 1 40 776 Tm /F1 14 Tf (Tabiques Prueba SL) Tj
+1 0 0 1 40 760 Tm /F1 10 Tf (CIF B22222222) Tj
+1 0 0 1 360 776 Tm /F1 14 Tf (FACTURA) Tj
+1 0 0 1 360 758 Tm /F1 10 Tf (PR-2026-102) Tj
+1 0 0 1 360 744 Tm /F1 10 Tf (16/11/2026) Tj
+1 0 0 1 40 720 Tm /F1 11 Tf (Cliente: INGENIERIA CONSTRUCTIVA DEL ESPACIO S.L) Tj
+1 0 0 1 40 704 Tm /F1 10 Tf (CIF cliente: B25962432) Tj
+1 0 0 1 40 688 Tm /F1 10 Tf (Presupuesto de subcontrata) Tj
+1 0 0 1 40 672 Tm /F1 11 Tf (Pedido P260285) Tj
+1 0 0 1 40 640 Tm /F1 10 Tf (Descripcion) Tj
+1 0 0 1 400 640 Tm /F1 10 Tf (Cant.) Tj
+1 0 0 1 450 640 Tm /F1 10 Tf (Precio) Tj
+1 0 0 1 510 640 Tm /F1 10 Tf (Importe) Tj
+1 0 0 1 40 618 Tm /F1 9 Tf (Tabique de pladur 13 mm. Pedido P260285) Tj
+1 0 0 1 400 618 Tm /F1 9 Tf (24.00) Tj
+1 0 0 1 450 618 Tm /F1 9 Tf (32.40) Tj
+1 0 0 1 510 618 Tm /F1 9 Tf (777.60) Tj
+1 0 0 1 40 600 Tm /F1 9 Tf (Lana mineral en tabique. Pedido P260285) Tj
+1 0 0 1 400 600 Tm /F1 9 Tf (24.00) Tj
+1 0 0 1 450 600 Tm /F1 9 Tf (6.20) Tj
+1 0 0 1 510 600 Tm /F1 9 Tf (148.80) Tj
+1 0 0 1 400 570 Tm /F1 10 Tf (Base imponible  926.40 EUR) Tj
+1 0 0 1 400 554 Tm /F1 10 Tf (IVA 21%  194.54 EUR) Tj
+1 0 0 1 400 538 Tm /F1 11 Tf (Total factura  1120.94 EUR) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+5 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000106 00000 n 
+0000001441 00000 n 
+0000001567 00000 n 
+0000001624 00000 n 
+trailer
+<< /Size 6 /Root 5 0 R >>
+startxref
+1673
+%%EOF

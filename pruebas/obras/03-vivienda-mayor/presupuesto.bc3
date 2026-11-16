@@ -1,0 +1,81 @@
+~V|INCOESPACIO|FIEBDC-3/2002|REFORMA INTEGRAL DE VIVIENDA||ANSI|
+~C|OBRA##||REFORMA INTEGRAL DE VIVIENDA|0||
+~D|OBRA##|01\1\1\02\1\1\03\1\1\04\1\1\05\1\1\|
+~C|01#||DEMOLICIONES|0||
+~D|01#|01.01\1\1\01.02\1\1\|
+~C|01.01#||Interiores|0||
+~D|01.01#|01.01.01\1\20.5\01.01.02\1\12.72\|
+~C|01.01.01|m2|Demolicion de tabique de ladrillo|17.8||
+~T|01.01.01|En cocina y pasillo. Carga incluida.|
+~M|01.01\01.01.01|||0\Cocina\1\3.4\2.5\\0\Pasillo\1\4.8\2.5\\|
+~C|01.01.02|m2|Picado de alicatado de cocina y bano|19.4||
+~T|01.01.02|Hasta el ladrillo. Retirada de escombro.|
+~M|01.01\01.01.02|||0\Cocina\1\3.2\2.4\\0\Bano\1\2.1\2.4\\|
+~C|01.02#||Vertidos|0||
+~D|01.02#|01.02.01\1\40\|
+~C|01.02.01|ud|Saco y porte de escombro|12||
+~T|01.02.01|Sacos de 50 litros bajados a contenedor de calle.|
+~M|01.02\01.02.01|||0\Sacos\40\\\\|
+~C|02#||ALBANILERIA|0||
+~D|02#|02.01\1\1\02.02\1\1\|
+~C|02.01#||Cerramientos|0||
+~D|02.01#|02.01.01\1\17\02.01.02\1\20.16\|
+~C|02.01.01|m2|Tabique de ladrillo hueco doble|34.6||
+~T|02.01.01|Recibido con mortero y recibido de precercos.|
+~M|02.01\02.01.01|||0\Nuevo bano\1\4.6\2.5\\0\Tendedero\1\2.2\2.5\\|
+~C|02.01.02|m2|Enfoscado maestreado de paramento|14.8||
+~T|02.01.02|Mortero de cemento, listo para alicatar.|
+~M|02.01\02.01.02|||0\Bano\1\8.4\2.4\\|
+~C|02.02#||Techos|0||
+~D|02.02#|02.02.01\1\10.18\|
+~C|02.02.01|m2|Falso techo continuo de placa de yeso|31.2||
+~T|02.02.01|En pasillo y banos, con junta terminada.|
+~M|02.02\02.02.01|||0\Pasillo\1\6.2\1.1\\0\Bano\1\2.1\1.6\\|
+~C|03#||INSTALACIONES|0||
+~D|03#|03.01\1\1\03.02\1\1\|
+~C|03.01#||Electricidad vivienda|0||
+~D|03.01#|03.01.01\1\1\03.01.02\1\11\|
+~C|03.01.01|ud|Cuadro de vivienda con proteccion contra sobretensiones|520||
+~T|03.01.01|Sustitucion del cuadro de Automaticos antiguo.|
+~M|03.01\03.01.01|||0\Recibidor\1\\\\|
+~C|03.01.02|ud|Punto de luz y mecanismo|38||
+~T|03.01.02|Interruptor y cableado nuevo en tubo.|
+~M|03.01\03.01.02|||0\Estancias reformadas\11\\\\|
+~C|03.02#||Fontaneria|0||
+~D|03.02#|03.02.01\1\1\03.02.02\1\1\|
+~C|03.02.01|ud|Conjunto de ducha empotrada|340||
+~T|03.02.01|Plato extraplano, griferia y mampara no incluida.|
+~M|03.02\03.02.01|||0\Bano principal\1\\\\|
+~C|03.02.02|ud|Mueble de lavabo de 80 cm|290||
+~T|03.02.02|Un seno, sifon y griferia.|
+~M|03.02\03.02.02|||0\Bano principal\1\\\\|
+~C|04#||COCINA|0||
+~D|04#|04.01\1\1\04.02\1\1\|
+~C|04.01#||Mobiliario|0||
+~D|04.01#|04.01.01\1\3.6\04.01.02\1\3.6\|
+~C|04.01.01|m|Mueble bajo de cocina laminado|280||
+~T|04.01.01|Modulos de 60 y 80, zocalo y encimera postformada aparte.|
+~M|04.01\04.01.01|||0\Frente de cocina\1\3.6\\\|
+~C|04.01.02|m|Encimera compacta de 2 cm|195||
+~T|04.01.02|Canto pulido y corte de fregadero.|
+~M|04.01\04.01.02|||0\Frente de cocina\1\3.6\\\|
+~C|04.02#||Alicatado|0||
+~D|04.02#|04.02.01\1\2.16\|
+~C|04.02.01|m2|Alicatado de gres en frente de cocina|42||
+~T|04.02.01|Formato 30x90, junta de 2 mm.|
+~M|04.02\04.02.01|||0\Frente\1\3.6\0.6\\|
+~C|05#||ACABADOS|0||
+~D|05#|05.01\1\1\05.02\1\1\|
+~C|05.01#||Suelos|0||
+~D|05.01#|05.01.01\1\41.44\|
+~C|05.01.01|m2|Pavimento porcelanico imitacion madera|39.5||
+~T|05.01.01|Encolado. Nivelacion previa con pasta.|
+~M|05.01\05.01.01|||0\Salon\1\5.4\4.2\\0\Dormitorio\1\3.8\3.2\\0\Pasillo\1\6\1.1\\|
+~C|05.02#||Pintura|0||
+~D|05.02#|05.02.01\1\55\05.02.02\1\6\|
+~C|05.02.01|m2|Pintura plastica en color suave|6.8||
+~T|05.02.01|Lijado, emplastecido y dos manos.|
+~M|05.02\05.02.01|||0\Paredes vivienda\1\22\2.5\\|
+~C|05.02.02|ud|Lijado y barnizado de puerta de paso|55||
+~T|05.02.02|Puertas existentes a conservar.|
+~M|05.02\05.02.02|||0\Puertas interiores\6\\\\|
