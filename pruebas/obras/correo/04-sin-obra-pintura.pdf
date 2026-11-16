@@ -1,0 +1,58 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Length 1260 >>
+stream
+BT
+1 0 0 1 40 800 Tm /F1 9 Tf (DOCUMENTO DE PRUEBA. No es una factura real.) Tj
+1 0 0 1 40 776 Tm /F1 14 Tf (Pintura Prueba SL) Tj
+1 0 0 1 40 760 Tm /F1 10 Tf (CIF B44444444) Tj
+1 0 0 1 360 776 Tm /F1 14 Tf (FACTURA) Tj
+1 0 0 1 360 758 Tm /F1 10 Tf (PR-2026-104) Tj
+1 0 0 1 360 744 Tm /F1 10 Tf (16/11/2026) Tj
+1 0 0 1 40 720 Tm /F1 11 Tf (Cliente: INGENIERIA CONSTRUCTIVA DEL ESPACIO S.L) Tj
+1 0 0 1 40 704 Tm /F1 10 Tf (CIF cliente: B25962432) Tj
+1 0 0 1 40 688 Tm /F1 10 Tf (Presupuesto de subcontrata) Tj
+1 0 0 1 40 672 Tm /F1 11 Tf (Sin numero de pedido) Tj
+1 0 0 1 40 640 Tm /F1 10 Tf (Descripcion) Tj
+1 0 0 1 400 640 Tm /F1 10 Tf (Cant.) Tj
+1 0 0 1 450 640 Tm /F1 10 Tf (Precio) Tj
+1 0 0 1 510 640 Tm /F1 10 Tf (Importe) Tj
+1 0 0 1 40 618 Tm /F1 9 Tf (Pintura plastica en paramentos) Tj
+1 0 0 1 400 618 Tm /F1 9 Tf (80.00) Tj
+1 0 0 1 450 618 Tm /F1 9 Tf (7.40) Tj
+1 0 0 1 510 618 Tm /F1 9 Tf (592.00) Tj
+1 0 0 1 40 600 Tm /F1 9 Tf (Esmalte en carpinteria) Tj
+1 0 0 1 400 600 Tm /F1 9 Tf (8.00) Tj
+1 0 0 1 450 600 Tm /F1 9 Tf (22.00) Tj
+1 0 0 1 510 600 Tm /F1 9 Tf (176.00) Tj
+1 0 0 1 400 570 Tm /F1 10 Tf (Base imponible  768.00 EUR) Tj
+1 0 0 1 400 554 Tm /F1 10 Tf (IVA 21%  161.28 EUR) Tj
+1 0 0 1 400 538 Tm /F1 11 Tf (Total factura  929.28 EUR) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+5 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000106 00000 n 
+0000001418 00000 n 
+0000001544 00000 n 
+0000001601 00000 n 
+trailer
+<< /Size 6 /Root 5 0 R >>
+startxref
+1650
+%%EOF

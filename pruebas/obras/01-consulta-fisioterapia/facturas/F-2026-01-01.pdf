@@ -1,0 +1,71 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Length 1930 >>
+stream
+BT
+1 0 0 1 40 800 Tm /F1 9 Tf (DOCUMENTO DE PRUEBA. No es una factura real.) Tj
+1 0 0 1 40 778 Tm /F1 14 Tf (TABIQUES DEMO LEVANTE SL) Tj
+1 0 0 1 40 762 Tm /F1 10 Tf (CIF B87412033) Tj
+1 0 0 1 40 748 Tm /F1 10 Tf (Poligono El Oliveral 12, Paterna) Tj
+1 0 0 1 360 778 Tm /F1 14 Tf (FACTURA) Tj
+1 0 0 1 360 760 Tm /F1 10 Tf (F-2026-01-01) Tj
+1 0 0 1 360 746 Tm /F1 10 Tf (07/03/2026) Tj
+1 0 0 1 40 710 Tm /F1 11 Tf (Cliente: INCOESPACIO) Tj
+1 0 0 1 40 694 Tm /F1 10 Tf (Obra: REFORMA CONSULTA DE FISIOTERAPIA) Tj
+1 0 0 1 40 680 Tm /F1 10 Tf (Avda. Colon 34 bajo) Tj
+1 0 0 1 40 650 Tm /F1 10 Tf (Descripcion) Tj
+1 0 0 1 360 650 Tm /F1 10 Tf (Cant.) Tj
+1 0 0 1 410 650 Tm /F1 10 Tf (Precio) Tj
+1 0 0 1 480 650 Tm /F1 10 Tf (Importe) Tj
+1 0 0 1 40 628 Tm /F1 9 Tf (Demolicion de tabique de ladrillo hueco) Tj
+1 0 0 1 360 628 Tm /F1 9 Tf (10.47) Tj
+1 0 0 1 410 628 Tm /F1 9 Tf (11.47 EUR) Tj
+1 0 0 1 480 628 Tm /F1 9 Tf (120.09 EUR) Tj
+1 0 0 1 40 610 Tm /F1 9 Tf (Levantado de pavimento de terrazo) Tj
+1 0 0 1 360 610 Tm /F1 9 Tf (7.55) Tj
+1 0 0 1 410 610 Tm /F1 9 Tf (8.80 EUR) Tj
+1 0 0 1 480 610 Tm /F1 9 Tf (66.44 EUR) Tj
+1 0 0 1 40 592 Tm /F1 9 Tf (Desmontaje de sanitario y griferia existente) Tj
+1 0 0 1 360 592 Tm /F1 9 Tf (2) Tj
+1 0 0 1 410 592 Tm /F1 9 Tf (17.36 EUR) Tj
+1 0 0 1 480 592 Tm /F1 9 Tf (34.72 EUR) Tj
+1 0 0 1 40 574 Tm /F1 9 Tf (Contenedor de escombro de 5 m3) Tj
+1 0 0 1 360 574 Tm /F1 9 Tf (3) Tj
+1 0 0 1 410 574 Tm /F1 9 Tf (114.70 EUR) Tj
+1 0 0 1 480 574 Tm /F1 9 Tf (344.10 EUR) Tj
+1 0 0 1 360 546 Tm /F1 10 Tf (Base imponible) Tj
+1 0 0 1 480 546 Tm /F1 10 Tf (565.35 EUR) Tj
+1 0 0 1 360 530 Tm /F1 10 Tf (IVA 21%) Tj
+1 0 0 1 480 530 Tm /F1 10 Tf (118.72 EUR) Tj
+1 0 0 1 360 514 Tm /F1 11 Tf (Total factura) Tj
+1 0 0 1 480 514 Tm /F1 11 Tf (684.07 EUR) Tj
+1 0 0 1 40 486 Tm /F1 10 Tf (IBAN de prueba: ES12 2100 0000 1100 0000 0000) Tj
+1 0 0 1 40 470 Tm /F1 9 Tf (Forma de pago: transferencia a 30 dias.) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+5 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000106 00000 n 
+0000002088 00000 n 
+0000002214 00000 n 
+0000002271 00000 n 
+trailer
+<< /Size 6 /Root 5 0 R >>
+startxref
+2320
+%%EOF

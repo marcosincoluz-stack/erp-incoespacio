@@ -1,4 +1,8 @@
 import base64
+import io
+from unittest.mock import patch
+
+from PyPDF2 import PdfFileWriter
 
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
@@ -67,6 +71,48 @@ class TestOcrScan(TransactionCase):
         self.assertTrue(other.is_duplicate_detected)
         other._check_invoice_duplicate(self.partner, "F-999", 0)
         self.assertFalse(other.is_duplicate_detected)
+
+    def test_duplicate_customer_by_name(self):
+        first = self.env["account.move"].create(
+            {
+                "move_type": "out_invoice",
+                "partner_id": self.partner.id,
+                "name": "F-CLI-1",
+            }
+        )
+        other = self.env["account.move"].create(
+            {
+                "move_type": "out_invoice",
+                "partner_id": self.partner.id,
+            }
+        )
+        other._check_invoice_duplicate(self.partner, "F-CLI-1", 0)
+        self.assertEqual(first.name, "F-CLI-1")
+        self.assertTrue(other.is_duplicate_detected)
+        self.assertEqual(other.duplicate_move_id, first)
+
+    def test_extend_pdf_uses_core_decoder_signature(self):
+        move = self._bill()
+        writer = PdfFileWriter()
+        writer.addBlankPage(72, 72)
+        buffer = io.BytesIO()
+        writer.write(buffer)
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": "factura.pdf",
+                "datas": base64.b64encode(buffer.getvalue()),
+                "mimetype": "application/pdf",
+            }
+        )
+        calls = []
+
+        def _fake(this, content, filename=None):
+            calls.append((filename, content[:4]))
+            return True
+
+        with patch.object(type(move), "_decode_with_gemini_ai", _fake):
+            move._extend_with_attachments(attachment, new=False)
+        self.assertEqual(calls, [("factura.pdf", b"%PDF")])
 
     def test_reocr_keeps_lines(self):
         move = self._bill(lines=True)

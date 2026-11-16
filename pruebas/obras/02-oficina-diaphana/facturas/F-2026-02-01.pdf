@@ -1,0 +1,71 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Length 1932 >>
+stream
+BT
+1 0 0 1 40 800 Tm /F1 9 Tf (DOCUMENTO DE PRUEBA. No es una factura real.) Tj
+1 0 0 1 40 778 Tm /F1 14 Tf (MAMPARAS DEMO OFICINA SL) Tj
+1 0 0 1 40 762 Tm /F1 10 Tf (CIF B20918455) Tj
+1 0 0 1 40 748 Tm /F1 10 Tf (Calle Industria 3, Valencia) Tj
+1 0 0 1 360 778 Tm /F1 14 Tf (FACTURA) Tj
+1 0 0 1 360 760 Tm /F1 10 Tf (F-2026-02-01) Tj
+1 0 0 1 360 746 Tm /F1 10 Tf (07/03/2026) Tj
+1 0 0 1 40 710 Tm /F1 11 Tf (Cliente: INCOESPACIO) Tj
+1 0 0 1 40 694 Tm /F1 10 Tf (Obra: IMPLANTACION DE OFICINA DIAFANA) Tj
+1 0 0 1 40 680 Tm /F1 10 Tf (Calle Roger de Lauria 19, 3) Tj
+1 0 0 1 40 650 Tm /F1 10 Tf (Descripcion) Tj
+1 0 0 1 360 650 Tm /F1 10 Tf (Cant.) Tj
+1 0 0 1 410 650 Tm /F1 10 Tf (Precio) Tj
+1 0 0 1 480 650 Tm /F1 10 Tf (Importe) Tj
+1 0 0 1 40 628 Tm /F1 9 Tf (Demolicion de mampara de oficina existente) Tj
+1 0 0 1 360 628 Tm /F1 9 Tf (25.38) Tj
+1 0 0 1 410 628 Tm /F1 9 Tf (10.04 EUR) Tj
+1 0 0 1 480 628 Tm /F1 9 Tf (254.82 EUR) Tj
+1 0 0 1 40 610 Tm /F1 9 Tf (Levantado de moqueta en losetas) Tj
+1 0 0 1 360 610 Tm /F1 9 Tf (69.6) Tj
+1 0 0 1 410 610 Tm /F1 9 Tf (3.97 EUR) Tj
+1 0 0 1 480 610 Tm /F1 9 Tf (276.31 EUR) Tj
+1 0 0 1 40 592 Tm /F1 9 Tf (Contenedor selectivo de obra) Tj
+1 0 0 1 360 592 Tm /F1 9 Tf (2) Tj
+1 0 0 1 410 592 Tm /F1 9 Tf (99.20 EUR) Tj
+1 0 0 1 480 592 Tm /F1 9 Tf (198.40 EUR) Tj
+1 0 0 1 40 574 Tm /F1 9 Tf (Mampara de vidrio laminado de despacho) Tj
+1 0 0 1 360 574 Tm /F1 9 Tf (7.99) Tj
+1 0 0 1 410 574 Tm /F1 9 Tf (114.70 EUR) Tj
+1 0 0 1 480 574 Tm /F1 9 Tf (916.45 EUR) Tj
+1 0 0 1 360 546 Tm /F1 10 Tf (Base imponible) Tj
+1 0 0 1 480 546 Tm /F1 10 Tf (1645.98 EUR) Tj
+1 0 0 1 360 530 Tm /F1 10 Tf (IVA 21%) Tj
+1 0 0 1 480 530 Tm /F1 10 Tf (345.66 EUR) Tj
+1 0 0 1 360 514 Tm /F1 11 Tf (Total factura) Tj
+1 0 0 1 480 514 Tm /F1 11 Tf (1991.64 EUR) Tj
+1 0 0 1 40 486 Tm /F1 10 Tf (IBAN de prueba: ES12 2100 0000 1100 0000 0000) Tj
+1 0 0 1 40 470 Tm /F1 9 Tf (Forma de pago: transferencia a 30 dias.) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+5 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000106 00000 n 
+0000002090 00000 n 
+0000002216 00000 n 
+0000002273 00000 n 
+trailer
+<< /Size 6 /Root 5 0 R >>
+startxref
+2322
+%%EOF

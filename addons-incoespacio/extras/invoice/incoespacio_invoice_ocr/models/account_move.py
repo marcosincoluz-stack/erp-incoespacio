@@ -77,10 +77,16 @@ class AccountMove(models.Model):
         readonly=True,
     )
 
-    def _get_edi_decoder(self, file_data, filename=None):
-        def _gemini_decoder(move):
-            success = move._decode_with_gemini_ai(file_data, filename)
-            return bool(success)
+    def _get_edi_decoder(self, file_data, new=False):
+        # El core llama decoder(move, file_data, new) fuera de su try.
+        # Una firma distinta revienta el correo y el PDF soltado en el chatter.
+        if file_data.get("type") != "pdf":
+            return super()._get_edi_decoder(file_data, new=new)
+
+        def _gemini_decoder(move, fd, new=False):
+            return bool(
+                move._decode_with_gemini_ai(fd.get("content"), fd.get("filename"))
+            )
 
         return _gemini_decoder
 
@@ -620,10 +626,14 @@ class AccountMove(models.Model):
             self.duplicate_move_id = False
             return
 
+        # En facturas de cliente el número va a name; en proveedor, a ref.
+        number_field = (
+            "name" if self.move_type in ("out_invoice", "out_refund") else "ref"
+        )
         domain = [
             ("id", "!=", self.id),
             ("partner_id", "=", partner.id),
-            ("ref", "=ilike", ref.strip()),
+            (number_field, "=ilike", ref.strip()),
             ("move_type", "=", self.move_type),
             ("state", "!=", "cancel"),
         ]

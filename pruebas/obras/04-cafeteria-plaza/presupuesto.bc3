@@ -1,0 +1,81 @@
+~V|INCOESPACIO|FIEBDC-3/2002|ACONDICIONAMIENTO DE CAFETERIA||ANSI|
+~C|OBRA##||ACONDICIONAMIENTO DE CAFETERIA|0||
+~D|OBRA##|01\1\1\02\1\1\03\1\1\04\1\1\05\1\1\|
+~C|01#||ADECUACION PREVIA|0||
+~D|01#|01.01\1\1\01.02\1\1\|
+~C|01.01#||Vaciado|0||
+~D|01.01#|01.01.01\1\7.04\01.01.02\1\58.9\|
+~C|01.01.01|m2|Demolicion de barra de obra existente|45||
+~T|01.01.01|Inclusive acometidas vistas a condenar.|
+~M|01.01\01.01.01|||0\Barra\1\6.4\1.1\\|
+~C|01.01.02|m2|Levantado de pavimento de gres|15.6||
+~T|01.01.02|En sala y zona de barra.|
+~M|01.01\01.01.02|||0\Sala\1\9.5\6.2\\|
+~C|01.02#||Licencias de obra|0||
+~D|01.02#|01.02.01\1\1\|
+~C|01.02.01|ud|Andamio de fachada para rotulo|320||
+~T|01.02.01|Ocupacion de via publica no incluida.|
+~M|01.02\01.02.01|||0\Fachada plaza\1\\\\|
+~C|02#||OBRA CIVIL|0||
+~D|02#|02.01\1\1\02.02\1\1\|
+~C|02.01#||Barra y cocina|0||
+~D|02.01#|02.01.01\1\6.4\02.01.02\1\13.02\|
+~C|02.01.01|m|Barra nueva de fabrica revestida|210||
+~T|02.01.01|Frente de ladrillo, listo para revestir con compacto.|
+~M|02.01\02.01.01|||0\Barra de servicio\1\6.4\\\|
+~C|02.01.02|m2|Solera de hormigon en cocina|38||
+~T|02.01.02|Espesor 8 cm, con mallazo, pendiente a sumidero.|
+~M|02.01\02.01.02|||0\Cocina\1\4.2\3.1\\|
+~C|02.02#||Revestidos humedos|0||
+~D|02.02#|02.02.01\1\26.04\|
+~C|02.02.01|m2|Alicatado antiacido en cocina|46||
+~T|02.02.01|Hasta 2,10 m. Junta epoxi.|
+~M|02.02\02.02.01|||0\Paredes cocina\1\12.4\2.1\\|
+~C|03#||INSTALACIONES DE HOSTELERIA|0||
+~D|03#|03.01\1\1\03.02\1\1\|
+~C|03.01#||Electricidad de local|0||
+~D|03.01#|03.01.01\1\1\03.01.02\1\2\|
+~C|03.01.01|ud|Cuadro de hosteleria con circuitos de fuerza|1180||
+~T|03.01.01|Circuitos de horno, camara, lavavajillas e iluminacion.|
+~M|03.01\03.01.01|||0\Cuadro cocina\1\\\\|
+~C|03.01.02|ud|Toma de fuerza trifasica 32 A|86||
+~T|03.01.02|Para horno y camara.|
+~M|03.01\03.01.02|||0\Cocina\2\\\\|
+~C|03.02#||Fontaneria y saneamiento|0||
+~D|03.02#|03.02.01\1\3\03.02.02\1\1\|
+~C|03.02.01|ud|Punto de agua y desague de fregadero industrial|145||
+~T|03.02.01|Grifo ducha y sifon registrable.|
+~M|03.02\03.02.01|||0\Barra y cocina\3\\\\|
+~C|03.02.02|ud|Sumidero sifonico en cocina|95||
+~T|03.02.02|Rejilla inox 20x20.|
+~M|03.02\03.02.02|||0\Cocina\1\\\\|
+~C|04#||CLIMA Y EXTRACCION|0||
+~D|04#|04.01\1\1\04.02\1\1\|
+~C|04.01#||Extraccion|0||
+~D|04.01#|04.01.01\1\1\04.01.02\1\6\|
+~C|04.01.01|ud|Campana extractora de barra con motor|1640||
+~T|04.01.01|Filtros y conducto hasta cubierta, maximo 6 m.|
+~M|04.01\04.01.01|||0\Barra\1\\\\|
+~C|04.01.02|m|Conducto de extraccion de chapa galvanizada|62||
+~T|04.01.02|Tramo visto en patio, con soportes.|
+~M|04.01\04.01.02|||0\Patio interior\1\6\\\|
+~C|04.02#||Climatizacion de sala|0||
+~D|04.02#|04.02.01\1\1\|
+~C|04.02.01|ud|Equipo cassette de sala 7 kW|2280||
+~T|04.02.01|Unidad exterior en cubierta.|
+~M|04.02\04.02.01|||0\Sala\1\\\\|
+~C|05#||ACABADOS DE SALA|0||
+~D|05#|05.01\1\1\05.02\1\1\|
+~C|05.01#||Pavimentos|0||
+~D|05.01#|05.01.01\1\66.58\|
+~C|05.01.01|m2|Pavimento porcelanico antideslizante de sala|41||
+~T|05.01.01|Clase C3 en zona de barra, C2 en sala.|
+~M|05.01\05.01.01|||0\Sala\1\9.5\6.2\\0\Barra\1\6.4\1.2\\|
+~C|05.02#||Carpinteria y pintura|0||
+~D|05.02#|05.02.01\1\1\05.02.02\1\54\|
+~C|05.02.01|ud|Puerta cortafuegos de cocina|480||
+~T|05.02.01|EI2 60, barra antipanico en cara de cocina.|
+~M|05.02\05.02.01|||0\Paso a cocina\1\\\\|
+~C|05.02.02|m2|Pintura plastica lavable en sala|8.6||
+~T|05.02.02|Color segun muestra de la propiedad.|
+~M|05.02\05.02.02|||0\Paredes sala\1\18\3\\|

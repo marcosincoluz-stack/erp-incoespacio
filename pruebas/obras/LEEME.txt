@@ -1,0 +1,14 @@
+Obras ficticias para simular a mano. No son documentos reales.
+
+Cada carpeta es una obra:
+  presupuesto.bc3   se importa con el asistente BC3 del presupuesto
+  facturas/         PDF de proveedor para subir al OCR de facturas
+
+El texto de cada linea de factura repite el resumen de una partida del BC3,
+para probar el emparejado con el presupuesto. IVA 21 %. CIF e IBAN inventados.
+
+Para regenerar los ficheros: python pruebas/obras/generar.py
+
+correo/  PDFs para mandar al buzon de facturas.
+         02 y 03 llevan el pedido P260285 y P260284.
+         Regenerar: python pruebas/obras/correo.py
