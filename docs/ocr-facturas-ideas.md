@@ -40,7 +40,21 @@
 - **Dónde tocar**:
   - `addons-incoespacio/extras/invoice/incoespacio_invoice_ocr_mail/models/fetchmail_server.py` y `account_move.py`: aceptar `image/jpeg` e `image/png` únicamente cuando sean adjuntos reales (`Content-Disposition != "inline"`) y superen un umbral mínimo de tamaño (p. ej. 25 KB) para no tragar logos de firma.
 
+### 5. Control de subcontrata: pedido/certificación frente a factura
+
+- **Contexto**: Incoespacio subcontrata el ~90% de la obra. El albarán de material apenas aplica, así que el triángulo clásico pedido → albarán → factura se convierte en **contrato/pedido a la subcontrata → certificación o parte ejecutado → factura de la subcontrata**. Misma naturaleza que el buzón: un documento o una factura entra, se contrasta con lo pactado y queda en revisión; nunca se bloquea ni se contabiliza solo.
+- **Qué falta hoy**: la factura de la subcontrata ya la lee el OCR y la casa con la obra por el código `P…`. No hay control de que el importe facturado por una subcontrata para una obra no se pase del pedido/contrato ni se desvíe de lo certificado.
+- **Dos variantes según cómo lleguen las certificaciones** (decide el alcance):
+  - **Entra documento** (la subcontrata manda PDF/Excel de certificación o parte): misma vía que el buzón, la IA lo lee y lo deja como borrador imputado a la obra, contra el que luego se cuadra la factura.
+  - **La ejecución la medís vosotros en Odoo**: no entra documento; solo se compara la factura contra el pedido/certificación que ya existe. Más simple.
+- **Cuándo compensa**: cuando empiecen a repetirse facturas de subcontrata que haya que cuadrar a mano contra lo pactado o lo certificado.
+- **Pendiente de confirmar antes de tocar nada**: de dónde salen esas certificaciones (documento del subcontratista frente a medición interna). Revisar antes qué cubre ya la familia `incoespacio_construction_certification*` para no duplicar.
+
 ---
+
+## Hecho
+
+- **Facturae 3.2.x desde el buzón** (`incoespacio_invoice_xml`): el XML se parsea al mismo diccionario que Gemini y entra en el circuito de CIF, líneas y revisión, sin llamada a la IA. Un lote con varias facturas solo lee la primera. UBL/CII sigue fuera.
 
 ## Qué descartamos a propósito
 

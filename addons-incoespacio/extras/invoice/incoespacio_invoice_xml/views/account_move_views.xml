@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_move_form_inherit_invoice_xml" model="ir.ui.view">
+        <field name="name">account.move.form.invoice.xml</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_mail.view_move_form_inherit_ocr_mail" />
+        <field name="arch" type="xml">
+            <xpath expr="//span[@invisible=&quot;ocr_review_reason != 'not_invoice'&quot;]" position="after">
+                <span invisible="ocr_review_reason != 'xml_unreadable'">
+                    El XML no es un Facturae legible.
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ocr_review_search_xml" model="ir.ui.view">
+        <field name="name">account.move.ocr.review.search.xml</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_mail.view_ocr_review_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='reason_not_invoice']" position="after">
+                <filter
+                    string="XML no legible"
+                    name="reason_xml_unreadable"
+                    domain="[('ocr_review_reason', '=', 'xml_unreadable')]"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

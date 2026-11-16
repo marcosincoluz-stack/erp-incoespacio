@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fe:Facturae xmlns:fe="http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_2.xml">
+  <Parties>
+    <SellerParty>
+      <TaxIdentification>
+        <PersonTypeCode>J</PersonTypeCode>
+        <ResidenceTypeCode>R</ResidenceTypeCode>
+        <TaxIdentificationNumber>B11111111</TaxIdentificationNumber>
+      </TaxIdentification>
+      <LegalEntity>
+        <CorporateName>Fontaneria Prueba SL</CorporateName>
+      </LegalEntity>
+    </SellerParty>
+    <BuyerParty>
+      <TaxIdentification>
+        <PersonTypeCode>J</PersonTypeCode>
+        <ResidenceTypeCode>R</ResidenceTypeCode>
+        <TaxIdentificationNumber>B25962432</TaxIdentificationNumber>
+      </TaxIdentification>
+      <LegalEntity>
+        <CorporateName>INGENIERIA CONSTRUCTIVA DEL ESPACIO S.L</CorporateName>
+      </LegalEntity>
+    </BuyerParty>
+  </Parties>
+  <Invoices>
+    <Invoice>
+      <InvoiceHeader>
+        <InvoiceNumber>104</InvoiceNumber>
+        <InvoiceSeriesCode>FA</InvoiceSeriesCode>
+        <InvoiceDocumentType>FC</InvoiceDocumentType>
+        <InvoiceClass>OO</InvoiceClass>
+      </InvoiceHeader>
+      <InvoiceIssueData>
+        <IssueDate>2026-11-16</IssueDate>
+        <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
+      </InvoiceIssueData>
+      <TaxesOutputs>
+        <Tax>
+          <TaxTypeCode>01</TaxTypeCode>
+          <TaxRate>21.00</TaxRate>
+          <TaxableBase><TotalAmount>100.00</TotalAmount></TaxableBase>
+          <TaxAmount><TotalAmount>21.00</TotalAmount></TaxAmount>
+        </Tax>
+      </TaxesOutputs>
+      <InvoiceTotals>
+        <TotalGrossAmount>100.00</TotalGrossAmount>
+        <TotalGrossAmountBeforeTaxes>100.00</TotalGrossAmountBeforeTaxes>
+        <TotalTaxOutputs>21.00</TotalTaxOutputs>
+        <TotalTaxesWithheld>0.00</TotalTaxesWithheld>
+        <InvoiceTotal>121.00</InvoiceTotal>
+      </InvoiceTotals>
+      <Items>
+        <InvoiceLine>
+          <ItemDescription>Tabique obra P260285</ItemDescription>
+          <Quantity>2.0</Quantity>
+          <UnitPriceWithoutTax>50.00</UnitPriceWithoutTax>
+          <GrossAmount>100.00</GrossAmount>
+          <TaxesOutputs>
+            <Tax>
+              <TaxTypeCode>01</TaxTypeCode>
+              <TaxRate>21.00</TaxRate>
+            </Tax>
+          </TaxesOutputs>
+        </InvoiceLine>
+      </Items>
+      <PaymentDetails>
+        <Installment>
+          <InstallmentDueDate>2026-12-16</InstallmentDueDate>
+          <InstallmentAmount>121.00</InstallmentAmount>
+          <AccountToBeCredited>
+            <IBAN>ES91 2100 0418 4502 0005 1332</IBAN>
+          </AccountToBeCredited>
+        </Installment>
+      </PaymentDetails>
+    </Invoice>
+  </Invoices>
+</fe:Facturae>
