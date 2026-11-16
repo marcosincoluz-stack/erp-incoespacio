@@ -1,4 +1,5 @@
 from odoo.tests.common import TransactionCase
+from odoo.tools.misc import format_date
 
 
 class TestPrintLayout(TransactionCase):
@@ -184,3 +185,38 @@ class TestPrintLayout(TransactionCase):
         decimal = self._html()
         self.assertIn(">1.1<", decimal)
         self.assertNotIn("C01", decimal)
+
+    def test_cover_prints_order_data_and_optional_plan(self):
+        self.partner.write({"street": "Avda. Colón 34", "street2": "bajo"})
+        self.order.date_order = "2026-10-06 12:00:00"
+        plain = self._html()
+        self.assertNotIn("inco-cover", plain)
+
+        self.order.print_cover = True
+        html = self._html()
+        self.assertIn('class="inco-cover"', html)
+        self.assertIn("PRESUPUESTO", html)
+        self.assertIn("Avda. Colón 34", html)
+        self.assertIn("bajo", html)
+        self.assertIn("Cliente obra", html)
+        self.assertNotIn("inco-cover-client", html)
+        self.assertNotIn("inco-cover-plan", html)
+        self.assertEqual(html.count("Nº"), 1)
+        self.assertIn(
+            format_date(self.env, self.order.date_order, date_format="long"), html
+        )
+
+        self.order.project_id = self.env["project.project"].create(
+            {"name": "Consulta de fisioterapia"}
+        )
+        titled = self._html()
+        self.assertIn("Consulta de fisioterapia", titled)
+        self.assertIn("inco-cover-client", titled)
+
+        self.order.print_cover_plan = (
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8"
+            "z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+        )
+        planned = self._html()
+        self.assertIn("inco-cover-plan", planned)
+        self.assertIn("data:image", planned)

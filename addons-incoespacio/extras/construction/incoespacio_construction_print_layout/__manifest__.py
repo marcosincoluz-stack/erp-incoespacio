@@ -1,7 +1,7 @@
 {
     "name": "Incoespacio: maquetación del PDF de obra",
     "summary": "PDF personalizado del presupuesto con tabla de mediciones y resumen",
-    "version": "17.0.1.0.1",
+    "version": "17.0.1.0.3",
     "category": "Accounting/Sales",
     "author": "Incoespacio",
     "license": "LGPL-3",

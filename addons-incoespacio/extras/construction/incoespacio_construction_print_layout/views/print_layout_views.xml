@@ -30,6 +30,14 @@
                 </group>
                 <group string="Presentación">
                     <field name="print_cover" />
+                    <field name="print_cover_plan_filename" invisible="1" />
+                    <field
+            name="print_cover_plan"
+            widget="binary"
+            filename="print_cover_plan_filename"
+            invisible="not print_cover"
+            options="{'accepted_file_extensions': '.png,.jpg,.jpeg'}"
+          />
                     <field name="print_signature" />
                 </group>
             </xpath>
