@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_move_form_inherit_ocr_product" model="ir.ui.view">
+        <field name="name">account.move.form.ocr.product</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_mail.view_move_form_inherit_ocr_mail" />
+        <field name="arch" type="xml">
+            <xpath expr="//span[@invisible=&quot;ocr_review_reason != 'not_invoice'&quot;]" position="after">
+                <span invisible="ocr_review_reason != 'tax_mismatch'">
+                    El IVA de la ficha del producto no coincide con el del PDF.
+                </span>
+                <span invisible="ocr_review_reason != 'total_mismatch'">
+                    El total de Odoo no coincide con el del PDF.
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ocr_review_search_product" model="ir.ui.view">
+        <field name="name">account.move.ocr.review.search.product</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="incoespacio_invoice_ocr_mail.view_ocr_review_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='reason_not_invoice']" position="after">
+                <filter
+                    string="IVA distinto al PDF"
+                    name="reason_tax_mismatch"
+                    domain="[('ocr_review_reason', '=', 'tax_mismatch')]"
+                />
+                <filter
+                    string="El total no cuadra"
+                    name="reason_total_mismatch"
+                    domain="[('ocr_review_reason', '=', 'total_mismatch')]"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

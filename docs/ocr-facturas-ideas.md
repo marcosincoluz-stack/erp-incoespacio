@@ -20,11 +20,12 @@
 
 ### 2. Aviso de descuadre entre el total del PDF y el calculado por Odoo
 
-- **Problema hoy**: el OCR crea las líneas, aplica IVA/IRPF y marca el borrador como `done` sin comprobar si `amount_total` coincide con `factura.total` del PDF. Con descuentos por línea, suplidos exentos, portes o varios tipos de IRPF puede quedar un borrador con un total distinto sin saltar alerta.
-- **Cuándo compensa**: si al revisar borradores aparecen diferencias de importe que contabilidad tiene que cazar a ojo.
-- **Dónde tocar**:
-  - `addons-incoespacio/extras/invoice/incoespacio_invoice_ocr/models/account_move.py`: al final de `_apply_ai_extracted_data`, comparar `abs(self.amount_total - total_factura) > 0.02`; si difiere, dejar nota en el chatter con ambos importes y pasar a revisión (`ocr_status = "review"`, motivo `total_mismatch`).
-  - `addons-incoespacio/extras/invoice/incoespacio_invoice_ocr_mail/views/account_move_views.xml`: añadir el motivo `Descuadre de total` en el aviso y en los filtros de **Facturas por revisar**.
+Hecho en `incoespacio_invoice_ocr_product`: si `amount_total` se separa más de 0,02 de `factura.total`, la factura queda en revisión con el motivo «El total no cuadra con el PDF». No pisa otro motivo de revisión que ya estuviera puesto.
+
+### 6. Después de 2–3 semanas de uso real
+
+- **IA solo para la primera factura de un contacto**, cuando no hay historial del que aprender el producto. Pasarle a Gemini la descripción y la lista de productos, con la opción de responder «ninguno», y marcar la línea como sugerida para revisarla antes de contabilizar.
+- **Pedir a Gemini que detecte «inversión del sujeto pasivo»** escrito en el PDF. La posición fiscal del contacto ya se aplica al elegir producto; esto cubriría el caso en que el PDF lo dice y la ficha del contacto todavía no.
 
 ### 3. Limpieza rápida en «Facturas por revisar» y listado de proveedores
 
@@ -55,6 +56,7 @@
 ## Hecho
 
 - **Facturae 3.2.x desde el buzón** (`incoespacio_invoice_xml`): el XML se parsea al mismo diccionario que Gemini y entra en el circuito de CIF, líneas y revisión, sin llamada a la IA. Un lote con varias facturas solo lee la primera. UBL/CII sigue fuera.
+- **Producto en las líneas** (`incoespacio_invoice_ocr_product`): aprende el producto de las facturas contabilizadas del mismo contacto, conserva el precio del PDF y usa el IVA de la ficha pasado por la posición fiscal. Si el porcentaje no cuadra, o el total de Odoo no coincide con el del documento, la factura queda para revisar.
 
 ## Qué descartamos a propósito
 

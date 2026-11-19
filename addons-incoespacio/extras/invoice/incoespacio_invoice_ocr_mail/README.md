@@ -68,6 +68,7 @@ Desactivar el servidor de entrada. Deja de entrar correo. Los borradores ya crea
 - Una rectificativa en PDF entra como factura normal. Un Facturae con clase OR o CR entra como abono.
 - Cada factura dentro de un PDF con varias se clasifica por su propio CIF.
 - Un borrador sin clasificar también sale en la lista de facturas de proveedor, en borrador.
+- El producto de cada línea lo sugiere `incoespacio_invoice_ocr_product` con las facturas ya contabilizadas de ese contacto. El precio y la etiqueta siguen siendo los del PDF.
 - Cada pase lee como mucho 50 correos. El resto espera al siguiente.
 
 Posibles mejoras tras probar el buzón con correo real: [`docs/ocr-facturas-ideas.md`](../../../../docs/ocr-facturas-ideas.md).
