@@ -418,6 +418,32 @@ class TestOcrProduct(TransactionCase):
             any("no cuadra" in (msg.body or "") for msg in move.message_ids)
         )
 
+    def test_base_mismatch_goes_to_review(self):
+        move = self._draft("in_invoice", self.partner)
+        data = self._data("Linea sin historial", total=181.5)
+        data["factura"]["base_imponible_total"] = 100
+        move._apply_ai_extracted_data(data, force=True)
+        self.assertEqual(move.ocr_review_reason, "total_mismatch")
+        self.assertTrue(any("Base:" in (msg.body or "") for msg in move.message_ids))
+
+    def test_discount_stays_when_product_is_assigned(self):
+        self._posted(
+            "in_invoice",
+            self.partner,
+            self.laboral,
+            "Peldano recto gresan albarracin",
+        )
+        move = self._draft("in_invoice", self.partner)
+        data = self._data("Peldano recto gresan albarracin", price=15.03, total=152.76)
+        data["lineas"][0]["cantidad"] = 12
+        data["lineas"][0]["subtotal"] = 126.25
+        data["factura"]["base_imponible_total"] = 126.25
+        move._apply_ai_extracted_data(data, force=True)
+        line = self._line(move)
+        self.assertEqual(line.product_id, self.laboral)
+        self.assertEqual(line.discount, 30)
+        self.assertNotEqual(move.ocr_status, "review")
+
     def test_tax_mismatch_wins_over_total(self):
         self._posted(
             "in_invoice",

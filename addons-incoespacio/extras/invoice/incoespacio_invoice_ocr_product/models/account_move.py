@@ -52,6 +52,16 @@ def _rates(taxes):
     return {round(tax.amount, 2) for tax in taxes if tax.amount > 0}
 
 
+def _expected(raw):
+    if raw in (None, "", False):
+        return None
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None
+    return value or None
+
+
 class AccountMove(models.Model):
     _inherit = "account.move"
 
@@ -206,19 +216,30 @@ class AccountMove(models.Model):
             lambda item: item.display_type == "product"
         ):
             return True
-        raw = (data.get("factura") or {}).get("total")
-        try:
-            expected = float(raw or 0.0)
-        except (TypeError, ValueError):
-            return True
-        if not expected or abs(self.amount_total - expected) <= _TOTAL_GAP:
+        factura = data.get("factura") or {}
+        expected_total = _expected(factura.get("total"))
+        expected_base = _expected(factura.get("base_imponible_total"))
+        total_off = (
+            expected_total is not None
+            and abs(self.amount_total - expected_total) > _TOTAL_GAP
+        )
+        base_off = (
+            expected_base is not None
+            and abs(self.amount_untaxed - expected_base) > _TOTAL_GAP
+        )
+        if not total_off and not base_off:
             return True
         self.write({"ocr_status": "review", "ocr_review_reason": "total_mismatch"})
         self.message_post(
             body=Markup("<div class='alert alert-warning'><b>{}</b> {}</div>").format(
                 _("El total no cuadra con el PDF."),
-                _("El documento dice %s y Odoo calcula %s.")
-                % (expected, self.amount_total),
+                _("Base: PDF %s / Odoo %s. Total: PDF %s / Odoo %s.")
+                % (
+                    expected_base if expected_base is not None else "-",
+                    self.amount_untaxed,
+                    expected_total if expected_total is not None else "-",
+                    self.amount_total,
+                ),
             ),
             subtype_xmlid="mail.mt_note",
         )

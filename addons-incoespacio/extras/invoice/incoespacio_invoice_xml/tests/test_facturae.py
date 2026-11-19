@@ -103,6 +103,49 @@ class TestFacturae(TransactionCase):
         self.assertEqual(moves.ocr_review_reason, "duplicate_file")
         self.assertEqual(moves.duplicate_move_id, existing)
 
+    def test_line_discount_from_gross(self):
+        text = self._xml().decode()
+        text = text.replace(
+            "<Quantity>2.0</Quantity>\n          <UnitPriceWithoutTax>50.00</UnitPriceWithoutTax>\n          <GrossAmount>100.00</GrossAmount>",
+            "<Quantity>12.0</Quantity>\n          <UnitPriceWithoutTax>15.03</UnitPriceWithoutTax>\n          <GrossAmount>126.25</GrossAmount>",
+        )
+        for old, new in (
+            (
+                "<InvoiceNumber>104</InvoiceNumber>",
+                "<InvoiceNumber>900</InvoiceNumber>",
+            ),
+            (
+                "<TotalGrossAmount>100.00</TotalGrossAmount>",
+                "<TotalGrossAmount>126.25</TotalGrossAmount>",
+            ),
+            (
+                "<TotalGrossAmountBeforeTaxes>100.00</TotalGrossAmountBeforeTaxes>",
+                "<TotalGrossAmountBeforeTaxes>126.25</TotalGrossAmountBeforeTaxes>",
+            ),
+            (
+                "<TotalTaxOutputs>21.00</TotalTaxOutputs>",
+                "<TotalTaxOutputs>26.51</TotalTaxOutputs>",
+            ),
+            (
+                "<InvoiceTotal>121.00</InvoiceTotal>",
+                "<InvoiceTotal>152.76</InvoiceTotal>",
+            ),
+            ("<TotalAmount>100.00</TotalAmount>", "<TotalAmount>126.25</TotalAmount>"),
+            ("<TotalAmount>21.00</TotalAmount>", "<TotalAmount>26.51</TotalAmount>"),
+            (
+                "<InstallmentAmount>121.00</InstallmentAmount>",
+                "<InstallmentAmount>152.76</InstallmentAmount>",
+            ),
+        ):
+            text = text.replace(old, new)
+        moves = self._incoming(text.encode(), name="dto.xml")
+        line = moves.invoice_line_ids.filtered(
+            lambda item: item.display_type == "product"
+        )
+        self.assertEqual(line.discount, 30)
+        self.assertAlmostEqual(moves.amount_untaxed, 126.25, places=2)
+        self.assertAlmostEqual(moves.amount_total, 152.76, places=2)
+
     def test_batch_keeps_first_and_warns(self):
         second = """
         <Invoice>

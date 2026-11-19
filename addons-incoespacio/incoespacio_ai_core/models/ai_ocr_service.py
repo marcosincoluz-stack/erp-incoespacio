@@ -32,6 +32,7 @@ REGLAS DE FISCALIDAD Y EXTRACCIÓN (ESPAÑA):
    - Fecha de vencimiento: Formato 'YYYY-MM-DD' si está indicada; si no, null.
 4. LÍNEAS DE FACTURA:
    - Extrae cada concepto desglosado con: descripción, cantidad (float), precio_unitario (float), porcentaje_iva (float, ej: 21.0, 10.0, 4.0, 0.0) e importe de línea (subtotal sin impuestos).
+   - precio_unitario es el precio antes del descuento. subtotal es el importe de la línea después de los descuentos, sin impuestos.
    - Si no hay líneas claras pero hay una base imponible general, crea una única línea con la descripción general o concepto.
 5. IMPUESTOS (IVA E IRPF):
    - Desglosa las bases imponibles y cuotas por cada tipo de IVA.

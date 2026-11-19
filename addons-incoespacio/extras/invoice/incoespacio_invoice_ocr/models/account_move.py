@@ -489,18 +489,20 @@ class AccountMove(models.Model):
                     taxes = self._find_matching_sale_taxes(pct_iva)
                 else:
                     taxes = self._find_matching_purchase_taxes(pct_iva, header_irpf)
-                new_lines.append(
-                    (
-                        0,
-                        0,
-                        {
-                            "name": desc,
-                            "quantity": qty,
-                            "price_unit": price,
-                            "tax_ids": [(6, 0, taxes.ids)],
-                        },
-                    )
-                )
+                vals = {
+                    "name": desc,
+                    "quantity": qty,
+                    "price_unit": price,
+                    "tax_ids": [(6, 0, taxes.ids)],
+                }
+                gross = qty * price
+                try:
+                    net = float(line.get("subtotal") or 0.0)
+                except (TypeError, ValueError):
+                    net = 0.0
+                if net > 0 and gross - net > 0.01:
+                    vals["discount"] = round((1 - net / gross) * 100, 2)
+                new_lines.append((0, 0, vals))
             self.invoice_line_ids = new_lines
 
         # Verificación IBAN

@@ -276,3 +276,55 @@ class TestOcrScan(TransactionCase):
         ]
         move.action_post()
         self.assertEqual(move.state, "posted")
+
+    def _apply_line(self, line):
+        move = self._bill()
+        move._apply_ai_extracted_data(
+            {
+                "factura": {"numero": "070159", "total": 152.76},
+                "emisor": {"cif": "B12345678", "nombre": "Proveedor OCR"},
+                "receptor": {},
+                "lineas": [line],
+                "pago": {},
+            },
+            force=True,
+        )
+        return move.invoice_line_ids.filtered(
+            lambda item: item.display_type == "product"
+        )
+
+    def test_line_discount_from_subtotal(self):
+        line = self._apply_line(
+            {
+                "descripcion": "Peldano recto",
+                "cantidad": 12,
+                "precio_unitario": 15.03,
+                "porcentaje_iva": 21,
+                "subtotal": 126.25,
+            }
+        )
+        self.assertEqual(line.discount, 30)
+        self.assertAlmostEqual(line.move_id.amount_untaxed, 126.25, places=2)
+        self.assertAlmostEqual(line.move_id.amount_total, 152.76, places=2)
+
+    def test_matching_or_missing_subtotal_has_no_discount(self):
+        priced = {
+            "descripcion": "Peldano recto",
+            "cantidad": 12,
+            "precio_unitario": 15.03,
+            "porcentaje_iva": 21,
+        }
+        self.assertEqual(self._apply_line(dict(priced, subtotal=180.36)).discount, 0)
+        self.assertEqual(self._apply_line(priced).discount, 0)
+
+    def test_surcharge_subtotal_has_no_discount(self):
+        line = self._apply_line(
+            {
+                "descripcion": "Peldano recto",
+                "cantidad": 12,
+                "precio_unitario": 15.03,
+                "porcentaje_iva": 21,
+                "subtotal": 200,
+            }
+        )
+        self.assertEqual(line.discount, 0)
