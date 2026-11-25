@@ -485,10 +485,11 @@ class AccountMove(models.Model):
                 qty = float(line.get("cantidad") or 1.0)
                 price = float(line.get("precio_unitario") or 0.0)
                 pct_iva = float(line.get("porcentaje_iva") or 0.0)
-                if is_customer:
-                    taxes = self._find_matching_sale_taxes(pct_iva)
-                else:
-                    taxes = self._find_matching_purchase_taxes(pct_iva, header_irpf)
+                taxes = self._find_matching_taxes(
+                    "sale" if is_customer else "purchase",
+                    pct_iva,
+                    0.0 if is_customer else header_irpf,
+                )
                 vals = {
                     "name": desc,
                     "quantity": qty,
@@ -583,43 +584,27 @@ class AccountMove(models.Model):
             )
         return super().action_post()
 
-    def _find_matching_purchase_taxes(self, pct_iva, pct_irpf=0.0):
+    def _find_matching_taxes(self, use, pct, irpf=0.0):
         Tax = self.env["account.tax"]
         comp = self.company_id or self.env.company
-        iva_tax = Tax.search(
+        taxes = Tax.search(
             [
-                ("type_tax_use", "=", "purchase"),
-                ("amount", "=", pct_iva),
+                ("type_tax_use", "=", use),
+                ("amount", "=", pct),
                 ("company_id", "=", comp.id),
             ],
             limit=1,
         )
-
-        result_taxes = iva_tax or Tax
-        if pct_irpf and pct_irpf > 0:
-            irpf_tax = Tax.search(
+        if use == "purchase" and irpf > 0:
+            taxes |= Tax.search(
                 [
                     ("type_tax_use", "=", "purchase"),
-                    ("amount", "=", -abs(pct_irpf)),
+                    ("amount", "=", -abs(irpf)),
                     ("company_id", "=", comp.id),
                 ],
                 limit=1,
             )
-            if irpf_tax:
-                result_taxes |= irpf_tax
-        return result_taxes
-
-    def _find_matching_sale_taxes(self, pct_iva):
-        Tax = self.env["account.tax"]
-        comp = self.company_id or self.env.company
-        return Tax.search(
-            [
-                ("type_tax_use", "=", "sale"),
-                ("amount", "=", pct_iva),
-                ("company_id", "=", comp.id),
-            ],
-            limit=1,
-        )
+        return taxes
 
     def _check_invoice_duplicate(self, partner, ref, total_amount):
         self.ensure_one()

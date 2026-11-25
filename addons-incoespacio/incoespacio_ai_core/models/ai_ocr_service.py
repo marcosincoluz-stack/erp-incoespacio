@@ -165,19 +165,12 @@ class AiOcrService:
             return file_bytes
 
     @classmethod
-    def analyze_invoice_document(cls, env, file_bytes, filename=""):
-        """Envía el documento a la API de Gemini Flash y retorna los datos extraídos en JSON.
-
-        :param env: Odoo Environment
-        :param file_bytes: Bytes del archivo PDF o imagen
-        :param filename: Nombre original del archivo
-        :return: dict con los datos fiscales de la factura
-        """
+    def _gemini(cls, env, parts, system, timeout):
         # sudo justificado: ir.config_parameter es lectura admin-only y la clave
         # Gemini no debe exponerse vía ACL al usuario que sube la factura
         icp = env["ir.config_parameter"].sudo()
-        api_key = icp.get_param(
-            "incoespacio_invoice_ocr.gemini_api_key", default=""
+        api_key = (
+            icp.get_param("incoespacio_invoice_ocr.gemini_api_key", default="") or ""
         ).strip()
         if not api_key:
             raise UserError(
@@ -185,110 +178,93 @@ class AiOcrService:
                 "Por favor, ve a Ajustes > Facturación > sección 'OCR con IA' "
                 "e introduce tu clave de Google Gemini para activar la lectura automática."
             )
-
-        # Validación temprana de documento protegido con contraseña
-        if cls.is_pdf_encrypted(file_bytes):
-            raise UserError(
-                "El archivo PDF está protegido con contraseña. Debe desprotegerse antes de ser procesado por la IA."
-            )
-
         model = (
             icp.get_param(
                 "incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash"
             ).strip()
             or "gemini-2.5-flash"
         )
-        mimetype = guess_mimetype(file_bytes, default="application/pdf")
-        b64_data = base64.b64encode(file_bytes).decode("utf-8")
-
-        url = GEMINI_API_BASE_URL.format(model=model)
-        headers = {
-            "Content-Type": "application/json",
-            "x-goog-api-key": api_key,
-        }
-
-        # Optimizaciones de velocidad:
-        # 1. Desactivar thinkingBudget en Gemini 2.5 para eliminar la latencia de 'reflexión' innecesaria
-        gen_config = {
-            "temperature": 0.1,
-            "response_mime_type": "application/json",
-        }
+        gen_config = {"temperature": 0.1, "response_mime_type": "application/json"}
         if "gemini-2.5" in model:
             gen_config["thinkingConfig"] = {"thinkingBudget": 0}
-
-        # 2. Utilizar systemInstruction nativo de Google para aprovechar la caché de atención
-        payload = {
-            "systemInstruction": {"parts": [{"text": INVOICE_PROMPT_SYSTEM}]},
-            "contents": [
-                {
-                    "parts": [
-                        {"inline_data": {"mime_type": mimetype, "data": b64_data}},
-                        {
-                            "text": "Analiza minuciosamente el documento adjunto y extrae todos los datos fiscales en JSON."
-                        },
-                    ]
-                }
-            ],
-            "generationConfig": gen_config,
-        }
-
         try:
-            _logger.info(
-                "Enviando documento %s (%s) a Gemini Flash (%s)...",
-                filename,
-                mimetype,
-                model,
-            )
             response = cls._new_session().post(
-                url, json=payload, headers=headers, timeout=45
+                GEMINI_API_BASE_URL.format(model=model),
+                json={
+                    "systemInstruction": {"parts": [{"text": system}]},
+                    "contents": [{"parts": parts}],
+                    "generationConfig": gen_config,
+                },
+                headers={
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": api_key,
+                },
+                timeout=timeout,
             )
         except requests.exceptions.RequestException as e:
-            _logger.exception("Error de conexión con Gemini API tras reintentos: %s", e)
+            _logger.exception(
+                "Error de conexión con Gemini API tras reintentos: %s", e
+            )
             raise UserError(
-                f"Error de conexión con la IA de Google tras reintentos: {str(e)}"
+                f"Error de conexión con la IA de Google tras reintentos: {e}"
+            ) from e
+        if response.status_code != 200:
+            msg = (
+                "Error al procesar la factura con Gemini "
+                f"(Código {response.status_code})"
             )
-
-        if response is None or response.status_code != 200:
-            status = response.status_code if response is not None else "Sin respuesta"
-            body_text = response.text if response is not None else ""
-            _logger.error("Error devuelto por Gemini API (%s): %s", status, body_text)
-            err_msg = f"Error al procesar la factura con Gemini (Código {status})"
             try:
-                err_json = response.json()
-                if "error" in err_json and "message" in err_json["error"]:
-                    err_msg += f": {err_json['error']['message']}"
+                msg += ": " + response.json()["error"]["message"]
             except Exception:
-                err_msg += f": {body_text[:200]}"
-            raise UserError(err_msg)
+                msg += ": " + (response.text or "")[:200]
+            raise UserError(msg)
+        text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        clean = (
+            text.strip()
+            .removeprefix("```json")
+            .removeprefix("```")
+            .removesuffix("```")
+            .strip()
+        )
+        return json.loads(clean)
 
+    @classmethod
+    def analyze_invoice_document(cls, env, file_bytes, filename=""):
+        if cls.is_pdf_encrypted(file_bytes):
+            raise UserError(
+                "El archivo PDF está protegido con contraseña. "
+                "Debe desprotegerse antes de ser procesado por la IA."
+            )
+        mimetype = guess_mimetype(file_bytes, default="application/pdf")
+        b64_data = base64.b64encode(file_bytes).decode("utf-8")
         try:
-            res_data = response.json()
-            candidates = res_data.get("candidates", [])
-            if not candidates:
-                raise ValueError("La respuesta de Gemini no contiene candidatos.")
-
-            text_content = (
-                candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            parsed = cls._gemini(
+                env,
+                [
+                    {"inline_data": {"mime_type": mimetype, "data": b64_data}},
+                    {
+                        "text": (
+                            "Analiza minuciosamente el documento adjunto "
+                            "y extrae todos los datos fiscales en JSON."
+                        )
+                    },
+                ],
+                INVOICE_PROMPT_SYSTEM,
+                45,
             )
-            # Limpiar posibles bloques de markdown si vinieran
-            clean_text = (
-                text_content.strip()
-                .removeprefix("```json")
-                .removeprefix("```")
-                .removesuffix("```")
-                .strip()
-            )
-
-            parsed_data = json.loads(clean_text.strip())
-            _logger.info(
-                "Datos extraídos exitosamente por Gemini para %s: %s",
-                filename,
-                parsed_data.get("factura", {}).get("numero"),
-            )
-            return parsed_data
+        except UserError:
+            raise
         except Exception as e:
             _logger.exception("Error parseando el JSON devuelto por Gemini: %s", e)
-            raise UserError(f"No se pudo interpretar el resultado de la IA: {str(e)}")
+            raise UserError(
+                f"No se pudo interpretar el resultado de la IA: {e}"
+            ) from e
+        _logger.info(
+            "Datos extraídos exitosamente por Gemini para %s: %s",
+            filename,
+            parsed.get("factura", {}).get("numero"),
+        )
+        return parsed
 
     @classmethod
     def complete_json(
@@ -298,50 +274,8 @@ class AiOcrService:
         system_prompt="Responde únicamente un objeto JSON válido.",
     ):
         """Llamada de texto a Gemini (sin PDF). Devuelve dict o {} si falla."""
-        icp = env["ir.config_parameter"].sudo()
-        api_key = icp.get_param(
-            "incoespacio_invoice_ocr.gemini_api_key", default=""
-        ).strip()
-        if not api_key:
-            return {}
-        model = (
-            icp.get_param(
-                "incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash"
-            ).strip()
-            or "gemini-2.5-flash"
-        )
-        url = GEMINI_API_BASE_URL.format(model=model)
-        gen_config = {"temperature": 0.1, "response_mime_type": "application/json"}
-        if "gemini-2.5" in model:
-            gen_config["thinkingConfig"] = {"thinkingBudget": 0}
-        payload = {
-            "systemInstruction": {"parts": [{"text": system_prompt}]},
-            "contents": [{"parts": [{"text": user_prompt}]}],
-            "generationConfig": gen_config,
-        }
         try:
-            response = cls._new_session().post(
-                url,
-                json=payload,
-                headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
-                timeout=20,
-            )
-            if response.status_code != 200:
-                _logger.warning(
-                    "complete_json Gemini %s: %s",
-                    response.status_code,
-                    response.text[:200],
-                )
-                return {}
-            text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
-            clean = (
-                text.strip()
-                .removeprefix("```json")
-                .removeprefix("```")
-                .removesuffix("```")
-                .strip()
-            )
-            return json.loads(clean)
+            return cls._gemini(env, [{"text": user_prompt}], system_prompt, 20)
         except Exception as e:
             _logger.warning("complete_json falló: %s", e)
             return {}

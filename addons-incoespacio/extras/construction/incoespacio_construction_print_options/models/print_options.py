@@ -115,6 +115,46 @@ def _drop_emptied_subchapters(body, had):
     return result
 
 
+def _chapter_summary(lines, amount_of, decimals, header_total=None):
+    chapters = []
+    current = None
+    for line in lines:
+        if _is_root_chapter(line):
+            code, name = _chapter_label(line)
+            current = {
+                "code": code,
+                "decimal": decimals.get(line.id, code),
+                "name": name,
+                "amount": 0.0,
+            }
+            chapters.append(current)
+        elif not line.display_type and current:
+            current["amount"] += amount_of(line)
+    # ponytail: partidas before the first level-0 chapter are dropped.
+    # Fold them into a synthetic chapter if a quote without chapters must summarize.
+    if header_total is None:
+        header_total = sum(chapter["amount"] for chapter in chapters)
+    for chapter in chapters:
+        chapter["pct"] = (
+            chapter["amount"] / header_total * 100.0 if header_total else 0.0
+        )
+    return chapters
+
+
+def _print_dialog(record, lines, view_xmlid):
+    _fill_print_chapter_range(record, lines)
+    view = record.env.ref(view_xmlid)
+    return {
+        "name": _("PDF personalizado"),
+        "type": "ir.actions.act_window",
+        "res_model": record._name,
+        "res_id": record.id,
+        "view_mode": "form",
+        "views": [(view.id, "form")],
+        "target": "new",
+    }
+
+
 def _chapter_label(line):
     name = (line.name or "").strip()
     code = getattr(line, "bc3_code", False) or getattr(line, "code", False) or ""
@@ -196,47 +236,20 @@ class SaleOrder(models.Model):
             if lines is None
             else lines
         )
-        decimals = self._decimal_codes()
-        chapters = []
-        current = None
-        for line in source:
-            if _is_root_chapter(line):
-                code, name = _chapter_label(line)
-                current = {
-                    "code": code,
-                    "decimal": decimals.get(line.id, code),
-                    "name": name,
-                    "amount": 0.0,
-                }
-                chapters.append(current)
-            elif not line.display_type and current:
-                current["amount"] += line.price_subtotal or 0.0
-            # ponytail: partidas before the first level-0 chapter are dropped.
-            # Fold them into a synthetic chapter if a quote without chapters must summarize.
-        total = (
-            (self.amount_untaxed or 0.0)
-            if lines is None
-            else sum(chapter["amount"] for chapter in chapters)
+        return _chapter_summary(
+            source,
+            lambda line: line.price_subtotal or 0.0,
+            self._decimal_codes(),
+            None if lines is not None else (self.amount_untaxed or 0.0),
         )
-        for chapter in chapters:
-            chapter["pct"] = chapter["amount"] / total * 100.0 if total else 0.0
-        return chapters
 
     def action_print_custom(self):
         self.ensure_one()
-        _fill_print_chapter_range(self, self._get_order_lines_to_report())
-        view = self.env.ref(
-            "incoespacio_construction_print_options.view_sale_order_print_custom"
+        return _print_dialog(
+            self,
+            self._get_order_lines_to_report(),
+            "incoespacio_construction_print_options.view_sale_order_print_custom",
         )
-        return {
-            "name": _("PDF personalizado"),
-            "type": "ir.actions.act_window",
-            "res_model": "sale.order",
-            "res_id": self.id,
-            "view_mode": "form",
-            "views": [(view.id, "form")],
-            "target": "new",
-        }
 
     def action_print_custom_pdf(self):
         self.ensure_one()
@@ -287,26 +300,11 @@ class ConstructionCertification(models.Model):
     def _get_chapter_summary(self, lines=None):
         """Capítulos de nivel 0 con el importe del periodo, subcapítulos incluidos."""
         self.ensure_one()
-        source = self._get_report_lines() if lines is None else lines
-        decimals = _decimal_code_map(self.line_ids)
-        chapters = []
-        current = None
-        for line in source:
-            if _is_root_chapter(line):
-                code, name = _chapter_label(line)
-                current = {
-                    "code": code,
-                    "decimal": decimals.get(line.id, code),
-                    "name": name,
-                    "amount": 0.0,
-                }
-                chapters.append(current)
-            elif not line.display_type and current:
-                current["amount"] += line.amount_period or 0.0
-        total = sum(chapter["amount"] for chapter in chapters)
-        for chapter in chapters:
-            chapter["pct"] = chapter["amount"] / total * 100.0 if total else 0.0
-        return chapters
+        return _chapter_summary(
+            self._get_report_lines() if lines is None else lines,
+            lambda line: line.amount_period or 0.0,
+            _decimal_code_map(self.line_ids),
+        )
 
     def _cert_amount_words(self):
         self.ensure_one()
@@ -317,19 +315,11 @@ class ConstructionCertification(models.Model):
 
     def action_print_custom(self):
         self.ensure_one()
-        _fill_print_chapter_range(self, self._get_report_lines())
-        view = self.env.ref(
-            "incoespacio_construction_print_options.view_certification_print_custom"
+        return _print_dialog(
+            self,
+            self._get_report_lines(),
+            "incoespacio_construction_print_options.view_certification_print_custom",
         )
-        return {
-            "name": _("PDF personalizado"),
-            "type": "ir.actions.act_window",
-            "res_model": "construction.certification",
-            "res_id": self.id,
-            "view_mode": "form",
-            "views": [(view.id, "form")],
-            "target": "new",
-        }
 
     def action_print_custom_pdf(self):
         self.ensure_one()

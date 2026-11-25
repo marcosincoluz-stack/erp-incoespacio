@@ -155,12 +155,6 @@ class ConstructionCertification(models.Model):
         store=True,
         currency_field="currency_id",
     )
-    progress_origin = fields.Float(
-        string="% Ejecutado a Origen",
-        compute="_compute_amounts",
-        store=True,
-    )
-
     @api.depends(
         "line_ids.amount_budget",
         "line_ids.amount_previous",
@@ -200,9 +194,6 @@ class ConstructionCertification(models.Model):
             cert.amount_net_period = net_period
             cert.amount_period_tax = period_tax
             cert.amount_period_total = rnd(net_period + period_tax)
-            cert.progress_origin = (
-                (total_origin / total_budget * 100.0) if total_budget else 0.0
-            )
 
     @api.model_create_multi
     def create(self, vals_list):
