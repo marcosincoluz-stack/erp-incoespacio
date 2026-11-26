@@ -12,6 +12,19 @@ from odoo.tools.mimetypes import guess_mimetype
 
 from .secret_store import GEMINI_KEY
 
+MODEL_PARAM = "incoespacio_invoice_ocr.gemini_model"
+# gemini-2.5-flash se apaga el 2026-12-01; Google lo sustituye por este, al mismo
+# precio, y es el que recomienda para proyectos nuevos.
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
+GEMINI_MODELS = [
+    (
+        "gemini-3.5-flash-lite",
+        "Gemini 3.5 Flash-Lite (Recomendado - Rápido y económico)",
+    ),
+    ("gemini-3.8-flash", "Gemini 3.8 Flash (Más capacidad, unas 2,5 veces más caro)"),
+    ("gemini-flash-latest", "Gemini Flash (Última versión disponible)"),
+]
+
 _logger = logging.getLogger(__name__)
 
 GEMINI_API_BASE_URL = (
@@ -179,14 +192,10 @@ class AiOcrService:
                 "e introduce tu clave de Google Gemini para activar la lectura automática."
             )
         model = (
-            icp.get_param(
-                "incoespacio_invoice_ocr.gemini_model", default="gemini-2.5-flash"
-            ).strip()
-            or "gemini-2.5-flash"
+            icp.get_param(MODEL_PARAM, default=DEFAULT_MODEL).strip() or DEFAULT_MODEL
         )
+        # Sin thinkingConfig: Flash-Lite piensa lo mínimo por defecto.
         gen_config = {"temperature": 0.1, "response_mime_type": "application/json"}
-        if "gemini-2.5" in model:
-            gen_config["thinkingConfig"] = {"thinkingBudget": 0}
         try:
             response = cls._new_session().post(
                 GEMINI_API_BASE_URL.format(model=model),

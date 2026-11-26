@@ -81,7 +81,13 @@ class TestSecretStore(TransactionCase):
             self.assertFalse(fresh.gemini_api_key)
             self.assertIn("…a1B2", fresh.gemini_api_key_status)
             values = fresh.read(["gemini_api_key", "gemini_api_key_status"])[0]
+            # Lo que recibe la pantalla al abrir Ajustes (registro nuevo).
+            shown = self.env["res.config.settings"].onchange(
+                {}, [], {"gemini_api_key_status": {}, "gemini_api_key": {}}
+            )["value"]
         self.assertNotIn(_KEY, str(values))
+        self.assertIn("…a1B2", shown["gemini_api_key_status"])
+        self.assertFalse(shown.get("gemini_api_key"))
 
     def test_secrets_are_not_callable_from_rpc(self):
         # Los métodos con _ no se pueden llamar desde el navegador.

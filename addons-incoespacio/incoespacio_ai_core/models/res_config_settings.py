@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import api, fields, models
 
+from .ai_ocr_service import DEFAULT_MODEL, GEMINI_MODELS, MODEL_PARAM
 from .secret_store import GEMINI_KEY
 
 
@@ -12,25 +13,23 @@ class ResConfigSettings(models.TransientModel):
         string="API Key de Gemini",
         help="Pega una clave nueva para sustituir la actual. Se guarda cifrada.",
     )
-    gemini_api_key_status = fields.Char(
-        string="Estado de la clave",
-        compute="_compute_gemini_api_key_status",
-    )
+    # Se rellena en get_values: un compute sin dependencias no llega a la vista
+    # de Ajustes (el onchange del registro nuevo lo deja vacío).
+    gemini_api_key_status = fields.Char(string="Estado de la clave", readonly=True)
     gemini_model = fields.Selection(
-        [
-            ("gemini-2.5-flash", "Gemini 2.5 Flash (Recomendado - Rápido y económico)"),
-            ("gemini-flash-latest", "Gemini Flash (Última versión disponible)"),
-            ("gemini-2.5-pro", "Gemini 2.5 Pro (Máxima capacidad)"),
-        ],
+        GEMINI_MODELS,
         string="Modelo Gemini",
-        default="gemini-2.5-flash",
-        config_parameter="incoespacio_invoice_ocr.gemini_model",
+        default=DEFAULT_MODEL,
+        config_parameter=MODEL_PARAM,
     )
 
-    def _compute_gemini_api_key_status(self):
-        status = self.env["incoespacio.secret"]._secret_status(GEMINI_KEY)
-        for settings in self:
-            settings.gemini_api_key_status = status
+    @api.model
+    def get_values(self):
+        res = super().get_values()
+        res["gemini_api_key_status"] = self.env["incoespacio.secret"]._secret_status(
+            GEMINI_KEY
+        )
+        return res
 
     def set_values(self):
         res = super().set_values()

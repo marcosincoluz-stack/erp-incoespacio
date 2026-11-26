@@ -13,7 +13,9 @@ class TestAiOcrService(TransactionCase):
         super().setUp()
         params = self.env["ir.config_parameter"].sudo()
         params.set_param("incoespacio_invoice_ocr.gemini_api_key", "test-key")
-        params.set_param("incoespacio_invoice_ocr.gemini_model", "gemini-2.5-flash")
+        params.set_param(
+            "incoespacio_invoice_ocr.gemini_model", "gemini-3.5-flash-lite"
+        )
 
     def test_retry_budget(self):
         retry = AiOcrService._new_session().get_adapter("https://").max_retries
