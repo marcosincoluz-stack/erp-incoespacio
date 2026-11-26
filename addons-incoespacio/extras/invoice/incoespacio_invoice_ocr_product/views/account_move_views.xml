@@ -23,15 +23,15 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='reason_not_invoice']" position="after">
                 <filter
-                    string="IVA distinto al PDF"
-                    name="reason_tax_mismatch"
-                    domain="[('ocr_review_reason', '=', 'tax_mismatch')]"
-                />
+          string="IVA distinto al PDF"
+          name="reason_tax_mismatch"
+          domain="[('ocr_review_reason', '=', 'tax_mismatch')]"
+        />
                 <filter
-                    string="El total no cuadra"
-                    name="reason_total_mismatch"
-                    domain="[('ocr_review_reason', '=', 'total_mismatch')]"
-                />
+          string="El total no cuadra"
+          name="reason_total_mismatch"
+          domain="[('ocr_review_reason', '=', 'total_mismatch')]"
+        />
             </xpath>
         </field>
     </record>

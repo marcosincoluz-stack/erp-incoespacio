@@ -11,9 +11,22 @@
                     <setting
             id="gemini_api_key_setting"
             string="Google Gemini API Key"
-            help="Clave de API de Google Gemini (obtenida gratis en Google AI Studio)."
+            help="Se guarda cifrada y no se vuelve a mostrar. Para cambiarla, pega otra encima."
           >
-                        <field name="gemini_api_key" password="True" placeholder="AIzaSy..." />
+                        <field name="gemini_api_key_status" readonly="1" />
+                        <field
+              name="gemini_api_key"
+              password="True"
+              placeholder="Pegar clave nueva (AIzaSy...)"
+              autocomplete="new-password"
+            />
+                        <button
+              name="action_clear_gemini_api_key"
+              type="object"
+              string="Borrar clave"
+              class="btn-link"
+              confirm="¿Borrar la clave de Gemini? El OCR dejará de funcionar hasta pegar otra."
+            />
                     </setting>
                     <setting
             id="gemini_model_setting"

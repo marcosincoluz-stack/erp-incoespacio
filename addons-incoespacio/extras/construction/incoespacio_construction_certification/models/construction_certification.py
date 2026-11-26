@@ -155,6 +155,7 @@ class ConstructionCertification(models.Model):
         store=True,
         currency_field="currency_id",
     )
+
     @api.depends(
         "line_ids.amount_budget",
         "line_ids.amount_previous",

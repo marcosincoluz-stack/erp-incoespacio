@@ -2,6 +2,8 @@
 import logging
 from odoo import models
 
+from odoo.addons.incoespacio_ai_core.models.secret_store import GEMINI_KEY
+
 _logger = logging.getLogger(__name__)
 
 
@@ -14,12 +16,7 @@ class AccountJournal(models.Model):
         cajón flotante estilo Drive abajo a la derecha y permitiendo añadir más facturas.
         """
         action_vals = super().create_document_from_attachment(attachment_ids)
-        icp = self.env[
-            "ir.config_parameter"
-        ].sudo()  # sudo justificado: icp es lectura admin-only (clave Gemini)
-        api_key = icp.get_param(
-            "incoespacio_invoice_ocr.gemini_api_key", default=""
-        ).strip()
+        api_key = self.env["incoespacio.secret"]._get_secret(GEMINI_KEY)
         if api_key and action_vals and action_vals.get("res_model") == "account.move":
             action_vals.update(
                 {
@@ -35,12 +32,7 @@ class AccountJournal(models.Model):
         cuando se use el botón 'Subir' con la IA activa, cree los borradores al instante
         y delegue la extracción al cron de Odoo (inmune a cierres de sesión).
         """
-        icp = self.env[
-            "ir.config_parameter"
-        ].sudo()  # sudo justificado: icp es lectura admin-only (clave Gemini)
-        api_key = icp.get_param(
-            "incoespacio_invoice_ocr.gemini_api_key", default=""
-        ).strip()
+        api_key = self.env["incoespacio.secret"]._get_secret(GEMINI_KEY)
         move_type = self._context.get("default_move_type", "entry")
 
         # Si no hay API key o no es factura contable, usar el comportamiento estándar de Odoo
