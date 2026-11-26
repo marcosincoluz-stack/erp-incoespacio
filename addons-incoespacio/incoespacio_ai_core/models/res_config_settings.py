@@ -33,13 +33,14 @@ class ResConfigSettings(models.TransientModel):
             settings.gemini_api_key_status = status
 
     def set_values(self):
-        super().set_values()
+        res = super().set_values()
         for settings in self:
             if settings.gemini_api_key:
                 self.env["incoespacio.secret"]._set_secret(
                     GEMINI_KEY, settings.gemini_api_key
                 )
                 settings.gemini_api_key = False
+        return res
 
     def action_clear_gemini_api_key(self):
         self.env["incoespacio.secret"]._clear_secret(GEMINI_KEY)
