@@ -10,6 +10,8 @@ from urllib3.util.retry import Retry
 from odoo.exceptions import UserError
 from odoo.tools.mimetypes import guess_mimetype
 
+from .secret_store import GEMINI_KEY
+
 _logger = logging.getLogger(__name__)
 
 GEMINI_API_BASE_URL = (
@@ -169,9 +171,7 @@ class AiOcrService:
         # sudo justificado: ir.config_parameter es lectura admin-only y la clave
         # Gemini no debe exponerse vía ACL al usuario que sube la factura
         icp = env["ir.config_parameter"].sudo()
-        api_key = (
-            icp.get_param("incoespacio_invoice_ocr.gemini_api_key", default="") or ""
-        ).strip()
+        api_key = env["incoespacio.secret"]._get_secret(GEMINI_KEY)
         if not api_key:
             raise UserError(
                 "No se ha configurado la clave API de Gemini.\n\n"
@@ -202,9 +202,7 @@ class AiOcrService:
                 timeout=timeout,
             )
         except requests.exceptions.RequestException as e:
-            _logger.exception(
-                "Error de conexión con Gemini API tras reintentos: %s", e
-            )
+            _logger.exception("Error de conexión con Gemini API tras reintentos: %s", e)
             raise UserError(
                 f"Error de conexión con la IA de Google tras reintentos: {e}"
             ) from e
@@ -256,9 +254,7 @@ class AiOcrService:
             raise
         except Exception as e:
             _logger.exception("Error parseando el JSON devuelto por Gemini: %s", e)
-            raise UserError(
-                f"No se pudo interpretar el resultado de la IA: {e}"
-            ) from e
+            raise UserError(f"No se pudo interpretar el resultado de la IA: {e}") from e
         _logger.info(
             "Datos extraídos exitosamente por Gemini para %s: %s",
             filename,

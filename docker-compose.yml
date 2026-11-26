@@ -27,6 +27,8 @@ services:
       - HOST=db
       - USER=${POSTGRES_USER:-odoo}
       - PASSWORD=${POSTGRES_PASSWORD:-odoo}
+      # Llave maestra de las claves de API cifradas (incoespacio_ai_core).
+      - ODOO_SECRETS_KEY=${ODOO_SECRETS_KEY:-}
     volumes:
       - incoespacio_web_data:/var/lib/odoo
       - ./config:/etc/odoo
