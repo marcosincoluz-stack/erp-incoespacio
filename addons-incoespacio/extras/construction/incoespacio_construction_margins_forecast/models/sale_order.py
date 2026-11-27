@@ -137,6 +137,29 @@ class SaleOrderLine(models.Model):
         digits=(16, 1),
     )
 
+    @api.depends(
+        "display_type",
+        "price_unit",
+        "product_uom_qty",
+        "price_subtotal",
+        "price_planned",
+        "amount_planned",
+        "amount_vendor_cost",
+        "order_id.certification_ids.state",
+        "order_id.certification_ids.number",
+        "order_id.certification_ids.line_ids.qty_origin",
+        "order_id.certification_ids.line_ids.sale_order_line_id",
+        "order_id.certification_ids.line_ids.display_type",
+    )
+    def _compute_line_margin(self):
+        # Sin coste objetivo no hay desviación: «objetivo ejecutado − coste»
+        # saldría como todo el coste en negativo, que parece un sobrecoste.
+        # Aquí y no en incoespacio_construction_margins (tope de líneas).
+        res = super()._compute_line_margin()
+        for line in self.filtered(lambda l: not l.price_planned):
+            line.amount_cost_deviation = 0.0
+        return res
+
     @api.depends("display_type", "amount_vendor_cost", "qty_cert_origin")
     def _compute_cost_ahead(self):
         for line in self:
