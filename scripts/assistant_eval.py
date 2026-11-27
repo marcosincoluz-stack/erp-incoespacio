@@ -24,6 +24,8 @@ overdue = sales.filtered(lambda m: m.payment_state in ("not_paid", "partial") an
 prado = obras.filtered(lambda o: o.project_id.name == "Viviendas Residencial El Prado")
 nave = obras.filtered(lambda o: o.project_id.name == "Nave industrial Polígono Sur")
 
+pav = E["sale.order.line"].search([("order_id.project_id.name", "=", "Vivienda Mayor"), ("name", "ilike", "Pavimento porcelanico")], limit=1)
+pavimento_vendor = (pav.vendor_cost_line_ids[:1].partner_id.name or "?").replace("[DEMO] ", "")
 N = lambda *v: ("num", list(v))
 T = lambda *v: ("txt", list(v))
 NO = lambda *v: ("not", list(v))
@@ -49,6 +51,13 @@ CASES = [
     (elena, "¿Cuántas facturas de proveedor no tienen obra?", [N(AM.search_count([("move_type", "=", "in_invoice"), ("state", "!=", "cancel"), ("project_id", "=", False), ("construction_not_job", "=", False)]))]),
     (pedro, "¿Qué avisos tengo?", [T(*[a.message.split(" · ")[0] for a in E["assistant.alert"].search([("user_id", "=", pedro.id), ("state", "in", ("new", "open"))])._still_matching()])]),
     (elena, "¿Cómo importo un BC3 de Presto?", [T("BC3"), NO("no lo puedo consultar")]),
+    # «¿Por qué?» sobre las obras de scripts/assistant_demo_margins.py: la IA tiene
+    # que encontrar sola cada causa preparada.
+    (elena, "¿Por qué va mal la obra Vivienda Mayor?", [T("pavimento"), N(1450), N(1200)]),
+    (elena, "¿Por qué el pavimento de Vivienda Mayor tiene sobrecoste?", [T(pavimento_vendor)]),
+    (elena, "¿Por qué la Oficina diáfana tiene tan poco margen?", [T("particiones")]),
+    (elena, "¿Qué riesgo ves en la Cafetería Plaza?", [T("comprometid")]),
+    (elena, "¿Por qué va mal Albañilería en Clínica dental Centro?", [T("objetivo"), N(4490)]),
 ]
 
 def plain(s):

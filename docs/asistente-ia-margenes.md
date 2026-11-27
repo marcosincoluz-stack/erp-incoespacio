@@ -33,20 +33,21 @@ Casi todos son **campos calculados** (no guardados): no se pueden filtrar ni sum
 
 ## 3. Enfoque
 
-Tres piezas, cada una para lo que hace bien:
+Tres piezas, cada una para lo que hace bien (revisado el 2026-11-27 con el usuario: **la IA razona con los datos, no lee un informe hecho por código**):
 
 1. **Catálogo hasta la partida** (`consultar`): preguntas libres y comparaciones. Entradas nuevas `partidas` y `capitulos`. Hace falta una capacidad nueva: **agrupar y sumar campos calculados** (sumar el coste por capítulo) leyendo los registros, con tope.
-2. **Herramienta de análisis `analizar_obra(obra)`**: el diagnóstico de una obra hecho por código, igual siempre y explicable: capítulos por desviación, partidas con sobrecoste, coste sin avance, coste sin imputar, comprometido por encima del objetivo, partidas certificadas por encima del 100 %, previsión a fin de obra frente al objetivo. Devuelve hechos con cifras; **la IA los explica, los prioriza y propone qué mejorar**, y si hace falta baja con `consultar`.
+2. **Datos de detalle para razonar** (en vez de una herramienta `analizar_obra`, descartada): la IA tiene que poder investigar el porqué por sí misma, también lo que nadie ha previsto. Para eso necesita (a) el detalle, no solo totales: las líneas de factura de proveedor de cada partida (`gastos`), las líneas de pedido de compra (`compras_partidas`) y lo certificado por periodo (`certificaciones_partidas`); (b) entender qué significa cada dato (definiciones en el catálogo y pautas de cómo investigar, no reglas que decidan por ella); y (c) margen para investigar: más consultas por pregunta (de 4 a 8). Los datos tienen que ser honestos: sin coste objetivo no hay desviación (no «− todo el coste»).
 3. **Aviso de desviación** (reglas, no IA): un tipo de aviso nuevo cuando un capítulo o una partida se desvía más de un umbral, al jefe de obra y a Dirección, con la comprobación al momento y el tachado que ya existen.
 
-Por qué así: lo que tiene que ser exacto e igual para todos (el diagnóstico, los avisos) lo calcula el código; la IA aporta lo que hace bien: entender la pregunta, comparar, explicar y sugerir.
+Por qué así: lo que tiene que ser exacto e igual para todos (los datos, los avisos) lo calcula el código; el análisis es de la IA, con acceso al detalle y sin un guion que la limite. La seguridad no cambia: todo pasa por el catálogo, como el usuario, en solo lectura, con la lista negra y con coste y margen solo para Facturación.
 
 ## 4. Seguridad y coste
 
 - Igual que el catálogo: solo lectura, como el usuario, lista negra.
 - Coste, margen, desviación, comprometido y previsión solo con **Facturación** (si no, saldrían calculados con lo que ve cada uno y engañarían). Venta, medición y avance, con los permisos de ventas.
 - **Topes**: `partidas` y `capitulos` piden filtrar por obra (o por código / descripción para comparar entre obras), para no leer miles de líneas. Tope propio de lectura por entrada (p. ej. 2.000 líneas) y como mucho 50 filas o 30 grupos de vuelta.
-- `analizar_obra` devuelve un resumen corto (los 5 peores de cada cosa), no todas las partidas: así una pregunta grande no dispara el coste.
+- Las entradas de detalle (`gastos`, `compras_partidas`, `certificaciones_partidas`) piden filtrar por obra, partida o documento, y entran en el test de oro como el resto. Importes y precios de proveedor, solo con Facturación.
+- Más consultas por pregunta (8) solo encarecen las preguntas de análisis (unos 0,005–0,01 €); las sencillas siguen con 1 o 2.
 
 ## 5. Sprints
 
@@ -66,11 +67,14 @@ Cada sprint se cierra con la suite en verde, el tope de 500 líneas por módulo,
 - Tests: sumas por capítulo que cuadran con la pantalla de márgenes, tope, filtro obligatorio, permisos (test de oro).
 - Prueba: «¿qué capítulo de Calle Mayor 12 va peor?», «¿qué partidas tienen sobrecoste?», «¿cuánto llevamos gastado en albañilería?».
 
-### Sprint 3: `analizar_obra`
+### Sprint 3: datos para razonar (sustituye a `analizar_obra`)
 
-- La herramienta de diagnóstico y el texto para la IA: cuándo usarla («cómo va», «qué mejorar», «por qué pierde») y cómo contestar (prioridades, cifras, sugerencias concretas).
-- Tests del diagnóstico con las obras del sprint 1 (cada desviación preparada tiene que salir).
-- Prueba: «¿qué podemos mejorar en la obra X?», «¿por qué pierde dinero la obra Y?».
+- Desviación honesta: una partida sin coste objetivo no tiene desviación (hoy sale «− todo el coste»).
+- Entradas `gastos` (líneas de factura de proveedor de la obra, con o sin partida), `compras_partidas` (líneas de pedido) y `certificaciones_partidas` (medición por periodo).
+- Definiciones completas y pautas de investigación en el catálogo («para explicar una desviación, mira precio real frente a objetivo, avance frente a coste, las facturas y compras de la partida y la misma partida en otras obras»).
+- Hasta 8 consultas por pregunta.
+- Tests de las entradas nuevas y de oro; batería con preguntas «¿por qué?» sobre las obras del sprint 1 (pavimento caro, lijado sin avance, factura sin imputar, capítulo 02 de la oficina, pedido caro de la cafetería): la IA tiene que encontrar cada causa por sí sola.
+- Prueba: «¿por qué va mal Albañilería?», «¿qué podemos mejorar en la obra X?», «¿por qué pierde dinero la obra Y?».
 
 ### Sprint 4: comparar entre obras
 
