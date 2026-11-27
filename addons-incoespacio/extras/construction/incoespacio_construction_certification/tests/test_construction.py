@@ -319,8 +319,13 @@ class TestConstruction(TransactionCase):
         self.order.action_confirm()
         project = self.order.project_id
         self.assertTrue(project)
+        self.assertEqual(project.user_id, self.env.user)
         self.order._ensure_project()
         self.assertEqual(self.order.project_id, project)
+
+    def test_confirm_sets_manager_even_if_default_is_empty(self):
+        self.order.with_context(default_user_id=False).action_confirm()
+        self.assertEqual(self.order.project_id.user_id, self.env.user)
 
     def test_unlink_draft_returns_to_order(self):
         self.order.action_confirm()

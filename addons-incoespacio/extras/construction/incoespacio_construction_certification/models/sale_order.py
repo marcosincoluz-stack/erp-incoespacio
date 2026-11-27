@@ -211,6 +211,8 @@ class SaleOrder(models.Model):
                     "name": name,
                     "partner_id": order.partner_id.id,
                     "company_id": order.company_id.id,
+                    # Quien confirma el presupuesto es el jefe de obra.
+                    "user_id": self.env.user.id,
                 }
             )
         return self.project_id
