@@ -7,7 +7,9 @@ CATALOG = {
         "Facturas de cliente y de proveedor, y sus rectificativas (tipo aparte: "
         "cuéntalas por separado). Un borrador aún no se debe ni se cobra: para "
         "deudas filtra estado = posted. Vencida: posted, pendiente > 0 y "
-        "vencimiento anterior a hoy. Sin obra: obra vacía y excluida_de_obra = no."
+        "vencimiento anterior a hoy. Sin obra: obra vacía y excluida_de_obra = no, "
+        "en cualquier estado menos cancelada (suelen ser borradores: no filtres "
+        "por publicada salvo que lo pidan)."
     ),
     "domain": [
         ("move_type", "in", ("out_invoice", "out_refund", "in_invoice", "in_refund"))

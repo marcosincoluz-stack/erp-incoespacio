@@ -125,7 +125,13 @@ PARTIDAS = {
         "entre obras). Para «por capítulo», agrupa por capitulo; para un capítulo "
         "concreto, filtra por código (p. ej. «02.»). Desviación = "
         "objetivo ejecutado − coste (negativo = sobrecoste). Adelantado = gastado "
-        "en partidas aún sin certificar (no entra en la desviación)."
+        "en partidas aún sin certificar (no entra en la desviación). Si objetivo = 0 "
+        "la obra no tiene coste objetivo: no hay desviación (sale 0) y hay que "
+        "decirlo; el margen real sí vale. Para explicar por qué va bien o mal una "
+        "partida, investiga: precio_real frente a precio_objetivo, avance frente a "
+        "coste, sus gastos (quién, cuándo, a qué precio), sus compras y lo "
+        "certificado por periodo, y la misma partida (código o descripción) en "
+        "otras obras. Saca tus conclusiones con cifras."
     ),
     "domain": [
         ("display_type", "=", False),
@@ -173,6 +179,101 @@ PARTIDAS = {
             "Margen previsto a fin de obra.",
             FULL_COST,
         ),
+    },
+}
+
+# Detalle para que la IA investigue el porqué por sí misma (sprint 3 de
+# docs/asistente-ia-margenes.md): de qué facturas, pedidos y certificaciones
+# salen los totales de cada partida. Mismas barreras que el resto del catálogo.
+GASTOS = {
+    "model": "account.move.line",
+    "help": (
+        "Gastos de las obras: cada línea de factura de proveedor publicada, con su "
+        "partida (vacía si aún no se ha imputado). De aquí sale el coste de cada "
+        "partida: sirve para ver quién facturó, cuándo, a qué precio y qué está sin "
+        "imputar. Las rectificativas (tipo in_refund) restan."
+    ),
+    "domain": [
+        ("parent_state", "=", "posted"),
+        ("move_id.move_type", "in", ("in_invoice", "in_refund")),
+        ("display_type", "=", "product"),
+        ("move_id.project_id", "!=", False),
+    ],
+    "order": "date desc, id desc",
+    "labels": ["name"],
+    "requires": ["obra", "partida", "factura", "proveedor"],
+    "scan": 5000,
+    "fields": {
+        "obra": ("assistant_project_id", "La obra."),
+        "partida": ("construction_line_id", "Partida imputada (vacía = sin imputar)."),
+        "subcapitulo": ("construction_section_id", "Capítulo o subcapítulo imputado."),
+        "proveedor": ("partner_id", "El proveedor."),
+        "factura": ("move_id", "La factura."),
+        "tipo": ("move_type", "in_invoice = factura; in_refund = rectificativa."),
+        "fecha": ("date", "Fecha contable."),
+        "concepto": ("name", "Concepto de la línea."),
+        "cantidad": ("quantity", "Cantidad facturada."),
+        "precio": ("price_unit", "Precio unitario del proveedor.", FULL_COST),
+        "importe": ("price_subtotal", "Importe sin IVA.", FULL_COST),
+    },
+}
+COMPRAS_PARTIDAS = {
+    "model": "purchase.order.line",
+    "help": (
+        "Líneas de los pedidos de compra confirmados de las obras, con su partida: "
+        "lo pedido, lo recibido y lo ya facturado. Lo pedido y no facturado es el "
+        "comprometido."
+    ),
+    "domain": [
+        ("order_id.state", "in", ("purchase", "done")),
+        ("order_id.project_id", "!=", False),
+    ],
+    "order": "id desc",
+    "labels": ["name"],
+    "requires": ["obra", "partida", "pedido", "proveedor"],
+    "scan": 5000,
+    "fields": {
+        "obra": ("assistant_project_id", "La obra."),
+        "partida": ("construction_line_id", "Partida a la que va."),
+        "pedido": ("order_id", "El pedido de compra."),
+        "proveedor": ("partner_id", "El proveedor."),
+        "fecha": ("date_order", "Fecha del pedido."),
+        "concepto": ("name", "Concepto."),
+        "cantidad": ("product_qty", "Cantidad pedida."),
+        "recibido": ("qty_received", "Cantidad recibida."),
+        "facturado": ("qty_invoiced", "Cantidad ya facturada."),
+        "precio": ("price_unit", "Precio unitario pedido.", FULL_COST),
+        "importe": ("price_subtotal", "Importe pedido sin IVA.", FULL_COST),
+    },
+}
+CERT_PARTIDAS = {
+    "model": "construction.certification.line",
+    "help": (
+        "Lo certificado de cada partida en cada certificación (periodo): sirve para "
+        "ver la evolución del avance mes a mes y compararla con los gastos."
+    ),
+    "domain": [
+        ("display_type", "=", False),
+        ("certification_id.state", "!=", "cancel"),
+    ],
+    "order": "id desc",
+    "labels": ["name"],
+    "requires": ["obra", "certificacion", "partida"],
+    "scan": 5000,
+    "fields": {
+        "obra": ("assistant_project_id", "La obra."),
+        "certificacion": ("certification_id", "La certificación."),
+        "fecha": ("assistant_cert_date", "Fecha de la certificación."),
+        "estado": ("assistant_cert_state", "Borrador, aprobada, facturada…"),
+        "partida": ("sale_order_line_id", "La partida del presupuesto."),
+        "codigo": ("code", "Código BC3."),
+        "medicion_presupuesto": ("qty_budget", "Medición presupuestada."),
+        "medicion_anterior": ("qty_previous", "Certificado antes de este periodo."),
+        "medicion_periodo": ("qty_period", "Certificado en este periodo."),
+        "medicion_origen": ("qty_origin", "Certificado a origen."),
+        "avance": ("percentage_origin", "% a origen."),
+        "importe_periodo": ("amount_period", "Importe certificado en el periodo."),
+        "importe_origen": ("amount_origin", "Importe certificado a origen."),
     },
 }
 
@@ -230,6 +331,32 @@ class SaleOrderLine(models.Model):
             line.assistant_chapter = chapter.get(line.id) or line.assistant_subchapter
 
 
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    assistant_project_id = fields.Many2one(
+        "project.project", related="move_id.project_id", string="Obra"
+    )
+
+
+class PurchaseOrderLine(models.Model):
+    _inherit = "purchase.order.line"
+
+    assistant_project_id = fields.Many2one(
+        "project.project", related="order_id.project_id", string="Obra"
+    )
+
+
+class ConstructionCertificationLine(models.Model):
+    _inherit = "construction.certification.line"
+
+    assistant_project_id = fields.Many2one(
+        "project.project", related="certification_id.project_id", string="Obra"
+    )
+    assistant_cert_date = fields.Date(related="certification_id.date")
+    assistant_cert_state = fields.Selection(related="certification_id.state")
+
+
 class AssistantAIQuestion(models.Model):
     _inherit = "assistant.ai.question"
 
@@ -241,6 +368,9 @@ class AssistantAIQuestion(models.Model):
             compras=PURCHASES,
             proyectos=PROJECTS,
             partidas=PARTIDAS,
+            gastos=GASTOS,
+            compras_partidas=COMPRAS_PARTIDAS,
+            certificaciones_partidas=CERT_PARTIDAS,
         )
 
     def _tools(self):

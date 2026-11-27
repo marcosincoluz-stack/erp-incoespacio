@@ -25,7 +25,7 @@ class AssistantAIQuestion(models.Model):
     def _tool_query(self, env, que="", filtros=None, agrupar="", sumar=None, **kw):
         try:
             self._check_required(que, filtros)
-            if self._needs_calc(env, que, agrupar, sumar):
+            if self._needs_calc(env, que, agrupar, sumar, filtros):
                 return self._grouped_calc(
                     env, que, filtros, agrupar, sumar, kw.get("limite", 20)
                 )
@@ -34,6 +34,22 @@ class AssistantAIQuestion(models.Model):
         return super()._tool_query(
             env, que=que, filtros=filtros, agrupar=agrupar, sumar=sumar, **kw
         )
+
+    # Filtrar por un texto calculado (p. ej. el capítulo de una partida): se lee
+    # y se compara aquí, sin distinguir mayúsculas ni acentos de más.
+    def _later(self, Model, known, item):
+        label, op = item.get("campo"), item.get("operador")
+        field = Model._fields[known.get(label, ("id",))[0]]
+        if _kind(field) == "texto" and op in ("=", "contiene"):
+            wanted = str(item.get("valor", "")).strip().lower()[:100]
+            return field.name, ("texto", op), wanted
+        return super()._later(Model, known, item)
+
+    def _holds(self, value, op, wanted):
+        if isinstance(op, tuple):
+            text = str(value or "").strip().lower()
+            return text == wanted if op[1] == "=" else wanted in text
+        return super()._holds(value, op, wanted)
 
     def _check_required(self, que, filtros):
         needed = self._catalog().get(que, {}).get("requires")
@@ -45,14 +61,19 @@ class AssistantAIQuestion(models.Model):
                 "Para consultar %s filtra por %s." % (que, " o ".join(needed))
             )
 
-    def _needs_calc(self, env, que, agrupar, sumar):
+    def _needs_calc(self, env, que, agrupar, sumar, filtros=None):
         entry = self._catalog().get(que)
         if not entry or not (agrupar or sumar):
             return False
         Model, known = env[entry["model"]], entry["fields"]
         label = str(agrupar or "").partition(":")[0]
         names = [n for n in [label] + list(sumar or []) if n in known]
-        return any(not _in_db(Model._fields[known[n][0]]) for n in names)
+        if any(not _in_db(Model._fields[known[n][0]]) for n in names):
+            return True
+        # Un filtro por un dato calculado que no se puede buscar en la base.
+        used = [i.get("campo") for i in filtros or [] if isinstance(i, dict)]
+        fields_ = [Model._fields[known[n][0]] for n in used if n in known]
+        return any(not (f.store or f.search) for f in fields_)
 
     def _grouped_calc(self, env, que, filtros, agrupar, sumar, limite):
         label = str(agrupar or "").partition(":")[0]

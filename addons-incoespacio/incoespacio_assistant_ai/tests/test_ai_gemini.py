@@ -3,6 +3,8 @@ from unittest.mock import patch
 
 from odoo.tests.common import TransactionCase
 
+from odoo.addons.incoespacio_assistant_ai.models.question_ai import MAX_ROUNDS
+
 
 def _text(text, tokens_in=100, tokens_out=20, thoughts=0):
     return {
@@ -54,8 +56,9 @@ class TestAIGemini(TransactionCase):
         self.sent = []
         queue = list(responses)
 
-        def fake(system, contents, tools):
+        def fake(system, contents, tools, last=False):
             self.sent.append(copy.deepcopy(contents))
+            self.last = last
             return queue.pop(0)
 
         return patch.object(type(self.Question), "_gemini_call", side_effect=fake)
@@ -145,10 +148,12 @@ class TestAIGemini(TransactionCase):
         self.assertEqual(Question._model(), "gemini-3.5-flash-lite")
 
     def test_too_many_rounds_and_unknown_tool(self):
-        with self._tools(), self._gemini(*[_call("inventada")] * 4):
+        with self._tools(), self._gemini(*[_call("inventada")] * MAX_ROUNDS):
             text, _usage = self.question._ask()
         self.assertIn("demasiadas consultas", text)
-        self.assertEqual(len(self.sent), 4)
+        self.assertEqual(len(self.sent), MAX_ROUNDS)
+        # En la última vuelta ya no puede pedir más consultas.
+        self.assertTrue(self.last)
         self.assertIn("error", self._tool_reply(1))
 
     def test_missing_key_ends_in_error_state(self):

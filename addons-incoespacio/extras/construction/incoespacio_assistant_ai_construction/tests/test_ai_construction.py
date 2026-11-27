@@ -375,3 +375,90 @@ class TestAIConstruction(TransactionCase):
             sumar=["coste"],
         )
         self.assertIn("permiso", reply["error"])
+
+    # ------------------------------------------------------------------ #
+    # Detalle para razonar: gastos, compras y certificaciones por partida
+    # ------------------------------------------------------------------ #
+    def test_detail_entries_explain_where_a_cost_comes_from(self):
+        order, (tabique, _techo, _pintura) = self._obra_con_capitulos()
+        buyer = self._user(
+            "Compras Detalle",
+            [
+                self.env.ref("sales_team.group_sale_manager").id,
+                self.env.ref("account.group_account_invoice").id,
+                self.env.ref("purchase.group_purchase_user").id,
+            ],
+        )
+        po = self.env["purchase.order"].create(
+            {
+                "partner_id": self.client.id,
+                "project_id": order.project_id.id,
+                "order_line": [
+                    (
+                        0,
+                        0,
+                        {
+                            "product_id": self.product.id,
+                            "name": "Placas",
+                            "product_qty": 4,
+                            "price_unit": 25,
+                            "construction_line_id": tabique.id,
+                        },
+                    )
+                ],
+            }
+        )
+        po.button_confirm()
+        partida = [{"campo": "partida", "operador": "contiene", "valor": "Tabique"}]
+        gastos = self._run(buyer, "consultar", que="gastos", filtros=partida)["result"]
+        self.assertEqual(gastos["total"], 1)
+        self.assertEqual(gastos["filas"][0]["importe"], 600)
+        self.assertEqual(gastos["filas"][0]["obra"], "Nave Capítulos")
+        compras = self._run(
+            buyer, "consultar", que="compras_partidas", filtros=partida
+        )["result"]
+        self.assertEqual(compras["filas"][0]["cantidad"], 4)
+        self.assertEqual(compras["filas"][0]["importe"], 100)
+        certs = self._run(
+            buyer, "consultar", que="certificaciones_partidas", filtros=partida
+        )["result"]
+        self.assertEqual(certs["filas"][0]["medicion_origen"], 5)
+        # Sin filtro, nada: las entradas de detalle piden obra, partida o documento.
+        self.assertIn("error", self._run(buyer, "consultar", que="gastos"))
+
+    def test_detail_entries_never_more_than_the_screen(self):
+        self._obra_con_capitulos()
+        obra = [{"campo": "obra", "operador": "contiene", "valor": "Nave Capítulos"}]
+        for user in (self.pedro, self.boss):
+            for que in ("gastos", "compras_partidas", "certificaciones_partidas"):
+                entry = self.env["assistant.ai.question"]._catalog()[que]
+                reply = self._run(user, "consultar", que=que, filtros=obra)
+                rows = reply.get("result", {}).get("filas", [])
+                try:
+                    visible = set(
+                        self.env[entry["model"]]
+                        .with_user(user)
+                        .search(entry["domain"])
+                        .ids
+                    )
+                except Exception:
+                    visible = set()
+                self.assertLessEqual({r["id"] for r in rows}, visible, (que, user.name))
+                for row in rows:
+                    for label in ("importe", "precio"):
+                        if label in row:
+                            self.assertEqual(row[label], "sin permiso", (que, label))
+
+    def test_partidas_filter_by_chapter(self):
+        self._obra_con_capitulos()
+        reply = self._run(
+            self._accountant(),
+            "consultar",
+            que="partidas",
+            filtros=[
+                {"campo": "obra", "operador": "contiene", "valor": "Nave Capítulos"},
+                {"campo": "capitulo", "operador": "=", "valor": "capítulo b"},
+            ],
+            campos=["descripcion"],
+        )["result"]
+        self.assertEqual([r["descripcion"] for r in reply["filas"]], ["Pintura"])

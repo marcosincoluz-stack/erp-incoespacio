@@ -18,7 +18,7 @@ from odoo.addons.incoespacio_ai_core.models.secret_store import GEMINI_KEY
 
 _logger = logging.getLogger(__name__)
 
-MAX_ROUNDS = 4
+MAX_ROUNDS = 8  # margen para investigar (preguntas de análisis)
 HISTORY = 3
 TIMEOUT = 60
 TOOL_TIMEOUT_MS = 5000
@@ -72,7 +72,9 @@ class AssistantAIQuestion(models.Model):
         tools = self._tools()
         usage = {"tokens_in": 0, "tokens_out": 0, "links": []}
         for _round in range(MAX_ROUNDS):
-            data = self._gemini_call(self._system(), contents, tools)
+            # Última vuelta: sin más consultas, contesta con lo que ya tiene.
+            last = (True,) if _round == MAX_ROUNDS - 1 else ()
+            data = self._gemini_call(self._system(), contents, tools, *last)
             meta = data.get("usageMetadata") or {}
             usage["tokens_in"] += meta.get("promptTokenCount", 0)
             # Google cobra lo que piensa el modelo como salida.
@@ -144,7 +146,7 @@ class AssistantAIQuestion(models.Model):
         cost = (usage["tokens_in"] * price_in + usage["tokens_out"] * price_out) / 1e6
         return dict(usage, cost=cost)
 
-    def _gemini_call(self, system, contents, tools):
+    def _gemini_call(self, system, contents, tools, last=False):
         api_key = self.env["incoespacio.secret"]._get_secret(GEMINI_KEY)
         if not api_key:
             raise UserError(_("Falta la clave de Gemini en Ajustes."))
@@ -158,6 +160,8 @@ class AssistantAIQuestion(models.Model):
             payload["tools"] = [
                 {"functionDeclarations": [spec for spec, _method in tools.values()]}
             ]
+        if last:
+            payload["toolConfig"] = {"functionCallingConfig": {"mode": "NONE"}}
         try:
             response = AiOcrService._new_session().post(
                 GEMINI_API_BASE_URL.format(model=model),
