@@ -1,6 +1,7 @@
 import base64
 
 from odoo.exceptions import ValidationError
+from odoo.tests import Form
 from odoo.tests.common import TransactionCase
 
 
@@ -45,6 +46,29 @@ class TestBC3PlannedCost(TransactionCase):
         line.product_uom_qty = 4.0
         self.assertAlmostEqual(line.qty_planned, 5.0)
         self.assertAlmostEqual(line.amount_planned, 8.54 * 5.0, places=2)
+
+    def test_qty_change_keeps_bc3_price(self):
+        # La tarifa daría otro precio: el del presupuesto no se toca.
+        line = self._line()
+        line.product_id.list_price = 99.0
+        line.product_uom_qty = 3.0
+        self.assertAlmostEqual(line.price_unit, 10.67)
+        with Form(line.order_id) as form:
+            with form.order_line.edit(0) as fline:
+                fline.price_unit = 12.0
+                fline.product_uom_qty = 4.0
+                self.assertAlmostEqual(fline.price_unit, 12.0)
+        self.assertAlmostEqual(line.price_unit, 12.0)
+        self.assertAlmostEqual(line.amount_planned, 12.0 * 0.8 * 4.0, places=2)
+        other = self.env["product.product"].create(
+            {"name": "Pintura", "list_price": 7.0}
+        )
+        line.product_id = other
+        self.assertAlmostEqual(
+            line.price_unit,
+            line.order_id.pricelist_id._get_product_price(other, 4.0),
+            places=2,
+        )
 
     def test_planned_percent_range(self):
         line = self._line()

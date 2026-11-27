@@ -78,7 +78,32 @@ class SaleOrderLine(models.Model):
         res = super().write(vals)
         if follow:
             follow.qty_planned = new_qty
+        if "product_id" in vals or "product_uom" in vals:
+            # Otro producto u otra unidad: aquí sí toca la tarifa.
+            self.filtered("order_id.bc3").with_context(
+                bc3_reprice=True
+            )._compute_price_unit()
         return res
+
+    def _bc3_keeps_price(self):
+        """En un pedido BC3 el P.U. sale del presupuesto: cambiar la cantidad
+        de una línea guardada no lo devuelve al de la tarifa."""
+        self.ensure_one()
+        origin = self._origin
+        return bool(
+            self.order_id.bc3
+            and not self.display_type
+            and origin.id
+            and origin.product_id == self.product_id
+            and origin.product_uom == self.product_uom
+            and not self.env.context.get("bc3_reprice")
+        )
+
+    def _compute_price_unit(self):
+        keep = self.filtered(lambda l: l._bc3_keeps_price())
+        for line in keep:
+            line.price_unit = line.price_unit
+        super(SaleOrderLine, self - keep)._compute_price_unit()
 
     @api.onchange("product_uom_qty")
     def _onchange_product_uom_qty_planned(self):
