@@ -103,7 +103,7 @@ class SaleOrderLine(models.Model):
         keep = self.filtered(lambda l: l._bc3_keeps_price())
         for line in keep:
             line.price_unit = line.price_unit
-        super(SaleOrderLine, self - keep)._compute_price_unit()
+        return super(SaleOrderLine, self - keep)._compute_price_unit()
 
     @api.onchange("product_uom_qty")
     def _onchange_product_uom_qty_planned(self):
