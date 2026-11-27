@@ -240,3 +240,16 @@ class TestMarginsForecast(TransactionCase):
         self.assertAlmostEqual(
             self.order.amount_margin_real, self.order.amount_job_margin
         )
+
+    def test_no_objective_means_no_deviation(self):
+        self.order.planned_percent = 0.0
+        self._invoice_cert(4)
+        self._post_bill(300)
+        self.line.invalidate_recordset()
+        self.order.invalidate_recordset()
+        # Antes: objetivo ejecutado 0 − coste 300 = −300, como si fuera sobrecoste.
+        self.assertFalse(self.line.price_planned)
+        self.assertAlmostEqual(self.line.amount_cost_deviation, 0.0)
+        self.assertAlmostEqual(self.order.amount_cost_deviation, 0.0)
+        # El margen real sí vale: certificado 400 − coste 300.
+        self.assertAlmostEqual(self.line.amount_margin, 100.0)
