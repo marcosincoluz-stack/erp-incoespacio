@@ -34,6 +34,8 @@ services:
       - ./config:/etc/odoo
       - ./addons:/mnt/extra-addons
       - ./addons-incoespacio:/mnt/incoespacio-addons
+      # Wiki de uso que lee IncoBot (incoespacio_assistant_ai_wiki), solo lectura.
+      - ./docs/wiki:/mnt/wiki:ro
     restart: always
 
   websocket:
