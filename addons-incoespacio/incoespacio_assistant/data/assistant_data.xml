@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="partner_incobot_assistant" model="res.partner">
+        <field name="name">IncoBot Asistente</field>
+        <field name="company_id" eval="False" />
+    </record>
+    <record id="ir_cron_assistant" model="ir.cron">
+        <field name="name">Asistente: avisos diarios</field>
+        <field name="model_id" ref="model_assistant_alert" />
+        <field name="state">code</field>
+        <field name="code">model._cron_run()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True" />
+    </record>
+</odoo>
