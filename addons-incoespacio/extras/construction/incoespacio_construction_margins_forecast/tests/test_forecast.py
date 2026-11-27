@@ -90,7 +90,7 @@ class TestMarginsForecast(TransactionCase):
         cert.action_create_invoice()
         return cert
 
-    def _post_bill(self, price):
+    def _post_bill(self, price, partida=True):
         bill = self.env["account.move"].create(
             {
                 "move_type": "in_invoice",
@@ -107,7 +107,7 @@ class TestMarginsForecast(TransactionCase):
                             "quantity": 1,
                             "price_unit": price,
                             "tax_ids": [(6, 0, [])],
-                            "construction_line_id": self.line.id,
+                            "construction_line_id": self.line.id if partida else False,
                         },
                     )
                 ],
@@ -153,3 +153,90 @@ class TestMarginsForecast(TransactionCase):
         self.assertAlmostEqual(self.line.amount_margin_forecast, 200.0)
         self.assertAlmostEqual(self.order.amount_cost_forecast, 800.0)
         self.assertAlmostEqual(self.order.margin_percent_forecast, 20.0)
+
+    def test_order_for_the_whole_partida_is_not_counted_twice(self):
+        # Certificado el 20 % (2 de 10), facturado al ritmo del objetivo (80 €/ud)
+        # y pedido el material de lo que falta por 700 €: antes se extrapolaba
+        # todo lo incurrido (860 / 2 × 8) y salían 4.300 € de previsión.
+        self._invoice_cert(2)
+        self._post_bill(160)
+        self._po(700)
+        self.line.invalidate_recordset()
+        self.order.invalidate_recordset()
+        # Lo que falta al ritmo real (8 × 80 = 640) es menos que lo pedido: manda
+        # el pedido. Previsión = 160 facturado + 700 comprometido.
+        self.assertAlmostEqual(self.line.amount_cost_forecast, 860.0)
+        self.assertAlmostEqual(self.line.amount_margin_forecast, 140.0)
+
+    def test_order_above_the_pace_raises_the_forecast(self):
+        self._invoice_cert(2)
+        self._post_bill(160)
+        self._po(1000)
+        self.line.invalidate_recordset()
+        # El pedido supera lo que falta al ritmo real: la previsión sube con él.
+        self.assertAlmostEqual(self.line.amount_cost_forecast, 1160.0)
+
+    def test_unassigned_cost_counts_in_the_order_forecast(self):
+        self._post_bill(150, partida=False)
+        self.line.invalidate_recordset()
+        self.order.invalidate_recordset()
+        # 800 de la partida al objetivo + 150 sin imputar.
+        self.assertAlmostEqual(self.order.amount_cost_forecast, 950.0)
+        self.assertAlmostEqual(self.order.amount_margin_forecast, 50.0)
+
+    def _second_partida_with_cost_but_no_progress(self):
+        second = self.env["sale.order.line"].create(
+            {
+                "order_id": self.order.id,
+                "product_id": self.product.id,
+                "product_uom_qty": 5,
+                "price_unit": 100,
+                "tax_id": [(6, 0, [])],
+            }
+        )
+        action = self.order.action_create_certification()
+        cert = self.env["construction.certification"].browse(action["res_id"])
+        cert.line_ids.filtered(
+            lambda l: l.sale_order_line_id == self.line
+        ).qty_origin = 4
+        cert.action_confirm()
+        cert.action_create_invoice()
+        self._post_bill(400)
+        bill = self._post_bill(150)
+        bill.button_draft()
+        bill.invoice_line_ids.construction_line_id = second
+        bill.action_post()
+        (self.line | second).invalidate_recordset()
+        self.order.invalidate_recordset()
+        return second
+
+    def test_cost_without_progress_is_ahead_not_deviation(self):
+        second = self._second_partida_with_cost_but_no_progress()
+        # La certificada: objetivo ejecutado 4 × 80 = 320 y coste 400.
+        self.assertAlmostEqual(self.line.amount_cost_deviation, -80.0)
+        self.assertAlmostEqual(self.line.amount_cost_ahead, 0.0)
+        # La que no tiene avance: su coste es adelantado, no desviación.
+        self.assertAlmostEqual(second.amount_cost_deviation, 0.0)
+        self.assertAlmostEqual(second.amount_cost_ahead, 150.0)
+        self.assertAlmostEqual(self.order.amount_cost_ahead, 150.0)
+
+    def test_order_deviation_is_the_sum_of_its_partidas(self):
+        self._second_partida_with_cost_but_no_progress()
+        # Antes la cabecera restaba también los 150 (−230) y no cuadraba con
+        # la tabla (−80).
+        self.assertAlmostEqual(self.order.amount_cost_deviation, -80.0)
+
+    def test_real_margin_counts_the_unassigned_cost(self):
+        self._invoice_cert(4)
+        self._post_bill(300)
+        self._post_bill(100, partida=False)
+        self.line.invalidate_recordset()
+        self.order.invalidate_recordset()
+        # Certificado 400; coste 300 en la partida + 100 sin imputar.
+        self.assertAlmostEqual(self.order.amount_cost_unassigned, 100.0)
+        self.assertAlmostEqual(self.order.amount_margin_real, 0.0)
+        self.assertAlmostEqual(self.order.margin_percent_real, 0.0)
+        # El margen de la pestaña y el de la obra (el que usa IncoBot) coinciden.
+        self.assertAlmostEqual(
+            self.order.amount_margin_real, self.order.amount_job_margin
+        )

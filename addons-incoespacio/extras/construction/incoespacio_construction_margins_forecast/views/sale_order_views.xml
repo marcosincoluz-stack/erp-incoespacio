@@ -10,6 +10,34 @@
                     Comprometido <field name="amount_po_partida" widget="monetary" nolabel="1" />
                 </div>
             </xpath>
+            <xpath expr="//field[@name='amount_cost_deviation']/.." position="after">
+                <div class="o_margin_kpi_sub text-warning" invisible="amount_cost_ahead == 0">
+                    Adelantado (sin avance)
+                    <field name="amount_cost_ahead" widget="monetary" nolabel="1" />
+                    <i
+            class="fa fa-question-circle"
+            title="Gastado en partidas que aún no tienen nada certificado. Puede ser normal (material comprado por adelantado) o un error de imputación. No entra en la desviación, que se mide sobre lo ejecutado."
+          />
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='amount_margin_real']" position="after">
+                <div class="o_margin_kpi_sub text-muted" invisible="amount_cost_unassigned == 0">
+                    Incluye <field name="amount_cost_unassigned" widget="monetary" nolabel="1" /> sin imputar
+                    <i
+            class="fa fa-question-circle"
+            title="Facturas de la obra que no están en ninguna partida. Cuentan en el margen real de la obra, pero no en la tabla, que va partida a partida."
+          />
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='margins']//field[@name='order_line']/tree" position="attributes">
+                <attribute name="decoration-warning">amount_cost_ahead &gt; 0 and not display_type</attribute>
+            </xpath>
+            <xpath
+        expr="//page[@name='margins']//field[@name='order_line']/tree/field[@name='display_type']"
+        position="after"
+      >
+                <field name="amount_cost_ahead" column_invisible="1" />
+            </xpath>
             <xpath expr="//div[hasclass('o_construction_margins_kpis')]" position="inside">
                 <div class="o_margin_kpi">
                     <div class="o_margin_kpi_title">Fin de obra previsto</div>
