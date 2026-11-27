@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_assistant_ai_question_tree_feedback" model="ir.ui.view">
+        <field name="name">assistant.ai.question.tree.feedback</field>
+        <field name="model">assistant.ai.question</field>
+        <field name="inherit_id" ref="incoespacio_assistant_ai.view_assistant_ai_question_tree" />
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="gap" optional="show" />
+                <field name="rating" optional="show" />
+            </field>
+        </field>
+    </record>
+
+    <record id="view_assistant_ai_question_form_feedback" model="ir.ui.view">
+        <field name="name">assistant.ai.question.form.feedback</field>
+        <field name="model">assistant.ai.question</field>
+        <field name="inherit_id" ref="incoespacio_assistant_ai.view_assistant_ai_question_form" />
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="gap" invisible="not gap" />
+                <field name="rating" invisible="not rating" />
+            </field>
+        </field>
+    </record>
+
+    <record id="view_assistant_ai_question_search" model="ir.ui.view">
+        <field name="name">assistant.ai.question.search</field>
+        <field name="model">assistant.ai.question</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="text" />
+                <field name="user_id" />
+                <filter name="gaps" string="Sin respuesta" domain="[('gap', '!=', False)]" />
+                <filter name="bad" string="No útiles" domain="[('rating', '=', 'down')]" />
+                <filter name="good" string="Útiles" domain="[('rating', '=', 'up')]" />
+                <separator />
+                <filter name="errors" string="Con error" domain="[('state', '=', 'error')]" />
+                <group expand="0" string="Agrupar por">
+                    <filter name="by_gap" string="Sin respuesta" context="{'group_by': 'gap'}" />
+                    <filter name="by_user" string="Persona" context="{'group_by': 'user_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_assistant_ai_gaps" model="ir.actions.act_window">
+        <field name="name">Lo que IncoBot no sabe</field>
+        <field name="res_model">assistant.ai.question</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_assistant_ai_question_search" />
+        <field name="context">{'search_default_gaps': 1, 'search_default_bad': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nada pendiente</p>
+            <p
+      >Aquí salen las preguntas que IncoBot no ha sabido contestar y las respuestas que alguien ha marcado como no útiles.</p>
+        </field>
+    </record>
+
+    <menuitem
+    id="menu_assistant_ai_gaps"
+    name="Lo que IncoBot no sabe"
+    parent="incoespacio_assistant.menu_incobot_config"
+    action="action_assistant_ai_gaps"
+    groups="base.group_system"
+    sequence="30"
+  />
+    <record id="res_config_settings_view_form_assistant_ai_feedback" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.assistant.ai.feedback</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="incoespacio_assistant_ai.res_config_settings_view_form_assistant_ai" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='assistant_ai_links']" position="inside">
+                <button
+          name="%(action_assistant_ai_gaps)d"
+          type="action"
+          string="Lo que IncoBot no sabe"
+          icon="oi-arrow-right"
+          class="btn-link ps-0 d-block"
+        />
+            </xpath>
+        </field>
+    </record>
+</odoo>
