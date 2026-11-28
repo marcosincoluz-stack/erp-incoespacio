@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
@@ -6,6 +6,12 @@ from odoo import fields
 from odoo.tests.common import TransactionCase
 
 _MADRID = ZoneInfo("Europe/Madrid")
+
+
+class _Weekday(date):
+    # Hoy, pero como si fuera miércoles: el cron no corre en fin de semana.
+    def weekday(self):
+        return 2
 
 
 class TestInvoiceAlerts(TransactionCase):
@@ -79,6 +85,17 @@ class TestInvoiceAlerts(TransactionCase):
                 }
             )
         )
+
+    def setUp(self):
+        super().setUp()
+        Alert = type(self.env["assistant.alert"])
+        today = self.env["assistant.alert"]._madrid_today()
+        if today.weekday() >= 5:
+            # Sábado o domingo: el cron no haría nada y los tests fallarían.
+            midweek = _Weekday(today.year, today.month, today.day)
+            patcher = patch.object(Alert, "_madrid_today", lambda alert: midweek)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def _bill(self, **extra):
         vals = {
