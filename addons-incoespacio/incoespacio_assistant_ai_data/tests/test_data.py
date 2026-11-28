@@ -167,3 +167,14 @@ class TestAIData(TransactionCase):
         second = ask([copy.deepcopy(text)])
         self.assertFalse(second.link_data)
         self.assertIn("o_incobot_link", second.reply_message_id.body)
+
+    def test_links_never_go_inside_html_tags_or_entities(self):
+        question = self.env["assistant.ai.question"].create(
+            {"user_id": self.users[0].id, "text": "x"}
+        )
+        body = question._to_html("Obra A & B\nfin")
+        links = [["res.partner", 1, ["amp", "br/", "fin"]]]
+        html = str(question._linkify(body, links))
+        self.assertIn("A &amp; B<br/>", html)
+        self.assertEqual(html.count("<a "), 1)
+        self.assertIn(">fin</a></p>", html)

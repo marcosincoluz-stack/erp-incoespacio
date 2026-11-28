@@ -103,9 +103,15 @@ class AssistantAIQuestion(models.Model):
         if not targets:
             return body
         names = sorted(targets, key=len, reverse=True)
-        pattern = re.compile("|".join(re.escape(name) for name in names))
+        # Las etiquetas y entidades HTML se saltan: un registro llamado «amp» o
+        # «br/» no puede romper el mensaje metiendo un enlace dentro de ellas.
+        pattern = re.compile(
+            "|".join(re.escape(name) for name in names) + r"|(<[^>]*>|&#?\w+;)"
+        )
 
         def link(match):
+            if match.group(1):
+                return match.group(0)
             model, rec_id, extra = targets[match.group(0)]
             return LINK.format(
                 id=rec_id, model=escape(model), extra=extra, text=match.group(0)
