@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="alert_type_cert_to_invoice" model="assistant.alert.type">
+        <field name="name">Certificaciones aprobadas sin facturar</field>
+        <field name="code">cert_to_invoice</field>
+        <field name="hint">Abre la certificación y pulsa «Crear Factura».</field>
+        <field name="collector">_collect_cert_to_invoice</field>
+        <field name="threshold_days">3</field>
+        <field name="notify_responsible" eval="False" />
+        <field name="sequence">60</field>
+    </record>
+    <record id="alert_type_cert_draft" model="assistant.alert.type">
+        <field name="name">Certificaciones en borrador</field>
+        <field name="code">cert_draft</field>
+        <field name="hint">Revisa las mediciones y pulsa «Aprobar Certificación». Si sobra, bórrala.</field>
+        <field name="collector">_collect_cert_draft</field>
+        <field name="threshold_days">7</field>
+        <field name="notify_responsible" eval="True" />
+        <field name="sequence">70</field>
+    </record>
+    <record id="alert_type_obra_no_cert" model="assistant.alert.type">
+        <field name="name">Obras sin certificar</field>
+        <field name="code">obra_no_cert</field>
+        <field
+      name="hint"
+    >Abre la obra y pulsa «Nueva Certificación» con lo ejecutado. Si está parada o acabada, archiva la obra.</field>
+        <field name="collector">_collect_obra_no_cert</field>
+        <field name="threshold_days">30</field>
+        <field name="notify_responsible" eval="True" />
+        <field name="sequence">80</field>
+    </record>
+</odoo>

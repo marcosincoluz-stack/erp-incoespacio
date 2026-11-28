@@ -1,0 +1,21 @@
+// Enlaces a registros en los mensajes de IncoBot (avisos y respuestas de la IA):
+// chapa blanca con borde, para que se distingan del texto del mensaje.
+.o-mail-Message-body a.o_incobot_link {
+  display: inline-block;
+  padding: 0 0.45em;
+  border: 1px solid rgba($o-action, 0.45);
+  border-radius: 0.375rem;
+  background-color: $white;
+  color: $o-action;
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus {
+    background-color: rgba($o-action, 0.08);
+    border-color: $o-action;
+    text-decoration: none;
+  }
+}

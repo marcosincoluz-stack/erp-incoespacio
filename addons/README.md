@@ -2,7 +2,7 @@
 
 Estos directorios **van en Git**. No uses submódulos ni clones sueltos en el servidor: `git clone` del ERP ya trae lo que Odoo necesita para arrancar.
 
-Congelados desde la rama `17.0` de cada repo OCA el **2026-10-08**. `OCA/web` está en `web-oca` porque así lo espera `addons_path` en `config/odoo.conf`.
+Congelados desde la rama `17.0` de cada repo OCA el **2026-10-08** (salvo `server-backend`, el **2026-11-26**, para `base_user_role`). `OCA/web` está en `web-oca` porque así lo espera `addons_path` en `config/odoo.conf`.
 
 | Carpeta | Origen |
 | :--- | :--- |
@@ -15,6 +15,7 @@ Congelados desde la rama `17.0` de cada repo OCA el **2026-10-08**. `OCA/web` es
 | `l10n-spain` | https://github.com/OCA/l10n-spain |
 | `partner-contact` | https://github.com/OCA/partner-contact |
 | `reporting-engine` | https://github.com/OCA/reporting-engine |
+| `server-backend` | https://github.com/OCA/server-backend |
 | `server-ux` | https://github.com/OCA/server-ux |
 | `vertical-construction` | https://github.com/OCA/vertical-construction |
 | `web-oca` | https://github.com/OCA/web |

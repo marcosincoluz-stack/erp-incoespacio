@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="alert_type_bill_draft_no_obra" model="assistant.alert.type">
+        <field name="name">Facturas de proveedor sin obra</field>
+        <field name="code">bill_draft_no_obra</field>
+        <field
+      name="hint"
+    >Abre cada factura y elige la obra. Si no es de obra (luz, oficina…), marca «No es de obra».</field>
+        <field name="collector">_collect_bill_draft_no_obra</field>
+        <field name="threshold_days">4</field>
+        <field name="notify_responsible" eval="True" />
+        <field name="sequence">10</field>
+    </record>
+    <record id="alert_type_bill_no_partida" model="assistant.alert.type">
+        <field name="name">Facturas con líneas sin partida</field>
+        <field name="code">bill_no_partida</field>
+        <field
+      name="hint"
+    >Abre la factura y pulsa «Imputar a partidas» para repartir las líneas que aún no tienen partida.</field>
+        <field name="collector">_collect_bill_no_partida</field>
+        <field name="since_date" eval="time.strftime('%Y-%m-%d')" />
+        <field name="notify_responsible" eval="True" />
+        <field name="sequence">20</field>
+    </record>
+    <record id="alert_type_bill_ocr_failed" model="assistant.alert.type">
+        <field name="name">Cola OCR con error</field>
+        <field name="code">bill_ocr_failed</field>
+        <field
+      name="hint"
+    >La lectura automática del PDF falló. Abre la factura, revisa el PDF y rellena los datos a mano.</field>
+        <field name="collector">_collect_bill_ocr_failed</field>
+        <field name="notify_responsible" eval="False" />
+        <field name="sequence">30</field>
+    </record>
+    <record id="alert_type_bill_draft_empty" model="assistant.alert.type">
+        <field name="name">Borradores vacíos</field>
+        <field name="code">bill_draft_empty</field>
+        <field name="hint">Borrador sin proveedor ni importe. Complétalo con su PDF o bórralo si sobra.</field>
+        <field name="collector">_collect_bill_draft_empty</field>
+        <field name="threshold_days">2</field>
+        <field name="notify_responsible" eval="False" />
+        <field name="sequence">40</field>
+    </record>
+    <record id="alert_type_invoice_overdue" model="assistant.alert.type">
+        <field name="name">Facturas de cliente vencidas</field>
+        <field name="code">invoice_overdue</field>
+        <field name="hint">Reclama el cobro al cliente. Si ya pagó, registra el pago en la factura.</field>
+        <field name="collector">_collect_invoice_overdue</field>
+        <field name="notify_responsible" eval="False" />
+        <field name="sequence">50</field>
+    </record>
+</odoo>

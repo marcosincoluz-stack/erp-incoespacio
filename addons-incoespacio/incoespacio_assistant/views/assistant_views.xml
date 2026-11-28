@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="message_alerts">
+        <p><b><t t-out="hello" /></b></p>
+        <t t-foreach="groups" t-as="group">
+            <p>
+                <b><t t-out="group['name']" /> (<t t-out="group['count']" />)</b>
+                <t t-if="group['hint']"><br /><i>→ <t t-out="group['hint']" /></i></t>
+            </p>
+            <ul>
+                <t t-foreach="group['lines']" t-as="line">
+                    <li t-attf-class="o_incobot_alert_#{line['alert_id']}">
+                        <t t-if="line['fresh']">🆕 </t>
+                        <a
+              t-att-href="line['href']"
+              t-att-data-oe-model="line['model']"
+              t-att-data-oe-id="line['id']"
+              class="o_incobot_link"
+            ><t t-out="line['label']" /></a><t t-out="line['rest']" />
+                        <t t-out="line['suffix']" />
+                    </li>
+                </t>
+                <li t-if="group['extra']">
+                    <a t-att-href="url">y <t t-out="group['extra']" /> más</a>
+                </li>
+            </ul>
+        </t>
+        <p><a t-att-href="url">Ver todos mis avisos</a></p>
+        <p><i><t t-out="footer" /></i></p>
+    </template>
+
+
+    <record id="view_assistant_alert_tree" model="ir.ui.view">
+        <field name="name">assistant.alert.tree</field>
+        <field name="model">assistant.alert</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0" default_order="pending_since">
+                <field name="type_id" />
+                <field name="message" />
+                <field name="state" />
+                <field name="pending_since" string="Pendiente desde" />
+                <field name="first_seen" optional="hide" />
+                <field name="snooze_until" optional="hide" />
+                <button name="action_open" type="object" string="Abrir" icon="fa-external-link" />
+                <button
+          name="action_snooze_day"
+          type="object"
+          string="Posponer 1 día"
+          invisible="state not in ('new', 'open')"
+        />
+                <button
+          name="action_snooze_week"
+          type="object"
+          string="Posponer 1 semana"
+          invisible="state not in ('new', 'open')"
+        />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_assistant_alert_form" model="ir.ui.view">
+        <field name="name">assistant.alert.form</field>
+        <field name="model">assistant.alert</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <header>
+                    <button name="action_open" type="object" string="Abrir" class="btn-primary" />
+                    <button
+            name="action_snooze_day"
+            type="object"
+            string="Posponer 1 día"
+            invisible="state not in ('new', 'open')"
+          />
+                    <button
+            name="action_snooze_week"
+            type="object"
+            string="Posponer 1 semana"
+            invisible="state not in ('new', 'open')"
+          />
+                    <field name="state" widget="statusbar" statusbar_visible="new,open,snoozed,resolved" />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="type_id" />
+                        <field name="message" />
+                        <field name="pending_since" string="Pendiente desde" />
+                        <field name="first_seen" />
+                        <field name="last_seen" />
+                        <field name="snooze_until" />
+                        <field name="resolved_date" />
+                        <field name="responsible_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_assistant_alert_search" model="ir.ui.view">
+        <field name="name">assistant.alert.search</field>
+        <field name="model">assistant.alert</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="message" />
+                <field name="type_id" />
+                <filter name="pending" string="Pendientes" domain="[('state', 'in', ('new', 'open'))]" />
+                <filter name="snoozed" string="Pospuestos" domain="[('state', '=', 'snoozed')]" />
+                <filter name="resolved" string="Resueltos" domain="[('state', '=', 'resolved')]" />
+                <filter name="group_type" string="Tipo" context="{'group_by': 'type_id'}" />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_my_alerts" model="ir.actions.act_window">
+        <field name="name">Mis avisos</field>
+        <field name="res_model">assistant.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{'search_default_pending': 1, 'search_default_group_type': 1}</field>
+    </record>
+
+    <!-- El menú y el enlace del chat pasan por aquí: comprueba los avisos
+         abiertos en el momento antes de abrir la lista. -->
+    <record id="action_my_alerts_checked" model="ir.actions.server">
+        <field name="name">Mis avisos</field>
+        <field name="model_id" ref="model_assistant_alert" />
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_my_alerts()</field>
+    </record>
+
+    <record id="view_assistant_alert_type_tree" model="ir.ui.view">
+        <field name="name">assistant.alert.type.tree</field>
+        <field name="model">assistant.alert.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="code" />
+                <field name="threshold_days" />
+                <field name="notify_responsible" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_assistant_alert_type_form" model="ir.ui.view">
+        <field name="name">assistant.alert.type.form</field>
+        <field name="model">assistant.alert.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="hint" />
+                        <field name="code" readonly="1" />
+                        <field name="collector" readonly="1" />
+                        <field name="sequence" />
+                        <field name="active" />
+                        <field name="threshold_days" />
+                        <field name="since_date" />
+                        <field name="notify_responsible" />
+                        <field name="role_ids" widget="many2many_tags" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_alert_types" model="ir.actions.act_window">
+        <field name="name">Tipos de aviso</field>
+        <field name="res_model">assistant.alert.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="groups_id" eval="[(4, ref('base.group_system'))]" />
+    </record>
+
+    <record id="res_config_settings_view_form_assistant_app" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.assistant.app</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="IncoBot" string="IncoBot" name="incoespacio_assistant" groups="base.group_system">
+                    <block title="IncoBot" name="assistant_general" />
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_form_simple_modif_assistant" model="ir.ui.view">
+        <field name="name">res.users.preferences.assistant</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='preference_contact']" position="inside">
+                <field name="assistant_muted_type_ids" widget="many2many_tags" options="{'no_create': True}" />
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- App IncoBot: todo lo del asistente en un sitio (Mis avisos para todos,
+         Configuración solo para administradores). -->
+    <record id="action_incobot_settings" model="ir.actions.act_window">
+        <field name="name">Ajustes</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'incoespacio_assistant', 'bin_size': False}</field>
+    </record>
+
+    <menuitem
+    id="menu_incobot_root"
+    name="IncoBot"
+    web_icon="incoespacio_assistant,static/description/icon.png"
+    groups="base.group_user"
+    sequence="45"
+  />
+    <menuitem
+    id="menu_my_alerts"
+    name="Mis avisos"
+    parent="menu_incobot_root"
+    action="action_my_alerts_checked"
+    sequence="10"
+  />
+    <menuitem
+    id="menu_incobot_config"
+    name="Configuración"
+    parent="menu_incobot_root"
+    groups="base.group_system"
+    sequence="90"
+  />
+    <menuitem
+    id="menu_alert_types"
+    name="Tipos de aviso"
+    parent="menu_incobot_config"
+    action="action_alert_types"
+    groups="base.group_system"
+    sequence="10"
+  />
+    <menuitem
+    id="menu_incobot_settings"
+    name="Ajustes"
+    parent="menu_incobot_config"
+    action="action_incobot_settings"
+    groups="base.group_system"
+    sequence="90"
+  />
+</odoo>

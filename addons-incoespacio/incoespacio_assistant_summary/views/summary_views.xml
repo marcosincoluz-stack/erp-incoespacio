@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="message_summary">
+        <p><b><t t-out="title" /></b></p>
+        <table>
+            <tr>
+                <th>Aviso</th>
+                <th>Abiertos</th>
+                <th>Nuevos hoy</th>
+                <th>Más de 7 días</th>
+            </tr>
+            <tr t-foreach="rows" t-as="row">
+                <td><t t-out="row['name']" /></td>
+                <td><t t-out="row['open']" /></td>
+                <td><t t-out="row['fresh']" /></td>
+                <td><t t-out="row['old']" /></td>
+            </tr>
+        </table>
+        <p><b>Lo más atascado</b></p>
+        <ul>
+            <li t-if="not stuck">Nada abierto.</li>
+            <li t-foreach="stuck" t-as="line" t-attf-class="o_incobot_alert_#{line['alert_id']}">
+                <a
+          t-att-href="line['href']"
+          t-att-data-oe-model="line['model']"
+          t-att-data-oe-id="line['id']"
+          class="o_incobot_link"
+        ><t t-out="line['label']" /></a><t t-out="line['rest']" />
+                <br /><t t-out="line['what']" />, <t t-out="line['days']" /> días.
+                Le toca a: <t t-out="line['who']" />.
+            </li>
+        </ul>
+        <p>
+            Resueltos desde el último resumen: <t t-out="solved" />.
+            <a t-att-href="url">Ver todos los avisos</a>
+        </p>
+        <t t-if="week">
+            <p><b>Semana</b></p>
+            <ul>
+                <li t-foreach="week" t-as="row">
+                    <t t-out="row['name']" />: <t t-out="row['now']" /> abiertos
+                    (lunes pasado <t t-out="row['then']" />),
+                    <t t-out="row['solved']" /> resueltos, media
+                    <t t-out="row['avg']" /> días
+                </li>
+            </ul>
+        </t>
+    </template>
+
+    <record id="action_all_alerts" model="ir.actions.act_window">
+        <field name="name">Avisos</field>
+        <field name="res_model">assistant.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_pending': 1, 'search_default_group_type': 1}</field>
+    </record>
+
+    <record id="action_all_alerts_checked" model="ir.actions.server">
+        <field name="name">Avisos</field>
+        <field name="model_id" ref="incoespacio_assistant.model_assistant_alert" />
+        <field name="state">code</field>
+        <field name="code">action = model._open_checked("incoespacio_assistant_summary.action_all_alerts", [])</field>
+    </record>
+
+    <record id="res_config_settings_view_form_assistant" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.assistant</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="incoespacio_assistant.res_config_settings_view_form_assistant_app" />
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='incoespacio_assistant']" position="inside">
+                    <block title="Resumen de Dirección" name="assistant_summary">
+                        <setting
+            string="Roles que reciben el resumen"
+            help="Un mensaje los lunes con los asuntos abiertos y la semana, no con las personas."
+          >
+                            <field name="summary_role_ids" widget="many2many_tags" />
+                        </setting>
+                    </block>
+            </xpath>
+        </field>
+    </record>
+    <menuitem
+    id="menu_all_alerts"
+    name="Todos los avisos"
+    parent="incoespacio_assistant.menu_incobot_root"
+    action="action_all_alerts_checked"
+    groups="base.group_system"
+    sequence="20"
+  />
+</odoo>

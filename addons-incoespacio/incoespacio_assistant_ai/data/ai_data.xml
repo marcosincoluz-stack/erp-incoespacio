@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Se lanza al llegar cada pregunta (_trigger); la hora es solo de repaso. -->
+    <record id="ir_cron_assistant_ai" model="ir.cron">
+        <field name="name">Asistente: contestar preguntas</field>
+        <field name="model_id" ref="model_assistant_ai_question" />
+        <field name="state">code</field>
+        <field name="code">model._cron_answer()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True" />
+    </record>
+</odoo>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_assistant_ai_question_tree" model="ir.ui.view">
+        <field name="name">assistant.ai.question.tree</field>
+        <field name="model">assistant.ai.question</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0">
+                <field name="create_date" string="Fecha" />
+                <field name="user_id" />
+                <field name="text" />
+                <field name="state" />
+                <field name="tokens_in" optional="hide" />
+                <field name="tokens_out" optional="hide" />
+                <field name="cost" sum="Total" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_assistant_ai_question_form" model="ir.ui.view">
+        <field name="name">assistant.ai.question.form</field>
+        <field name="model">assistant.ai.question</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <sheet>
+                    <group>
+                        <field name="create_date" string="Fecha" />
+                        <field name="user_id" />
+                        <field name="state" />
+                        <field name="cost" />
+                        <field name="tokens_in" />
+                        <field name="tokens_out" />
+                        <field name="error" invisible="not error" />
+                    </group>
+                    <group string="Pregunta">
+                        <field name="text" nolabel="1" colspan="2" />
+                    </group>
+                    <group string="Respuesta">
+                        <field name="answer" nolabel="1" colspan="2" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_assistant_ai_questions" model="ir.actions.act_window">
+        <field name="name">Preguntas a la IA</field>
+        <field name="res_model">assistant.ai.question</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+    id="menu_assistant_ai_questions"
+    name="Preguntas a la IA"
+    parent="incoespacio_assistant.menu_incobot_config"
+    action="action_assistant_ai_questions"
+    groups="base.group_system"
+    sequence="20"
+  />
+
+    <record id="res_config_settings_view_form_assistant_ai" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.assistant.ai</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="incoespacio_assistant.res_config_settings_view_form_assistant_app" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='assistant_general']" position="inside">
+                <setting
+          string="IncoBot activo"
+          help="Apagado, IncoBot no manda avisos, no contesta en el chat y no tacha nada. Los avisos guardados y la configuración se quedan como están."
+        >
+                    <field name="assistant_enabled" />
+                </setting>
+            </xpath>
+            <xpath expr="//app[@name='incoespacio_assistant']" position="inside">
+                <block title="Preguntas a la IA" name="assistant_ai">
+                    <setting
+            string="Preguntas a la IA"
+            help="Deja que cada usuario pregunte a IncoBot en su chat. Apagado, el chat solo envía avisos."
+          >
+                        <field name="assistant_ai_enabled" />
+                        <div class="content-group mt8" name="assistant_ai_links">
+                            <!-- Un enlace por línea, sin sangría (como «Gestionar usuarios»). -->
+                            <button
+                name="%(action_assistant_ai_questions)d"
+                type="action"
+                string="Preguntas a la IA"
+                icon="oi-arrow-right"
+                class="btn-link ps-0 d-block"
+              />
+                        </div>
+                    </setting>
+                    <setting
+            string="Modelo y gasto"
+            help="El precio va con el modelo. Al llegar al gasto máximo, IncoBot no llama a la IA y lo dice; los avisos y el OCR siguen igual."
+          >
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label for="assistant_ai_model" class="col-lg-5" />
+                                <field name="assistant_ai_model" class="col-lg-7" />
+                            </div>
+                            <div class="row">
+                                <label for="assistant_ai_monthly_budget" class="col-lg-5" />
+                                <field name="assistant_ai_monthly_budget" class="col-lg-7" />
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
